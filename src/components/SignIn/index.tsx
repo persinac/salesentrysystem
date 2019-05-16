@@ -1,14 +1,16 @@
 import * as React from "react";
+import { withRouter } from "react-router-dom";
+// import { PasswordForgetLink } from "../PasswordForget";
+import { SignUpLink } from "../SignUp";
+import { SignInForm } from "./SignInForm";
 
-export default class SignIn extends React.Component {
+const SignInComponent = ({ history }: { [key: string]: any }) => (
+    <div>
+        <h1>SignIn</h1>
+        <SignInForm history={history} />
+        <SignUpLink />
+        {/*<PasswordForgetLink />*/}
+    </div>
+);
 
-    render() {
-        return (
-            <div>
-                <div>
-                    <h1>Sign In</h1>
-                </div>
-            </div>
-        )
-    }
-}
+export const SignIn = withRouter(SignInComponent);

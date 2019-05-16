@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import * as firebase from "../Firebase/firebase";
 import Navigation from '../Navigation/Navigation';
 import LandingPage from '../Landing';
-import SignUpPage from '../SignUp/SignUp';
-import SignInPage from '../SignIn';
+import { SignUp } from '../SignUp';
+import { SignIn } from '../SignIn';
 import PasswordForgetPage from '../PasswordForget';
 import HomePage from '../Home';
 import AccountPage from '../Account';
@@ -39,8 +39,8 @@ export default class App extends React.Component {
                         <Navigation />
                         <hr />
                         <Route exact path={ROUTES.LANDING} component={LandingPage} />
-                        <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
-                        <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+                        <Route path={ROUTES.SIGN_UP} component={SignUp} />
+                        <Route path={ROUTES.SIGN_IN} component={SignIn} />
                         <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
                         <Route path={ROUTES.HOME} component={HomePage} />
                         <Route path={ROUTES.ACCOUNT} component={AccountPage} />

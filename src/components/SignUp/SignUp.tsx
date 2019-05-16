@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import {ChangeEvent, FormEvent} from "react";
 import { auth } from "../Firebase/firebase";
-import { db } from "../Firebase/index";
 
 interface ISignUpProps {
     email?: string;
@@ -20,7 +19,7 @@ interface IFormState {
     email: string,
     passwordOne: string,
     passwordTwo: string,
-    error: IError | null
+    error?: IError | null
 };
 
 interface IError {
@@ -35,22 +34,6 @@ const INITIAL_STATE = {
     error: null,
 };
 
-export default class SignUp extends React.Component {
-
-    render() {
-        return (
-            <div>
-                <div>
-                    <h1>Sign Up</h1>
-                </div>
-                <div>
-                    <SignUpForm  />
-                </div>
-            </div>
-        )
-    }
-}
-
 export class SignUpForm extends React.Component<ISignUpProps, Partial<IFormState>> {
     constructor(props: ISignUpProps) {
         super(props);
@@ -62,19 +45,27 @@ export class SignUpForm extends React.Component<ISignUpProps, Partial<IFormState
         const { email, passwordOne, username } = this.state;
         const { history } = this.props;
         if(email && passwordOne && username) {
-            auth
-                .createUserWithEmailAndPassword(email, passwordOne)
+            auth.createUserWithEmailAndPassword(email, passwordOne)
                 .then((authUser: any) => {
-
+                    console.log(authUser);
+                    // console.log(this.props);
+                    history.push(ROUTES.HOME);
+                    // console.log(this.props);
+                    console.log(this.state);
+                    this.setState({...INITIAL_STATE});
+                    console.log(this.state);
                     // Create a user in your own accessible Firebase Database too
-                    db.doCreateUser(authUser.user.uid, username, email)
+                    /*db.doCreateUser(authUser.user.uid, username, email)
                         .then(() => {
+                            console.log('1');
                             this.setState(() => ({...INITIAL_STATE}));
+                            console.log('2');
                             history.push(ROUTES.HOME);
+                            console.log('3');
                         })
                         .catch((error: any) => {
                             this.setState(error);
-                        });
+                        });*/
                 })
                 .catch((error: any) => {
                     this.setState(error);

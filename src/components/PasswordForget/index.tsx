@@ -1,14 +1,16 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
+import { PasswordForgetForm } from "./PasswordForgetForm";
 
-export default class PasswordForget extends React.Component {
+export const PasswordForget = () => (
+    <div>
+        <h1>PasswordForget</h1>
+        <PasswordForgetForm />
+    </div>
+);
 
-    render() {
-        return (
-            <div>
-                <div>
-                    <h1>Forgot my password</h1>
-                </div>
-            </div>
-        )
-    }
-}
+export const PasswordForgetLink = () => (
+    <p>
+        <Link to="/pw-forget">Forgot Password?</Link>
+    </p>
+);
