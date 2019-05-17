@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as firebase from "./firebase";
+import { firebase } from "./index";
 import { AuthUserContext } from "./AuthUserContext";
 
 interface InterfaceProps {

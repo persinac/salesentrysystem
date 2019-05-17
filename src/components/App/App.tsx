@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import * as firebase from "../Firebase/firebase";
+import * as firebase from "../../Firebase/firebase";
 import Navigation from '../Navigation/Navigation';
 import LandingPage from '../Landing';
 import { SignUp } from '../SignUp';
 import { SignIn } from '../SignIn';
-import PasswordForgetPage from '../PasswordForget';
+import { PasswordForget }from '../PasswordForget';
 import HomePage from '../Home';
 import AccountPage from '../Account';
 import AdminPage from '../Admin';
@@ -41,7 +41,7 @@ export default class App extends React.Component {
                         <Route exact path={ROUTES.LANDING} component={LandingPage} />
                         <Route path={ROUTES.SIGN_UP} component={SignUp} />
                         <Route path={ROUTES.SIGN_IN} component={SignIn} />
-                        <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
+                        <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
                         <Route path={ROUTES.HOME} component={HomePage} />
                         <Route path={ROUTES.ACCOUNT} component={AccountPage} />
                         <Route path={ROUTES.ADMIN} component={AdminPage} />

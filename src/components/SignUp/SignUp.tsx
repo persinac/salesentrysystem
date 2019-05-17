@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import * as ROUTES from '../../constants/routes';
 import {ChangeEvent, FormEvent} from "react";
-import { auth } from "../Firebase/firebase";
+import { auth } from "../../Firebase";
 
 interface ISignUpProps {
     email?: string;
@@ -45,7 +45,7 @@ export class SignUpForm extends React.Component<ISignUpProps, Partial<IFormState
         const { email, passwordOne, username } = this.state;
         const { history } = this.props;
         if(email && passwordOne && username) {
-            auth.createUserWithEmailAndPassword(email, passwordOne)
+            auth.doCreateUserWithEmailAndPassword(email, passwordOne)
                 .then((authUser: any) => {
                     console.log(authUser);
                     // console.log(this.props);

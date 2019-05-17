@@ -1,5 +1,4 @@
-import { auth } from "./firebase";
-
+import { auth, googleProvider } from "./firebase";
 // Sign Up
 export const doCreateUserWithEmailAndPassword = (
     email: string,
@@ -24,3 +23,8 @@ export const doPasswordUpdate = async (password: string) => {
     }
     throw Error("No auth.currentUser!");
 };
+
+
+// Google Auth
+export const doSignInWithGoogle = () =>
+    auth.signInWithPopup(googleProvider)

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { auth } from "../Firebase/firebase";
+import { auth } from "../../Firebase";
 
 export class PasswordForgetForm extends React.Component {
     private static INITIAL_STATE = {
