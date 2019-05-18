@@ -10,10 +10,7 @@ interface InterfaceState {
   error: any;
 }
 
-export class GoogleSignIn extends React.Component<
-  InterfaceProps,
-  InterfaceState
-  > {
+export class GoogleSignIn extends React.Component<InterfaceProps, InterfaceState> {
   private static INITIAL_STATE = {
     error: ""
   };

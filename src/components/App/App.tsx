@@ -6,19 +6,18 @@ import LandingPage from '../Landing';
 import { SignUp } from '../SignUp';
 import { SignIn } from '../SignIn';
 import { PasswordForget }from '../PasswordForget';
-import HomePage from '../Home';
-import AccountPage from '../Account';
+import { Home } from '../Home';
+import { Account } from '../Account';
 import AdminPage from '../Admin';
+import { IAppState } from '../../State'
 
 import * as ROUTES from '../../constants/routes';
+import {withAuthentication} from "../../Firebase/withAuthentication";
 
-export default class App extends React.Component {
+class AppComponent extends React.Component<any, IAppState> {
     constructor(props: any) {
         super(props);
-
-        this.state = {
-            authUser: null
-        };
+        this.state = { authUser: null };
     }
 
     public componentDidMount() {
@@ -42,8 +41,8 @@ export default class App extends React.Component {
                         <Route path={ROUTES.SIGN_UP} component={SignUp} />
                         <Route path={ROUTES.SIGN_IN} component={SignIn} />
                         <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
-                        <Route path={ROUTES.HOME} component={HomePage} />
-                        <Route path={ROUTES.ACCOUNT} component={AccountPage} />
+                        <Route path={ROUTES.HOME} component={Home} />
+                        <Route path={ROUTES.ACCOUNT} component={Account} />
                         <Route path={ROUTES.ADMIN} component={AdminPage} />
                     </div>
                 </Router>
@@ -51,3 +50,5 @@ export default class App extends React.Component {
         );
     }
 }
+
+export const App = withAuthentication(AppComponent);

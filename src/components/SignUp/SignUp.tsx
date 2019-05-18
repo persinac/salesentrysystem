@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import * as ROUTES from '../../constants/routes';
 import {ChangeEvent, FormEvent} from "react";
-import { auth } from "../../Firebase";
+import { auth, db } from "../../Firebase";
 
 interface ISignUpProps {
     email?: string;
@@ -41,31 +41,21 @@ export class SignUpForm extends React.Component<ISignUpProps, Partial<IFormState
     }
 
     private onSubmit = (event: FormEvent<HTMLFormElement>) => {
-        console.log(event);
         const { email, passwordOne, username } = this.state;
         const { history } = this.props;
         if(email && passwordOne && username) {
             auth.doCreateUserWithEmailAndPassword(email, passwordOne)
                 .then((authUser: any) => {
-                    console.log(authUser);
-                    // console.log(this.props);
-                    history.push(ROUTES.HOME);
-                    // console.log(this.props);
-                    console.log(this.state);
                     this.setState({...INITIAL_STATE});
-                    console.log(this.state);
                     // Create a user in your own accessible Firebase Database too
-                    /*db.doCreateUser(authUser.user.uid, username, email)
+                    db.doCreateUser(authUser.user.uid, username, email)
                         .then(() => {
-                            console.log('1');
                             this.setState(() => ({...INITIAL_STATE}));
-                            console.log('2');
                             history.push(ROUTES.HOME);
-                            console.log('3');
                         })
                         .catch((error: any) => {
                             this.setState(error);
-                        });*/
+                        });
                 })
                 .catch((error: any) => {
                     this.setState(error);

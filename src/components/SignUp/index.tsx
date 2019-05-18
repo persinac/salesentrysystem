@@ -3,10 +3,10 @@ import { Link, withRouter } from "react-router-dom";
 import * as routes from "../../constants/routes";
 import { SignUpForm } from "./SignUp";
 
-const SignUpComponent = () => (
+const SignUpComponent = ({ history }: { [key: string]: any }) => (
     <div>
         <h1>Sign Up</h1>
-        <SignUpForm />
+        <SignUpForm history={history}/>
     </div>
 );
 

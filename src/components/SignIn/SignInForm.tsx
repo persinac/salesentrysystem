@@ -15,10 +15,7 @@ interface InterfaceState {
     password: string;
 }
 
-export class SignInForm extends React.Component<
-    InterfaceProps,
-    InterfaceState
-    > {
+export class SignInForm extends React.Component<InterfaceProps, InterfaceState> {
     private static INITIAL_STATE = {
         email: "",
         error: null,

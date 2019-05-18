@@ -9,7 +9,7 @@ const SignInComponent = ({ history }: { [key: string]: any }) => (
     <div>
         <h1>SignIn</h1>
         <SignInForm history={history} />
-        <GoogleSignIn />
+        <GoogleSignIn history={history} />
         <SignUpLink />
         <PasswordForgetLink />
     </div>

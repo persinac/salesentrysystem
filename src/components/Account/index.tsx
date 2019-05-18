@@ -1,14 +1,21 @@
 import * as React from "react";
+import { AuthUserContext } from "../../Firebase/AuthUserContext";
+import { withAuthorization } from "../../Firebase/withAuthorization";
+import { PasswordForgetForm } from "../PasswordForget/PasswordForgetForm";
+import { PasswordChangeForm } from "./PasswordChangeForm";
 
-export default class Account extends React.Component {
+export const AccountComponent = () => (
+  <AuthUserContext.Consumer>
+    {authUser => (
+      <div>
+        <h1>Account: {(authUser as any).email}</h1>
+        <PasswordForgetForm />
+        <PasswordChangeForm />
+      </div>
+    )}
+  </AuthUserContext.Consumer>
+);
 
-    render() {
-        return (
-            <div>
-                <div>
-                    <h1>Account</h1>
-                </div>
-            </div>
-        )
-    }
-}
+const authCondition = (authUser: any) => !!authUser;
+
+export const Account = withAuthorization(authCondition)(AccountComponent);
