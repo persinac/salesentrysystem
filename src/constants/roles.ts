@@ -1,1 +1,3 @@
-export const ADMIN = 'ADMIN';
+// These values correspond to the keys stored in the database
+export const ADMIN = 'isAdmin';
+export const SALES = 'isSales';
