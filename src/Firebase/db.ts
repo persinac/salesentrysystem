@@ -1,11 +1,14 @@
 import { db } from "./firebase";
+import { Roles } from "../State";
 
 // User API
-export const doCreateUser = (id: string, username: string, email: string) =>
-    db.ref(`users/${id}`).set({
-        email,
-        username
-    });
+export const doCreateUser = (id: string, username: string, email: string, roles: Roles): Promise<any> => {
+  return db.ref(`users/${id}`).set({
+    email,
+    username,
+    roles
+  })
+};
 
 export const getUsers = () => db.ref("users").once("value");
-export const getUserById = (uid: string) => db.ref(`users/#{uid}`).once("value");
+export const getUserById = (uid: string) => db.ref(`users/${uid}`).once("value");

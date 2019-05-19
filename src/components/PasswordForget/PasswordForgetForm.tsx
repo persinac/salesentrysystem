@@ -4,7 +4,7 @@ import { auth } from "../../Firebase";
 export class PasswordForgetForm extends React.Component {
     private static INITIAL_STATE = {
         email: "",
-        error: null
+        error: {}
     };
 
     private static propKey(propertyName: string, value: string) {

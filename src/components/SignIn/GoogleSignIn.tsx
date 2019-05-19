@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as routes from "../../constants/routes";
 import { auth } from "../../Firebase";
+import {Roles} from "../../State";
 
 interface InterfaceProps {
   history?: any;
@@ -8,11 +9,16 @@ interface InterfaceProps {
 
 interface InterfaceState {
   error: any;
+  roles: Roles;
 }
 
 export class GoogleSignIn extends React.Component<InterfaceProps, InterfaceState> {
   private static INITIAL_STATE = {
-    error: ""
+    error: "",
+    roles: {
+      isAdmin: true,
+      isSales: true
+    }
   };
 
   private static propKey(propertyName: string, value: any): object {

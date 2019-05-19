@@ -1,1 +1,1 @@
-export const LANDING_ROLE = '/';
+export const ADMIN = 'ADMIN';

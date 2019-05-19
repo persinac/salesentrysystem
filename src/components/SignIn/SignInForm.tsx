@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as routes from "../../constants/routes";
 import { auth } from "../../Firebase";
+import {Roles} from "../../State";
 
 interface InterfaceProps {
     email?: string;
@@ -13,13 +14,18 @@ interface InterfaceState {
     email: string;
     error: any;
     password: string;
+    roles: Roles;
 }
 
 export class SignInForm extends React.Component<InterfaceProps, InterfaceState> {
     private static INITIAL_STATE = {
         email: "",
-        error: null,
-        password: ""
+        error: {},
+        password: "",
+        roles: {
+            isAdmin: true,
+            isSales: true
+        }
     };
 
     private static propKey(propertyName: string, value: any): object {

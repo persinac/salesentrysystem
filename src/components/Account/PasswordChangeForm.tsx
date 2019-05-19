@@ -19,7 +19,7 @@ export class PasswordChangeForm extends React.Component<
   InterfaceState
   > {
   private static INITIAL_STATE = {
-    error: null,
+    error: {},
     passwordOne: "",
     passwordTwo: ""
   };

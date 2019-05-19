@@ -16,12 +16,12 @@ export default class Navigation extends React.Component {
     render () {
         return (
           <AuthUserContext.Consumer>
-              {authUser => (authUser ? this.returnAuthorizedLogin() : this.returnNonAuthorizedLogin())}
+              {authUser => (authUser ? this.returnAuthorizedLogin(authUser) : this.returnNonAuthorizedLogin(authUser))}
           </AuthUserContext.Consumer>
         );
     }
 
-    private returnNonAuthorizedLogin() {
+    private returnNonAuthorizedLogin(authUser: any) {
         console.log('Non Auth user');
         return (
           <div>
@@ -37,8 +37,9 @@ export default class Navigation extends React.Component {
         )
     }
 
-    private returnAuthorizedLogin() {
+    private returnAuthorizedLogin(authUser: any) {
         console.log('Auth user');
+        console.log(authUser);
         return (
           <div>
               <ul>

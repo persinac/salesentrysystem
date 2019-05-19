@@ -8,7 +8,7 @@ import { SignIn } from '../SignIn';
 import { PasswordForget }from '../PasswordForget';
 import { Home } from '../Home';
 import { Account } from '../Account';
-import AdminPage from '../Admin';
+import { AdminPage } from '../Admin';
 import { IAppState } from '../../State'
 
 import * as ROUTES from '../../constants/routes';

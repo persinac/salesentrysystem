@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import {ChangeEvent, FormEvent} from "react";
 import { auth, db } from "../../Firebase";
+import { Roles } from "../../State";
 
 interface ISignUpProps {
     email?: string;
@@ -19,7 +20,8 @@ interface IFormState {
     email: string,
     passwordOne: string,
     passwordTwo: string,
-    error?: IError | null
+    error?: IError | null,
+  roles: Roles
 };
 
 interface IError {
@@ -27,11 +29,17 @@ interface IError {
 }
 
 const INITIAL_STATE = {
-    username: '',
-    email: '',
-    passwordOne: '',
-    passwordTwo: '',
-    error: null,
+  username: '',
+  email: '',
+  passwordOne: '',
+  passwordTwo: '',
+  error: {
+    message: ""
+  },
+  roles: {
+    isAdmin: true,
+    isSales: true
+  }
 };
 
 export class SignUpForm extends React.Component<ISignUpProps, Partial<IFormState>> {
@@ -41,14 +49,14 @@ export class SignUpForm extends React.Component<ISignUpProps, Partial<IFormState
     }
 
     private onSubmit = (event: FormEvent<HTMLFormElement>) => {
-        const { email, passwordOne, username } = this.state;
+        const { email, passwordOne, username, roles } = this.state;
         const { history } = this.props;
         if(email && passwordOne && username) {
             auth.doCreateUserWithEmailAndPassword(email, passwordOne)
                 .then((authUser: any) => {
                     this.setState({...INITIAL_STATE});
                     // Create a user in your own accessible Firebase Database too
-                    db.doCreateUser(authUser.user.uid, username, email)
+                    db.doCreateUser(authUser.user.uid, username, email, roles)
                         .then(() => {
                             this.setState(() => ({...INITIAL_STATE}));
                             history.push(ROUTES.HOME);
