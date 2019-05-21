@@ -14,7 +14,7 @@
     "react-router-dom": "^5.0.0",
     "react-scripts": "3.0.1",
     "ts-lint": "^4.5.1",
-    "typescript": "^3.4.5"
+    "typescript": "next"
   },
   "scripts": {
     "start": "react-scripts start",
