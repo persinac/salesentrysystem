@@ -34,8 +34,10 @@ class AdminComponent extends React.Component {
   }
 
   getWRFServerData = (builtURI: string): Promise<any> => {
+    console.log('get wrf server data');
     return rp(builtURI)
       .then(function(d: any) {
+        console.log(d);
         return d;
       })
       .catch(function(e: any) {
