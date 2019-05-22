@@ -27,7 +27,6 @@ class AdminComponent extends React.Component {
     );
 
     this.getWRFServerData(baseURL).then( d => {
-        console.log(d);
         this.setState({data: JSON.parse(d)})
       }
     );
