@@ -25,7 +25,7 @@ export class Admin extends React.Component<InterfaceProps, {}> {
         <p></p>
         <div>
           <ul>
-            {Object.keys(some_data).map(key => {
+            {!!some_data && Object.keys(some_data).map(key => {
               return <li key={key}>{some_data[key].order_num}</li>;
             })}
           </ul>
