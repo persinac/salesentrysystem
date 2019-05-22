@@ -19,7 +19,8 @@
     "noEmit": true,
     "jsx": "preserve",
     "noImplicitAny": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "noImplicitThis": false
   },
   "include": [
     "src"
