@@ -6,7 +6,7 @@ import * as ROLES from '../../constants/roles'
 import * as routes from "../../constants/routes";
 const rp = require('request-promise');
 
-const baseURL = 'http://localhost:8080';
+const baseURL = 'https://wrf-center.com/api';
 let options = {
   method: 'GET',
   json: true // Automatically parses the JSON string in the response
@@ -34,10 +34,8 @@ class AdminComponent extends React.Component {
   }
 
   getWRFServerData = (builtURI: string): Promise<any> => {
-    console.log('get wrf server data');
     return rp(builtURI)
       .then(function(d: any) {
-        console.log(d);
         return d;
       })
       .catch(function(e: any) {
