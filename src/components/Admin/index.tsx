@@ -4,6 +4,13 @@ import { withAuthorization } from "../../Firebase/withAuthorization";
 import {Admin} from "./Admin";
 import * as ROLES from '../../constants/roles'
 import * as routes from "../../constants/routes";
+const rp = require('request-promise');
+
+const baseURL = 'https://wrf-center.com/api';
+let options = {
+  method: 'GET',
+  json: true // Automatically parses the JSON string in the response
+};
 
 class AdminComponent extends React.Component {
   constructor(props: any) {
@@ -18,16 +25,35 @@ class AdminComponent extends React.Component {
     db.getUsers().then(snapshot =>
       this.setState(() => ({ users: snapshot.val() }))
     );
+
+    this.getWRFServerData(baseURL).then( d => {
+        this.setState({data: JSON.parse(d)})
+      }
+    );
+  }
+
+  getWRFServerData = (builtURI: string): Promise<any> => {
+    return rp(builtURI)
+      .then(function(d: any) {
+        return d;
+      })
+      .catch(function(e: any) {
+        console.log('ERROR!!!!');
+        console.log(e);
+      });
   }
 
   public render() {
-    const { users }: any = this.state;
+    const { users, data }: any = this.state;
     return (
       <div>
         <h2>Admin</h2>
         <p>The admin page is only accessible by admins.</p>
 
-        {!!users && <Admin users={users} />}
+        {!!users && <Admin
+          users={users}
+          some_data={data}
+        />}
       </div>
     );
   }
