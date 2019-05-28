@@ -1,18 +1,10 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
-import { PasswordForgetLink } from "../PasswordForget";
-import { SignUpLink } from "../SignUp";
-import { SignInForm } from "./SignInForm";
-import { GoogleSignIn } from "./GoogleSignIn";
+import './sign_style/signin.css';
+import {Wrapper} from "./wrapper";
 
 const SignInComponent = ({ history }: { [key: string]: any }) => (
-    <div>
-        <h1>SignIn</h1>
-        <SignInForm history={history} />
-        <GoogleSignIn history={history} />
-        <SignUpLink />
-        <PasswordForgetLink />
-    </div>
+	<Wrapper history={history}/>
 );
 
 export const SignIn = withRouter(SignInComponent);

@@ -4,16 +4,16 @@ import * as routes from "../../constants/routes";
 import { SignUpForm } from "./SignUp";
 
 const SignUpComponent = ({ history }: { [key: string]: any }) => (
-    <div>
-        <h1>Sign Up</h1>
-        <SignUpForm history={history}/>
-    </div>
+	<div>
+		<h1>Sign Up</h1>
+		<SignUpForm history={history}/>
+	</div>
 );
 
 export const SignUpLink = () => (
-    <p>
-        Don't have an account? <Link to={routes.SIGN_UP}>Sign Up</Link>
-    </p>
+	<div className="d-flex justify-content-center links">
+		Don't have an account? <Link to={routes.SIGN_UP}>Sign Up</Link>
+	</div>
 );
 
 export const SignUp = withRouter(SignUpComponent);

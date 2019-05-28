@@ -9,7 +9,7 @@ interface INavState {
 }
 
 interface INavProps {
-    authUser: any
+    history: any
 }
 
 export default class Navigation extends React.Component {
@@ -22,27 +22,13 @@ export default class Navigation extends React.Component {
     }
 
     private returnNonAuthorizedLogin() {
-        return (
-          <div>
-            <ul>
-              <li>
-                <Link to={ROUTES.SIGN_IN}>Sign In</Link>
-              </li>
-              <li>
-                <Link to={ROUTES.LANDING}>Landing</Link>
-              </li>
-            </ul>
-          </div>
-        )
+        return (<div></div>)
     }
 
     private returnAuthorizedLogin() {
         return (
           <div>
               <ul>
-                  <li>
-                      <Link to={ROUTES.LANDING}>Landing</Link>
-                  </li>
                   <li>
                       <Link to={ROUTES.HOME}>Home</Link>
                   </li>
@@ -53,7 +39,7 @@ export default class Navigation extends React.Component {
                       <Link to={ROUTES.ADMIN}>Admin</Link>
                   </li>
                   <li>
-                      <SignOut/>
+                      <SignOut />
                   </li>
               </ul>
           </div>

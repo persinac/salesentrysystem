@@ -6,7 +6,7 @@ import * as ROLES from '../../constants/roles'
 import * as routes from "../../constants/routes";
 const rp = require('request-promise');
 
-const baseURL = 'https://wrf-center.com/api';
+const baseURL = 'https://wrf-center.com/api/product';
 let options = {
   method: 'GET',
   json: true // Automatically parses the JSON string in the response
@@ -79,7 +79,7 @@ const defaultRouteRedirect = (authUser: any) => {
     } else if(!!authUser.roles[ROLES.SALES]) {
       route = routes.ACCOUNT;
     } else {
-      route = routes.LANDING;
+      route = routes.SIGN_IN;
     }
   }
   return route;
