@@ -4,8 +4,8 @@ import {GoogleSignIn} from "./GoogleSignIn";
 import {SignUpLink} from "../SignUp";
 import {PasswordForgetLink} from "../PasswordForget";
 import {SignInForm} from "./SignInForm";
-import {SignOutComponent} from "../SignOut/SignOut";
 import {authUserContext} from "../../Firebase/AuthUserContext";
+import * as routes from "../../constants/routes";
 
 interface InterfaceProps {
 	history?: any;
@@ -19,30 +19,38 @@ interface InterfaceState {
 export class Wrapper extends React.Component<InterfaceProps, InterfaceState> {
 	constructor(props: InterfaceProps) {
 		super(props);
-
-		console.log(authUserContext.Consumer);
 		this.state = { renderChild: true };
-		this.handleChildUnmount = this.handleChildUnmount.bind(this);
-		this.handleChildMount = this.handleChildMount.bind(this);
 	}
-
-	handleChildUnmount(){
-		this.setState({ renderChild: false });
-	}
-
-	handleChildMount(){
-		this.setState({ renderChild: true });
-	}
-
-
 
 	public render() {
 		return (
 			<authUserContext.Consumer>
 				{authUser => {
-					return (authUser ? null: this.returnComponent())}}
+					console.log(this.props.history.location.pathname);
+					console.log(authUser);
+					if(this.props.history.location.pathname === '/pw-forget' || this.props.history.location.pathname === '/signup') {
+						return this.returnBackToSignIn();
+					} else if(!authUser) {
+						return this.returnComponent()
+					}
+					}
+				}
 			</authUserContext.Consumer>
 		);
+	}
+
+	public onSubmit = (event: any) => {
+		this.props.history.push(routes.SIGN_IN);
+	};
+
+	private returnBackToSignIn() {
+		return (
+			<form onSubmit={event => this.onSubmit(event)}>
+				<button type="submit" className="btn float-right login_btn">
+					Back to Sign In
+				</button>
+			</form>
+		)
 	}
 
 	private returnComponent() {
