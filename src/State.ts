@@ -1,8 +1,8 @@
 export interface IAppState {
-  authUser: any
+	authUser: any;
 }
 
 export interface Roles {
-  isAdmin: boolean,
-  isSales: boolean
+	isAdmin: boolean;
+	isSales: boolean;
 }

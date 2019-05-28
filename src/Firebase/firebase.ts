@@ -1,10 +1,10 @@
-import { config } from "./config"
-import * as firebase from "firebase";
-import "firebase/auth";
-import "firebase/database";
+import * as firebase from 'firebase';
+import 'firebase/auth';
+import 'firebase/database';
+import { config } from './config';
 
 if (!firebase.apps.length) {
-    firebase.initializeApp(config);
+	firebase.initializeApp(config);
 }
 
 export const auth = firebase.auth();
