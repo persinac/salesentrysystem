@@ -2,7 +2,7 @@ import * as React from "react";
 import { withRouter } from "react-router-dom";
 import * as routes from "../constants/routes";
 import { firebase, db } from "./index";
-import { AuthUserContext } from "./AuthUserContext";
+import { authUserContext } from "./AuthUserContext";
 import {ComponentType} from "react";
 import {Roles} from "../State";
 
@@ -47,9 +47,9 @@ export const withAuthorization = (condition: any, routeRedirect?: any) => (Compo
 
         public render() {
             return (
-                <AuthUserContext.Consumer>
+                <authUserContext.Consumer>
                     {authUser => (authUser ? <Component /> : null)}
-                </AuthUserContext.Consumer>
+                </authUserContext.Consumer>
             );
         }
     }

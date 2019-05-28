@@ -1,11 +1,11 @@
 import * as React from "react";
-import { AuthUserContext } from "../../Firebase/AuthUserContext";
+import { authUserContext } from "../../Firebase/AuthUserContext";
 import { withAuthorization } from "../../Firebase/withAuthorization";
 import { PasswordForgetForm } from "../PasswordForget/PasswordForgetForm";
 import { PasswordChangeForm } from "./PasswordChangeForm";
 
 export const AccountComponent = () => (
-  <AuthUserContext.Consumer>
+  <authUserContext.Consumer>
     {authUser => {  console.log("ACCOUNT COMP"); console.log(authUser); return(
       <div>
         <h1>Account: {(authUser as any).email}</h1>
@@ -16,7 +16,7 @@ export const AccountComponent = () => (
         <PasswordChangeForm />
       </div>
     )}}
-  </AuthUserContext.Consumer>
+  </authUserContext.Consumer>
 );
 
 const authCondition = (authUser: any) => !!authUser;

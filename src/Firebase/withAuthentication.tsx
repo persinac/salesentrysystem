@@ -1,6 +1,6 @@
 import * as React from "react";
 import { firebase } from "./index";
-import { AuthUserContext } from "./AuthUserContext";
+import { authUserContext } from "./AuthUserContext";
 
 interface InterfaceProps {
     authUser?: any;
@@ -35,9 +35,9 @@ export const withAuthentication = (Component: any) => {
             const { authUser } = this.state;
 
             return (
-                <AuthUserContext.Provider value={authUser}>
+                <authUserContext.Provider value={authUser}>
                     <Component />
-                </AuthUserContext.Provider>
+                </authUserContext.Provider>
             );
         }
     }

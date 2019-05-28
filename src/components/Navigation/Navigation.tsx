@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import { SignOut } from '../SignOut'
-import { AuthUserContext } from "../../Firebase/AuthUserContext";
+import { authUserContext } from "../../Firebase/AuthUserContext";
 
 interface INavState {
     authUser: any
@@ -15,9 +15,9 @@ interface INavProps {
 export default class Navigation extends React.Component {
     render () {
         return (
-          <AuthUserContext.Consumer>
+          <authUserContext.Consumer>
               {authUser => (authUser ? this.returnAuthorizedLogin() : this.returnNonAuthorizedLogin())}
-          </AuthUserContext.Consumer>
+          </authUserContext.Consumer>
         );
     }
 
