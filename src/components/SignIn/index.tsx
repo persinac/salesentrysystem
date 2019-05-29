@@ -1,7 +1,7 @@
 import * as React from "react";
 import { withRouter } from "react-router-dom";
-import './sign_style/signin.css';
-import '../../styles/general.css'
+import '../../styles/general.css';
+import '../../styles/signin.css';
 import {Wrapper} from "./wrapper";
 
 const SignInComponent = ({ history }: { [key: string]: any }) => (
