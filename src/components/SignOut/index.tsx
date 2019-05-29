@@ -4,7 +4,7 @@ import { SignOutComponent } from "./SignOut";
 
 const SignUpComponent = ({ history }: { [key: string]: any }) => (
   <div>
-    <SignOutComponent history={history} />
+    <SignOutComponent history={history}/>
   </div>
 );
 

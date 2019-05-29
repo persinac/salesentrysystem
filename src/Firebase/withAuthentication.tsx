@@ -33,7 +33,6 @@ export const withAuthentication = (Component: any) => {
 
         public render() {
             const { authUser } = this.state;
-
             return (
                 <authUserContext.Provider value={authUser}>
                     <Component />

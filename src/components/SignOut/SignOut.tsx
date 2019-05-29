@@ -18,7 +18,7 @@ export class SignOutComponent extends React.Component<Props, State> {
     auth.doSignOut()
       .then(() => {
         this.setState({error: null});
-        history.push(routes.LANDING);
+        history.push(routes.SIGN_IN);
       })
       .catch((e: any) => {
         this.setState({error: e});

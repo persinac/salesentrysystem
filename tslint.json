@@ -65,6 +65,7 @@
     "no-var-requires": true,
     "no-object-literal-type-assertion": [true, {"allow-arguments": true}],
     "object-literal-sort-keys": false,
+    "no-submodule-imports": false,
     "one-line": [
       true,
       "check-open-brace",
