@@ -62,9 +62,9 @@ export class SignInForm extends React.Component<InterfaceProps, InterfaceState> 
 			<form onSubmit={event => this.onSubmit(event)}>
 				<div className="input-group form-group">
 					<div className="input-group-prepend">
-                        <span className="input-group-text">
-                            <FontAwesomeIcon icon={faUser}/>
-                        </span>
+	          <span className="input-group-text">
+	              <FontAwesomeIcon icon={faUser}/>
+	          </span>
 					</div>
 					<input
 						value={email}
@@ -76,9 +76,9 @@ export class SignInForm extends React.Component<InterfaceProps, InterfaceState> 
 				</div>
 				<div className="input-group form-group">
 					<div className="input-group-prepend">
-                        <span className="input-group-text">
-                            <FontAwesomeIcon icon={faUser}/>
-                        </span>
+	          <span className="input-group-text">
+	              <FontAwesomeIcon icon={faUser}/>
+	          </span>
 					</div>
 					<input
 						value={password}
@@ -88,11 +88,13 @@ export class SignInForm extends React.Component<InterfaceProps, InterfaceState> 
 						className="form-control"
 					/>
 				</div>
-				<button disabled={isInvalid} type="submit" className="btn float-right login_btn">
+				<button type="submit" className="btn float-right login_btn">
 					Sign In
 				</button>
 
-				{error && <p>{error.message}</p>}
+				<div className="input-group form-group">
+					{error && <p className={"signin-error"}>{error.message}</p>}
+				</div>
 			</form>
 		);
 	}

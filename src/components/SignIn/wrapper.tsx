@@ -29,7 +29,8 @@ export class Wrapper extends React.Component<InterfaceProps, InterfaceState> {
 					console.log(this.props.history.location.pathname);
 					console.log(authUser);
 					if(this.props.history.location.pathname === '/pw-forget' || this.props.history.location.pathname === '/signup') {
-						return this.returnBackToSignIn();
+						// return <BackToSignIn />
+						return null;
 					} else if(!authUser) {
 						return this.returnComponent()
 					}
@@ -55,11 +56,12 @@ export class Wrapper extends React.Component<InterfaceProps, InterfaceState> {
 
 	private returnComponent() {
 		return (
+			<div className={"signin-container height-100"}>
 			<div className="container">
 				<div className="d-flex justify-content-center h-100">
 					<Card>
 						<div className="card-header">
-							<h3>SignIn</h3>
+							<h3>Sign In</h3>
 							<div className="d-flex justify-content-end social_icon">
 								<GoogleSignIn
 									history={this.props.history}
@@ -78,6 +80,7 @@ export class Wrapper extends React.Component<InterfaceProps, InterfaceState> {
 					</Card>
 				</div>
 			</div>
+		</div>
 		);
 	}
 }

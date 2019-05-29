@@ -9,6 +9,7 @@ import { Home } from '../Home';
 import { Account } from '../Account';
 import { AdminPage } from '../Admin';
 import { IAppState } from '../../State'
+import '../../styles/general.css'
 
 import * as ROUTES from '../../constants/routes';
 import {withAuthentication} from "../../Firebase/withAuthentication";
@@ -32,11 +33,10 @@ class AppComponent extends React.Component<any, IAppState> {
     }
     render () {
         return (
-            <div>
+            <div className={"height-100"}>
                 <Router>
-                    <div>
+                    <div className={"height-100"}>
                         <Navigation />
-                        <hr />
                         <Route exact path={ROUTES.SIGN_UP} component={SignUp} />
                         <Route path={ROUTES.SIGN_IN} component={SignIn} />
                         <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
