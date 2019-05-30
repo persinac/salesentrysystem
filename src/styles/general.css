@@ -26,3 +26,7 @@
     background-size: cover;
     background-repeat: no-repeat;
 }
+
+.floater-rght {
+    float: right;
+}
