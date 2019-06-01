@@ -37,6 +37,8 @@ export class GoogleSignIn extends React.Component<InterfaceProps, InterfaceState
 
 		auth.doSignInWithGoogle()
 			.then((socialAuthUser: any) => {
+				// query server for list of allowed users/emails
+				// redirect if email is not found?
 				this.setState({error: null});
 				history.push(routes.HOME);
 				const roles = {isAdmin: true, isSales: false};

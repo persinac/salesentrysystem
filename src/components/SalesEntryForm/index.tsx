@@ -32,7 +32,7 @@ interface IState {
 	roles: Roles;
 	data: any;
 	questions?: Questions[];
-	questionValues?: QuestionValues[];
+	questionValues?: Map<number, QuestionValues>;
 	categories?: any;
 	secondary_categories?: any;
 	height?: string;
@@ -50,7 +50,6 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 			isSales: true
 		},
 		data: {},
-		questionValues: [{}],
 		doesContainShow: false
 	};
 
@@ -61,15 +60,14 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 	}
 
 	public componentDidMount() {
-		console.log('component did mount');
 		const questionUrl = devBaseURL + 'question';
 		this.getWRFServerData(questionUrl).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({questions: parsedD});
 			if (parsedD) {
-				const qVals: QuestionValues[] = [];
-				parsedD.forEach((e: Questions) => {
-					qVals.push({[e.short_name]: ''});
+				let qVals: Map<number, QuestionValues> = new Map;
+				parsedD.forEach((e: any) => {
+					qVals.set(e.q_id, {[e.short_name]: ''});
 				});
 				this.setState({questionValues: qVals});
 			}
@@ -146,7 +144,7 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 	}
 
 	private renderCards() {
-		if (this.state.questionValues.length > 1 && this.state.categories) {
+		if (this.state.questionValues && this.state.categories) {
 			const filteredPrimaryCats = this.state.categories.filter((filter: any) => filter.category_hierarchy === 1);
 			const eles = filteredPrimaryCats.map((cat: any) => {
 				const filteredSecondaryCats = this.state.categories.filter((filter: any) => filter.belongs_to === cat.category_id);
@@ -165,31 +163,6 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 
 	private static propKey(propertyName: string, value: any): object {
 		return {[propertyName]: value};
-	}
-
-	private dynPropKey(qVal: QuestionValues, propertyName: string, value: any): object {
-		return {[propertyName]: value};
-	}
-
-	private setStateWithEvent(event: any, columnType: string): void {
-		this.setState(SalesEntryFormComponent.propKey(columnType, (event.target as any).value));
-	}
-
-	private setDynStateWithEvent(event: any, index: number, columnType: string): void {
-		this.setState({questionValues: this.onUpdateItem(index, columnType, (event.target as any).value)});
-		// this. (this.state.questionValues[index], columnType, (event.target as any).value)});
-	}
-
-	private onUpdateItem = (i: number, propName: string, value: any) => {
-		const list: QuestionValues[] = this.state.questionValues.map((item, j) => {
-			if (j === i) {
-				return this.dynPropKey(item, propName, value);
-			} else {
-				return item;
-			}
-		}) as QuestionValues[];
-		console.log(list);
-		return list;
 	}
 }
 

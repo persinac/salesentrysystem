@@ -4,6 +4,22 @@ import * as React from "react";
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import {Questions, QuestionValues} from '../../State';
+import {whileStatement} from "@babel/types";
+
+const ShortNames = ['total_length',
+'total_depth',
+'total_height',
+'cab_quantity',
+'cab_fl',
+'cab_fw',
+'cab_sl',
+'cab_sw',
+'cab_bl',
+'cab_bw',
+'cab_mt',
+'paint' ,
+'doors_mt'];
+
 
 interface InterfaceProps {
 	users?: any;
@@ -12,19 +28,20 @@ interface InterfaceProps {
 	category_title?: string;
 	secondary_categories?: any;
 	questions?: Questions[];
-	questionValues: QuestionValues[];
+	questionValues: Map<number, QuestionValues>;
 }
 
 interface IState {
 	doesContainShow?: boolean;
-	questionValues?: QuestionValues[];
+	questionValues?: Map<number, QuestionValues>;
+	currentQuestionIdx?: number;
 }
 
 export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	constructor(props: any) {
 		super(props);
 
-		this.state = {doesContainShow: false, questionValues: this.props.questionValues};
+		this.state = {doesContainShow: false, questionValues: this.props.questionValues, currentQuestionIdx: 0};
 	}
 
 	private handleAccordionToggleClick(e: any, aId: string) {
@@ -37,77 +54,99 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		}
 	}
 
+	shouldComponentUpdate(nextProps: InterfaceProps, nextState: IState) {
+		// did any of the question responses change?
+		let didToggle = this.state.doesContainShow !== nextState.doesContainShow;
+
+
+		const shouldRerender: boolean = !didToggle;
+		// console.log(shouldRerender);
+		return shouldRerender;
+	}
+
+	private createNewRow(questions: any) {
+		return (
+			<div className={'row'}>
+				{questions}
+			</div>
+		);
+	}
+
+	private buildHeader(category: string) {
+		return (<h5>{category}</h5>);
+	}
+
+	private injectGroupingInput(question: Questions, value: any, classyMcClasserson: string) {
+		return (
+			<div className={classyMcClasserson}>
+				<input
+					value={this.state.questionValues.get(question.q_id)[question['short_name']]}
+					onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+					type='text'
+					placeholder={question['text']}
+					className='form-control'
+				/>
+			</div>
+		);
+	}
+
 	private questionBuilder() {
 		if (this.props.questions) {
-			const eles = this.props.questions.map((question: Questions, index: number) => {
+			const maxQsPerRow = 2;
+			const classyClass = `col-md-${12/maxQsPerRow} mb-3`;
+			const eles = this.props.questions.map((question: any, index: number) => {
 				if (question.cat_fk === this.props.category_id) {
 					let value = '';
-					if (this.state.questionValues.length > 1) {
-						value = this.state.questionValues[index][question['short_name']];
+					if (this.state.questionValues.size > 1) {
+						value = this.state.questionValues.get(question.q_id)[question['short_name']];
 					}
 					return (
-						<input
-							value={value}
-							onChange={(event: any) => this.setDynStateWithEvent(event, index, question['short_name'])}
-							type='text'
-							placeholder={question['text']}
-							className='form-control'
-						/>
+						<div className={'row'}>
+							{this.injectGroupingInput(question, value, classyClass)}
+						</div>
 					);
 				}
 			});
-			let secondaryQs = this.props.secondary_categories.map((sc: any) => {
-				return this.props.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
-			});
-			secondaryQs = [].concat.apply([], secondaryQs);
-			let prev_cat_fk: number;
-			let cat_fk_idx = 0;
-			const moreEles = secondaryQs.map((q: Questions, index: number) => {
-				let value = '';
-				if (this.state.questionValues.length > 1) {
-					value = this.state.questionValues[index][q['short_name']];
-				}
-				if (index === 0) {
-					prev_cat_fk = this.props.secondary_categories[cat_fk_idx].category_id;
-					return (
-						<div><h5>{this.props.secondary_categories[cat_fk_idx].category}</h5>
-						<input
-							value={value}
-							onChange={(event: any) => this.setDynStateWithEvent(event, index, q['short_name'])}
-							type='text'
-							placeholder={q['text']}
-							className='form-control'
-						/>
-						</div>
-					);
-				} else if (prev_cat_fk !== q.cat_fk) {
-					cat_fk_idx += 1;
-					return (
-						<div><h5>{this.props.secondary_categories[cat_fk_idx].category}</h5>
-							<input
-								value={value}
-								onChange={(event: any) => this.setDynStateWithEvent(event, index, q['short_name'])}
-								type='text'
-								placeholder={q['text']}
-								className='form-control'
-							/>
-						</div>
-					);
-				} else {
-					return (
-						<input
-							value={value}
-							onChange={(event: any) => this.setDynStateWithEvent(event, index, q['short_name'])}
-							type='text'
-							placeholder={q['text']}
-							className='form-control'
-						/>
-					);
-				}
+			// for each secondary category
+			let groupedSubCatInputs = this.props.secondary_categories.map((sc: any) => {
+				// - grab the questions that correspond to that category
+				let filteredQs: any = this.props.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
 
+				// - construct a header
+				const header = this.buildHeader(sc.category);
+
+				// unique groups will be built via the questions.grouping
+				const uniqueGroups: number[] = Array.from(new Set(filteredQs.map((item: any) => item.grouping)));
+				const divRowQuestionsByGrouping = uniqueGroups.map((groupNum: number) => {
+					// for each unique grouping
+					//  - get questions that are in the current grouping
+					let groupFilteredQs: any = filteredQs.filter((filter: any) => filter.grouping === groupNum);
+
+					//  - construct the questions inputs
+					const builtQuestions = groupFilteredQs.map((q: any) => {
+						let value = '';
+						if (this.state.questionValues.size > 1) {
+							value = ''
+						}
+						return this.injectGroupingInput(q, value, classyClass);
+					});
+					return (
+						this.createNewRow(builtQuestions)
+					);
+				});
+				if (divRowQuestionsByGrouping.length > 0) {
+					return (
+						<div>
+							{header}
+							{divRowQuestionsByGrouping}
+						</div>
+					)
+				}
 			});
-			if (moreEles.length > 0) {
-				return (eles.concat.apply([], moreEles));
+			groupedSubCatInputs = [].concat.apply([], groupedSubCatInputs);
+
+			if (groupedSubCatInputs.length > 0) {
+				return (eles.concat.apply([], groupedSubCatInputs));
 			} else {
 				return (eles);
 			}
@@ -160,17 +199,12 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private setDynStateWithEvent(event: any, index: number, columnType: string): void {
-		this.setState({questionValues: this.onUpdateItem(index, columnType, (event.target as any).value)});
+		this.setState({ questionValues: this.onUpdateItem(index, columnType, (event.target as any).value) });
 	}
 
 	private onUpdateItem = (i: number, propName: string, value: any) => {
-		const list: QuestionValues[] = this.state.questionValues.map((item, j) => {
-			if (j === i) {
-				return this.dynPropKey(item, propName, value);
-			} else {
-				return item;
-			}
-		}) as QuestionValues[];
-		return list;
+		const myList = this.state.questionValues;
+		myList.set(i, {[propName]: value});
+		return myList;
 	}
 }

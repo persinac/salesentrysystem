@@ -12,7 +12,7 @@ export interface QuestionValues {
 }
 
 export interface Questions {
-	id: number;
+	q_id: number;
 	text: string;
 	short_name: string;
 	category_id: number;
