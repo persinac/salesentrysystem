@@ -1,5 +1,6 @@
 #root {
     height: 100%;
+    overflow: hidden;
 }
 
 .height-100 {
@@ -29,4 +30,33 @@
 
 .floater-rght {
     float: right;
+}
+
+.nopadding {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.sales-form-card-overflow-height-300 {
+    padding: 1em;
+    height: 300px;
+    overflow-y: scroll;
+}
+
+.sales-form-card-overflow-height-auto {
+    padding: 1em;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.margin-l-10 {
+    margin-left: 10px;
+}
+
+.margin-t-10 {
+    margin-top: 10px;
+}
+
+a {
+    cursor: pointer;
 }

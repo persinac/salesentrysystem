@@ -129,13 +129,16 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 					</div>
 					<div className={'row'}>
 						<div className={'col-md-4 order-md-2 mb-4'}>
-							<p className={'lead'}>Maybe use this sidebar as a component checklist? Validations?</p>
-							<p>{!!data && <h4>Stuff here</h4>}</p>
+							<p className={'lead'}>Maybe use this sidebar as a component summary? Price/Margin?</p>
 						</div>
 						<div className={'col-md-8 order-md-1'}>
 							<Accordion>
 								{this.renderCards()}
 							</Accordion>
+							<div className={'floater-rght'}>
+								<button type='button' className='btn btn-outline-primary margin-t-10'>Save Order</button>
+								<button type='button' className='btn btn-outline-success margin-t-10 margin-l-10'>Submit Order</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -152,6 +155,7 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 					category_id={cat.category_id}
 					category_title={cat.category}
 					secondary_categories={filteredSecondaryCats}
+					all_categories={this.state.categories}
 					questions={this.state.questions}
 					questionValues={this.state.questionValues}/>;
 			});

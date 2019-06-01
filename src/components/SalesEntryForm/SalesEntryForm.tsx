@@ -27,6 +27,7 @@ interface InterfaceProps {
 	category_id?: number;
 	category_title?: string;
 	secondary_categories?: any;
+	all_categories?: any;
 	questions?: Questions[];
 	questionValues: Map<number, QuestionValues>;
 }
@@ -54,13 +55,24 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		}
 	}
 
+	componentDidUpdate(prevProps: Readonly<InterfaceProps>, prevState: Readonly<IState>, snapshot?: any): void {
+		console.log('did update?');
+	}
+
+	componentDidMount(): void {
+		const currCategory = this.props.all_categories.filter((f: any) => f.category_id === this.props.category_id);
+		const element = document.getElementById(`parent-question-${currCategory[0].category_id}`);
+		if (element.childElementCount > 1) {
+			element.classList.add('sales-form-card-overflow-height-300');
+		} else {
+			element.classList.add('sales-form-card-overflow-height-auto');
+		}
+	}
+
 	shouldComponentUpdate(nextProps: InterfaceProps, nextState: IState) {
-		// did any of the question responses change?
 		let didToggle = this.state.doesContainShow !== nextState.doesContainShow;
 
-
 		const shouldRerender: boolean = !didToggle;
-		// console.log(shouldRerender);
 		return shouldRerender;
 	}
 
@@ -76,80 +88,81 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		return (<h5>{category}</h5>);
 	}
 
-	private injectGroupingInput(question: Questions, value: any, classyMcClasserson: string) {
+	private injectGroupingInput(question: any, classyMcClasserson: string) {
+		console.log(question);
 		return (
 			<div className={classyMcClasserson}>
+				<label htmlFor={question['short_name']}>{question['text']}</label>
 				<input
+					id={question['short_name']}
 					value={this.state.questionValues.get(question.q_id)[question['short_name']]}
 					onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
 					type='text'
-					placeholder={question['text']}
+					placeholder={question['tooltip']}
 					className='form-control'
 				/>
 			</div>
 		);
 	}
 
-	private questionBuilder() {
-		if (this.props.questions) {
-			const maxQsPerRow = 2;
-			const classyClass = `col-md-${12/maxQsPerRow} mb-3`;
-			const eles = this.props.questions.map((question: any, index: number) => {
-				if (question.cat_fk === this.props.category_id) {
-					let value = '';
-					if (this.state.questionValues.size > 1) {
-						value = this.state.questionValues.get(question.q_id)[question['short_name']];
-					}
-					return (
-						<div className={'row'}>
-							{this.injectGroupingInput(question, value, classyClass)}
-						</div>
-					);
-				}
-			});
-			// for each secondary category
-			let groupedSubCatInputs = this.props.secondary_categories.map((sc: any) => {
+	private recursivelyBuildQuestions(currCategory: any, groupedInputs?: any) {
+		const maxQsPerRow = 2;
+		const classyClass = `col-md-${12/maxQsPerRow} mb-3`;
+		if(currCategory) {
+			// for each category
+			let groupedSubCatInputs = currCategory.map((sc: any) => {
 				// - grab the questions that correspond to that category
 				let filteredQs: any = this.props.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
 
+				console.log('---------- '+ sc.category +' --------------');
 				// - construct a header
-				const header = this.buildHeader(sc.category);
+				const header = sc.category_hierarchy > 1 ? this.buildHeader(sc.category) : null;
 
 				// unique groups will be built via the questions.grouping
 				const uniqueGroups: number[] = Array.from(new Set(filteredQs.map((item: any) => item.grouping)));
-				const divRowQuestionsByGrouping = uniqueGroups.map((groupNum: number) => {
+
+				let divRowQuestionsByGrouping = uniqueGroups.map((groupNum: number) => {
 					// for each unique grouping
 					//  - get questions that are in the current grouping
 					let groupFilteredQs: any = filteredQs.filter((filter: any) => filter.grouping === groupNum);
 
 					//  - construct the questions inputs
 					const builtQuestions = groupFilteredQs.map((q: any) => {
-						let value = '';
-						if (this.state.questionValues.size > 1) {
-							value = ''
-						}
-						return this.injectGroupingInput(q, value, classyClass);
+						return this.injectGroupingInput(q, classyClass);
 					});
-					return (
-						this.createNewRow(builtQuestions)
-					);
+					return ( this.createNewRow(builtQuestions) );
 				});
-				if (divRowQuestionsByGrouping.length > 0) {
-					return (
-						<div>
-							{header}
-							{divRowQuestionsByGrouping}
-						</div>
-					)
+				let subCats: any = this.props.all_categories.filter((filter: any) => filter.belongs_to === sc.category_id);
+				if (subCats.length > 0) {
+					return this.recursivelyBuildQuestions(subCats, divRowQuestionsByGrouping);
+				} else {
+					let concatInputs;
+					if (groupedInputs !== undefined) {
+						concatInputs = groupedInputs.concat(header, divRowQuestionsByGrouping);
+					} else {
+						concatInputs = divRowQuestionsByGrouping;
+					}
+					if (concatInputs.length > 0) {
+						return (
+							<div>
+								{concatInputs}
+							</div>
+						)
+					}
 				}
 			});
-			groupedSubCatInputs = [].concat.apply([], groupedSubCatInputs);
+			return [].concat.apply([], groupedSubCatInputs);
+		}
+	}
 
-			if (groupedSubCatInputs.length > 0) {
-				return (eles.concat.apply([], groupedSubCatInputs));
-			} else {
-				return (eles);
-			}
+	private questionBuilder() {
+		if (this.props.questions) {
+			const currCategory = this.props.all_categories.filter((f: any) => f.category_id === this.props.category_id);
+			return (
+				<div id={`parent-question-${currCategory[0].category_id}`} >
+					{this.recursivelyBuildQuestions(currCategory)}
+				</div>
+			);
 		}
 	}
 
@@ -168,17 +181,18 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				<Accordion.Toggle as={Card.Header} eventKey={this.props.category_id.toString()}
 				                  onClick={(e) => this.handleAccordionToggleClick(e, `accord-${this.props.category_id.toString()}`)}>
 					{this.props.category_title}
-					<span className={'floater-rght'} id={'accord-icon-0'}>
+					{/* TODO: not working properly due to state should update */
+						/*<span className={'floater-rght'} id={'accord-icon-0'}>
 						{
 							this.state.doesContainShow ?
 								<FontAwesomeIcon icon={faLongArrowAltUp}/> :
 								<FontAwesomeIcon icon={faLongArrowAltDown}/>
 						}
-					</span>
+					</span>*/}
 				</Accordion.Toggle>
 				<Accordion.Collapse eventKey={this.props.category_id.toString()}
 				                    id={`accord-${this.props.category_id.toString()}`}>
-					<Card.Body>
+					<Card.Body className={'nopadding'}>
 						{!!questions && this.questionBuilder()}
 					</Card.Body>
 				</Accordion.Collapse>
