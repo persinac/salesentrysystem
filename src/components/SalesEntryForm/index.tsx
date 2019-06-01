@@ -14,7 +14,7 @@ import {Questions, QuestionValues, Roles} from '../../State';
 
 const rp = require('request-promise');
 
-const baseURL = 'https://wrf-center.com/api/product';
+const baseURL = 'https://wrf-center.com/api/';
 const devBaseURL = 'http://localhost:8080/';
 
 interface IProps {
@@ -60,7 +60,7 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 	}
 
 	public componentDidMount() {
-		const questionUrl = devBaseURL + 'question';
+		const questionUrl = baseURL + 'question';
 		this.getWRFServerData(questionUrl).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({questions: parsedD});
@@ -73,7 +73,7 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 			}
 		});
 
-		const catUrl = devBaseURL + 'category/';
+		const catUrl = baseURL + 'category/';
 		this.getWRFServerData(catUrl).then(d => {
 				const parsedD = JSON.parse(d);
 				if (parsedD) {
