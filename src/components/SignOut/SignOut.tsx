@@ -29,9 +29,9 @@ export class SignOutComponent extends React.Component<Props, State> {
 
   render() {
     return (
-      <button type="button" onClick={e => this.onSubmit(e)}>
+      <a className={'nav-link'} onClick={e => this.onSubmit(e)}>
         Sign Out
-      </button>
+      </a>
     );
   }
 }

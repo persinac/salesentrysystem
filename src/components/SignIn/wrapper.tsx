@@ -57,9 +57,9 @@ export class Wrapper extends React.Component<InterfaceProps, InterfaceState> {
 	private returnComponent() {
 		return (
 			<div className={"signin-container height-100"}>
-			<div className="container">
+			<div className="signin-child-container">
 				<div className="d-flex justify-content-center h-100">
-					<Card>
+					<Card className={'signin-card'}>
 						<div className="card-header">
 							<h3>Sign In</h3>
 							<div className="d-flex justify-content-end social_icon">
