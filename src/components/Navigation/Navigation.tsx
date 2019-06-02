@@ -31,7 +31,11 @@ export default class Navigation extends React.Component {
 		return (
 			<Nav className={'navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0'}>
 				<div className={'navbar-brand col-sm-3 col-md-2 mr-0'}><a>WRF Center</a></div>
-				<div className={'collapse navbar-collapse'} id="navbarNav">
+				{/*<button className={"navbar-toggler"} type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+				        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span className={"navbar-toggler-icon"}></span>
+				</button>*/}
+				<div className={'navbar'} id="navbarSupportedContent">
 					<ul className={'navbar-nav mr-auto'}>
 						<li className={"nav-item active"}>
 							<Link className={"nav-link"} to={ROUTES.HOME} onClick={(event) => {

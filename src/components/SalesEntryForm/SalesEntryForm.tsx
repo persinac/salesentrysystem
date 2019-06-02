@@ -55,10 +55,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		}
 	}
 
-	componentDidUpdate(prevProps: Readonly<InterfaceProps>, prevState: Readonly<IState>, snapshot?: any): void {
-		console.log('did update?');
-	}
-
 	componentDidMount(): void {
 		const currCategory = this.props.all_categories.filter((f: any) => f.category_id === this.props.category_id);
 		const element = document.getElementById(`parent-question-${currCategory[0].category_id}`);
@@ -89,7 +85,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private injectGroupingInput(question: any, classyMcClasserson: string) {
-		console.log(question);
 		return (
 			<div className={classyMcClasserson}>
 				<label htmlFor={question['short_name']}>{question['text']}</label>
@@ -114,7 +109,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				// - grab the questions that correspond to that category
 				let filteredQs: any = this.props.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
 
-				console.log('---------- '+ sc.category +' --------------');
 				// - construct a header
 				const header = sc.category_hierarchy > 1 ? this.buildHeader(sc.category) : null;
 
