@@ -35,7 +35,7 @@ export default class Navigation extends React.Component {
 				        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 					<span className={"navbar-toggler-icon"}></span>
 				</button>*/}
-				<div className={'navbar'} id="navbarSupportedContent">
+				<div className={'navbar-collapse'} id="navbarSupportedContent">
 					<ul className={'navbar-nav mr-auto'}>
 						<li className={"nav-item active"}>
 							<Link className={"nav-link"} to={ROUTES.HOME} onClick={(event) => {
