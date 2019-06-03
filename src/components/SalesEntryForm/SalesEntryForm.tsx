@@ -4,7 +4,6 @@ import * as React from "react";
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import {Questions, QuestionValues} from '../../State';
-import {whileStatement} from "@babel/types";
 
 const ShortNames = ['total_length',
 'total_depth',
