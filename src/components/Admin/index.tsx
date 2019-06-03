@@ -4,17 +4,26 @@ import {withAuthorization} from '../../Firebase/withAuthorization';
 import {Admin} from './Admin';
 import * as ROLES from '../../constants/roles';
 import * as routes from '../../constants/routes';
+import AdminSideNav from "../Navigation/AdminSideNav";
 
 const rp = require('request-promise');
 
 const baseURL = 'https://wrf-center.com/api/product';
 
-class AdminComponent extends React.Component {
+interface IState {
+	navbarHeight: string;
+	users: any;
+	data: any;
+}
+
+class AdminComponent extends React.Component<{}, IState> {
 	constructor(props: any) {
 		super(props);
 
 		this.state = {
-			users: null
+			users: null,
+			navbarHeight: '',
+			data: null
 		};
 	}
 
@@ -27,6 +36,7 @@ class AdminComponent extends React.Component {
 				this.setState({data: JSON.parse(d)})
 			}
 		);
+		this.setState({navbarHeight: window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue("height")})
 	}
 
 	public getWRFServerData = (builtURI: string): Promise<any> => {
@@ -38,19 +48,29 @@ class AdminComponent extends React.Component {
 				console.log('ERROR!!!!');
 				console.log(e);
 			});
-	}
+	};
 
 	public render() {
-		const {users, data}: any = this.state;
+		const {navbarHeight} = this.state;
+		const containerStyle = {
+			height: `calc(100% - ${navbarHeight})`
+		};
 		return (
-			<div>
-				<h2>Admin</h2>
-				<p>The admin page is only accessible by admins.</p>
+			<div className={'container-fluid'} style={containerStyle}>
+				<div className={'row height-100'}>
+					<AdminSideNav />
+					<main role={'main'} className={'col-md-9 ml-sm-auto col-lg-10 pt-3 px-4'}>
+						<h2>Admin</h2>
+						<p>The admin page is only accessible by admins.</p>
+						<p>{navbarHeight}</p>
 
-				{!!users && <Admin
-					users={users}
-					some_data={data}
-				/>}
+						<div>
+							<p className={'lead'}>
+								Add the list of sales orders component here
+							</p>
+						</div>
+					</main>
+				</div>
 			</div>
 		);
 	}

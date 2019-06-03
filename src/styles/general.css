@@ -32,6 +32,10 @@
     float: right;
 }
 
+.floater-left {
+    float: left;
+}
+
 .nopadding {
     padding: 0 !important;
     margin: 0 !important;
@@ -55,6 +59,10 @@
 
 .margin-t-10 {
     margin-top: 10px;
+}
+
+.margin-r-10 {
+    margin-right: 10px;
 }
 
 a {

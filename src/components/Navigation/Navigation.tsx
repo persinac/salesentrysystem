@@ -29,7 +29,7 @@ export default class Navigation extends React.Component {
 
 	private returnAuthorizedLogin() {
 		return (
-			<Nav className={'navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0'}>
+			<Nav id={'primary-navbar'} className={'navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0'}>
 				<div className={'navbar-brand col-sm-3 col-md-2 mr-0'}><a>WRF Center</a></div>
 				{/*<button className={"navbar-toggler"} type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
 				        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
