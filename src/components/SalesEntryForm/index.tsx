@@ -39,7 +39,7 @@ interface IState {
 	doesContainShow?: boolean;
 }
 
-class SalesEntryFormComponent extends React.Component<IProps, IState> {
+export class SalesEntryFormComponent extends React.Component<IProps, IState> {
 	private static INITIAL_STATE = {
 		email: '',
 		error: {},
@@ -101,45 +101,17 @@ class SalesEntryFormComponent extends React.Component<IProps, IState> {
 			});
 	};
 
-	private doesContainShow(aId: string) {
-		const el = document.getElementById(aId);
-		if (el && el.classList.contains('show')) {
-			return <FontAwesomeIcon icon={faLongArrowAltUp}/>
-		}
-	}
-
-	private handleAccordionToggleClick(e: any, aId: string) {
-		const el = document.getElementById(aId);
-		el.classList.toggle('show');
-		if (el && el.classList.contains('show')) {
-			this.setState({doesContainShow: true});
-		} else {
-			this.setState({doesContainShow: false});
-		}
-	}
-
 	public render() {
 		const {email, password, error, data, height, questions} = this.state;
 		return (
-			<div className={'bg-light height-100'}>
-				<div className={'container'}>
-					<div className={'py-5 text-center'}>
-						<h2>Sales Entry</h2>
-						<p>Accessible if sales or admin</p>
-					</div>
-					<div className={'row'}>
-						<div className={'col-md-4 order-md-2 mb-4'}>
-							<p className={'lead'}>Maybe use this sidebar as a component summary? Price/Margin?</p>
-						</div>
-						<div className={'col-md-8 order-md-1'}>
-							<Accordion>
-								{this.renderCards()}
-							</Accordion>
-							<div className={'floater-rght'}>
-								<button type='button' className='btn btn-outline-primary margin-t-10'>Save Order</button>
-								<button type='button' className='btn btn-outline-success margin-t-10 margin-l-10'>Submit Order</button>
-							</div>
-						</div>
+			<div className={'margin-t-10 row'}>
+				<div className={'width-100'}>
+					<Accordion>
+						{this.renderCards()}
+					</Accordion>
+					<div className={'floater-rght'}>
+						<button type='button' className='btn btn-outline-primary margin-t-10'>Save Order</button>
+						<button type='button' className='btn btn-outline-success margin-t-10 margin-l-10'>Submit Order</button>
 					</div>
 				</div>
 			</div>
@@ -196,5 +168,3 @@ const defaultRouteRedirect = (authUser: any) => {
 	}
 	return route;
 };
-
-export const salesEntryFormPage = withAuthorization(authCondition, defaultRouteRedirect)(SalesEntryFormComponent);
