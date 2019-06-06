@@ -5,15 +5,21 @@ import {Admin} from './Admin';
 import * as ROLES from '../../constants/roles';
 import * as routes from '../../constants/routes';
 import AdminSideNav from "../Navigation/AdminSideNav";
+import {listOfProductOrdersPage} from "../ListOfProductOrders";
+import {Component} from "react";
+import {ListOfProductOrders} from "../ListOfProductOrders/ListOfProductOrders";
+import {ProductHeader} from "../../State";
 
 const rp = require('request-promise');
 
-const baseURL = 'https://wrf-center.com/api/product';
+const baseURL = 'https://wrf-center.com/api/';
+const devBaseURL = 'http://localhost:8080/';
 
 interface IState {
 	navbarHeight: string;
 	users: any;
 	data: any;
+	productHeader?: ProductHeader[];
 }
 
 class AdminComponent extends React.Component<{}, IState> {
@@ -32,10 +38,12 @@ class AdminComponent extends React.Component<{}, IState> {
 			this.setState(() => ({users: snapshot.val()}))
 		);
 
-		this.getWRFServerData(baseURL).then(d => {
-				this.setState({data: JSON.parse(d)})
-			}
-		);
+		const productURL = devBaseURL + 'product';
+		this.getWRFServerData(productURL).then(d => {
+			const parsedD = JSON.parse(d);
+			this.setState({productHeader: parsedD});
+		});
+
 		this.setState({navbarHeight: window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue("height")})
 	}
 
@@ -65,14 +73,18 @@ class AdminComponent extends React.Component<{}, IState> {
 						<p>{navbarHeight}</p>
 
 						<div>
-							<p className={'lead'}>
-								Add the list of sales orders component here
-							</p>
+							{this.renderList()}
 						</div>
 					</main>
 				</div>
 			</div>
 		);
+	}
+
+	private renderList() {
+		if (this.state !== null) {
+			return <ListOfProductOrders productHeader={this.state.productHeader} />
+		}
 	}
 }
 
