@@ -55,11 +55,10 @@ export class ProductHeaderInfo extends React.Component<InterfaceProps, IState> {
 								/>
 							</div>
 							<div className={`col-md-12 mb-3`}>
-								<input
+								<textarea
 									id={'p-q-1'}
 									value={notes}
 									onChange={(event: any) => this.props.phHandler(event, 'notes')}
-									type='text'
 									placeholder={'notes'}
 									className='form-control'
 								/>
