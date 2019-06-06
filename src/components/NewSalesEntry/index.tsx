@@ -39,6 +39,10 @@ interface IState {
 	page: number;
 	customer?: Customer;
 	productHeader?: ProductHeader;
+	questions?: Questions[];
+	questionValues?: Map<number, QuestionValues>;
+	categories?: any;
+	secondary_categories?: any;
 }
 
 class NewSalesEntryComponent extends React.Component<IProps, IState> {
@@ -67,14 +71,28 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 	}
 
 	public componentDidMount() {
+		const questionUrl = baseURL + 'question';
+		this.getWRFServerData(questionUrl).then(d => {
+			const parsedD = JSON.parse(d);
+			this.setState({questions: parsedD});
+			if (parsedD) {
+				let qVals: Map<number, QuestionValues> = new Map;
+				parsedD.forEach((e: any) => {
+					qVals.set(e.q_id, {[e.short_name]: ''});
+				});
+				this.setState({questionValues: qVals});
+			}
+		});
+
 		const catUrl = baseURL + 'category/';
-		// this.getWRFServerData(catUrl).then(d => {
-		// 		const parsedD = JSON.parse(d);
-		// 		if (parsedD) {
-		// 			this.setState({categories: parsedD});
-		// 		}
-		// 	}
-		// );)'sales-entry-hdr'
+		this.getWRFServerData(catUrl).then(d => {
+				const parsedD = JSON.parse(d);
+				if (parsedD) {
+					this.setState({categories: parsedD});
+				}
+			}
+		);
+
 		const primaryNavBarHeight =  window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue("height");
 		const hdrHeight =  window.getComputedStyle(document.getElementById('sales-entry-hdr'), null).getPropertyValue("height");
 		this.setState({containerHeight: `(${primaryNavBarHeight} + ${hdrHeight})`, navbarHeight: primaryNavBarHeight})
@@ -154,7 +172,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 	};
 
 	private renderPage() {
-		const {page, customer, productHeader} = this.state;
+		const {page, customer, productHeader, questions, questionValues, categories} = this.state;
 		if (page == 0) {
 			return (
 				<div>
@@ -174,9 +192,17 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 				</div>
 			)
 		} else if (page == 1) {
-			return <SalesEntryFormComponent />
+			return <SalesEntryFormComponent
+				questions={questions}
+				questionValues={questionValues}
+				categories={categories}
+			/>
 		} else if (page == 2) {
-			return <SalesEntryFormComponent />
+			return <SalesEntryFormComponent
+				questions={questions}
+				questionValues={questionValues}
+				categories={categories}
+			/>
 		} else  {
 			return (
 				<div>
