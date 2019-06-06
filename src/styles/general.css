@@ -68,3 +68,7 @@
 a {
     cursor: pointer;
 }
+
+.the-lonely-card {
+    border-radius: 0.25rem;
+}

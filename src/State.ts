@@ -18,3 +18,15 @@ export interface Questions {
 	category_id: number;
 	cat_fk: number;
 }
+
+export interface Customer {
+	name?: string;
+	email?: string;
+	primary_phone_number?: string;
+	shipping_address?: string;
+}
+
+export interface ProductHeader {
+	notes?: string;
+	reference_number?: string;
+}

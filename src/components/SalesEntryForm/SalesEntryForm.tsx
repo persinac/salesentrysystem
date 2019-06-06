@@ -25,7 +25,6 @@ interface InterfaceProps {
 	some_data?: any;
 	category_id?: number;
 	category_title?: string;
-	secondary_categories?: any;
 	all_categories?: any;
 	questions?: Questions[];
 	questionValues: Map<number, QuestionValues>;
