@@ -61,7 +61,7 @@ export default class Navigation extends React.Component {
 						<li className={"nav-item"}>
 							<Link className={"nav-link"} to={ROUTES.SALES_ENTRY_FORM} onClick={(event) => {
 								this.removeActiveClasses();
-								(event.target as any).classList.toggle('active')
+								(event.target as any).classList.toggle('active');
 							}
 							}>New Sales Entry</Link>
 						</li>

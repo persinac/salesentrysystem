@@ -11,7 +11,7 @@ interface InterfaceProps {
 	roles?: Roles;
 }
 
-export const withAuthorization = (condition: any, routeRedirect?: any) => (Component: ComponentType) => {
+export const withAuthorization = (condition: any, routeRedirect?: any) => (Component: ComponentType, extras?: any) => {
 	class WithAuthorization extends React.Component<InterfaceProps, {}> {
 		constructor(props: InterfaceProps) {
 			super(props);
@@ -33,6 +33,7 @@ export const withAuthorization = (condition: any, routeRedirect?: any) => (Compo
 							uid: authUser.uid,
 							email: authUser.email,
 							...dbUser,
+							...extras
 						};
 						let route = routeRedirect ? routeRedirect(authUser) : routes.SIGN_IN;
 						console.log(this.props);
@@ -49,7 +50,7 @@ export const withAuthorization = (condition: any, routeRedirect?: any) => (Compo
 		public render() {
 			return (
 				<authUserContext.Consumer>
-					{authUser => (authUser ? <Component/> : null)}
+					{authUser => (authUser ? <Component {...authUser} /> : null)}
 				</authUserContext.Consumer>
 			);
 		}

@@ -30,7 +30,7 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 	}
 
 	private renderCard() {
-		const {email, name, primary_phone_number, shipping_address} = this.props.customer;
+		const {primary_email, name, phone_number, shipping_address} = this.props.customer;
 		// console.log(this.state);
 		return (
 			<div className={'the-lonely-card'}>
@@ -41,8 +41,8 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 							<div className={`col-md-6 mb-3`}>
 								<input
 									id={'cust-q-1'}
-									value={email}
-									onChange={(event: any) => this.props.customerHandler(event, 'email')}
+									value={primary_email}
+									onChange={(event: any) => this.props.customerHandler(event, 'primary_email')}
 									type='text'
 									placeholder={'email'}
 									className='form-control'
@@ -61,8 +61,8 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 							<div className={`col-md-6 mb-3`}>
 								<input
 									id={'cust-q-3'}
-									value={primary_phone_number}
-									onChange={(event: any) => this.props.customerHandler(event, 'primary_phone_number')}
+									value={phone_number}
+									onChange={(event: any) => this.props.customerHandler(event, 'phone_number')}
 									type='text'
 									placeholder={'primary_phone_number'}
 									className='form-control'

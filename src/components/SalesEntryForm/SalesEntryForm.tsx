@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import * as React from "react";
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import {Questions, QuestionValues} from '../../State';
+import {ProductDetails, Questions} from '../../State';
 
 const ShortNames = ['total_length',
 'total_depth',
@@ -27,12 +27,12 @@ interface InterfaceProps {
 	category_title?: string;
 	all_categories?: any;
 	questions?: Questions[];
-	questionValues: Map<number, QuestionValues>;
+	productDetails: ProductDetails[];
 }
 
 interface IState {
 	doesContainShow?: boolean;
-	questionValues?: Map<number, QuestionValues>;
+	productDetails?: ProductDetails[];
 	currentQuestionIdx?: number;
 }
 
@@ -40,7 +40,11 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	constructor(props: any) {
 		super(props);
 
-		this.state = {doesContainShow: false, questionValues: this.props.questionValues, currentQuestionIdx: 0};
+		this.state = {
+			doesContainShow: false,
+			currentQuestionIdx: 0,
+			productDetails: this.props.productDetails
+		};
 	}
 
 	private handleAccordionToggleClick(e: any, aId: string) {
@@ -83,12 +87,20 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private injectGroupingInput(question: any, classyMcClasserson: string) {
+		let idx = -1;
+		this.state.productDetails.some((pd: ProductDetails, internal_i: number) => {
+			if (pd.q_fk == question.q_id) {
+				idx = internal_i;
+				return true;
+			}
+			return false;
+		});
 		return (
 			<div className={classyMcClasserson}>
 				<label htmlFor={question['short_name']}>{question['text']}</label>
 				<input
 					id={question['short_name']}
-					value={this.state.questionValues.get(question.q_id)[question['short_name']]}
+					value={this.state.productDetails[idx].response}
 					onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
 					type='text'
 					placeholder={question['tooltip']}
@@ -196,21 +208,29 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		return {[propertyName]: value};
 	}
 
-	private dynPropKey(qVal: QuestionValues, propertyName: string, value: any): object {
-		return {[propertyName]: value};
-	}
-
 	private setStateWithEvent(event: any, columnType: string): void {
 		this.setState(SalesEntryForm.propKey(columnType, (event.target as any).value));
 	}
 
 	private setDynStateWithEvent(event: any, index: number, columnType: string): void {
-		this.setState({ questionValues: this.onUpdateItem(index, columnType, (event.target as any).value) });
+		this.setState({
+			productDetails: this.onUpdateItem(index, columnType, (event.target as any).value)
+		});
 	}
 
 	private onUpdateItem = (i: number, propName: string, value: any) => {
-		const myList = this.state.questionValues;
-		myList.set(i, {[propName]: value});
+		let myList = this.state.productDetails;
+		let idx = -1;
+		this.state.productDetails.some((pd: ProductDetails, internal_i: number) => {
+			if (pd.q_fk == i) {
+				idx = internal_i;
+				return true;
+			}
+			return false;
+		});
+		let pdItem: ProductDetails = this.state.productDetails[idx];
+		pdItem.response = value;
+		myList[idx] = pdItem;
 		return myList;
 	}
 }

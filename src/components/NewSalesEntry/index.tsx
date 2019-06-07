@@ -10,10 +10,12 @@ import '../../styles/general.css';
 import Accordion from 'react-bootstrap/Accordion';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowDown, faLongArrowAltDown, faLongArrowAltUp, faUser} from '@fortawesome/free-solid-svg-icons';
-import {Customer, ProductHeader, Questions, QuestionValues, Roles} from '../../State';
+import {Customer, ProductDetails, ProductHeader, Questions, QuestionValues, Roles} from '../../State';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {CustomerEntry} from "../Customer/CustomerEntry";
 import {ProductHeaderComponent} from "../ProductHeaderInfo";
+import {authUserContext} from "../../Firebase/AuthUserContext";
+import {array} from "prop-types";
 
 const rp = require('request-promise');
 
@@ -26,6 +28,8 @@ interface IProps {
 	history?: any;
 	password?: string;
 	height?: string;
+	productId?: number;
+	context?: any;
 }
 
 interface IState {
@@ -39,10 +43,11 @@ interface IState {
 	page: number;
 	customer?: Customer;
 	productHeader?: ProductHeader;
+	productDetails?: ProductDetails[];
 	questions?: Questions[];
-	questionValues?: Map<number, QuestionValues>;
 	categories?: any;
 	secondary_categories?: any;
+	productId?: number;
 }
 
 class NewSalesEntryComponent extends React.Component<IProps, IState> {
@@ -58,8 +63,17 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		containerHeight: '',
 		navbarHeight: '',
 		page: 0,
-		customer: {email: '', name: '', primary_phone_number: '', shipping_address: ''},
-		productHeader: {notes: '', reference_number: ''},
+		customer: {primary_email: '', name: '', phone_number: '', shipping_address: ''},
+		productHeader: {notes: '', reference_number: '', group_id: 0, order_num: 0, status: 'Started', crafting_required: false},
+	};
+
+	private post_options = {
+		method: 'POST',
+		uri: '',
+		body: {
+			some: 'payload'
+		},
+		json: true // Automatically stringifies the body to JSON
 	};
 
 	constructor(props: any) {
@@ -67,35 +81,83 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 
 		this.setCustomerStateWithEvent = this.setCustomerStateWithEvent.bind(this);
 		this.setProductStateWithEvent = this.setProductStateWithEvent.bind(this);
+		this.onProductDetailsSubmit = this.onProductDetailsSubmit.bind(this);
 		this.state = {...NewSalesEntryComponent.INITIAL_STATE};
 	}
 
 	public componentDidMount() {
-		const questionUrl = baseURL + 'question';
-		this.getWRFServerData(questionUrl).then(d => {
+		this.buildData();
+		const primaryNavBarHeight =  window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue("height");
+		const hdrHeight =  window.getComputedStyle(document.getElementById('sales-entry-hdr'), null).getPropertyValue("height");
+		this.setState({containerHeight: `(${primaryNavBarHeight} + ${hdrHeight})`, navbarHeight: primaryNavBarHeight})
+	}
+
+	private async buildData() {
+		const isExistingEntry = (window.location.search !== null && window.location.search !== undefined && window.location.search.length > 0);
+		let salesEntryId: number = null;
+		if (isExistingEntry) {
+			console.log("window.location.search");
+			console.log(window.location.search.length);
+			salesEntryId = Number.parseInt(window.location.search.slice(1));
+
+			const myURL = devBaseURL + 'product/relationship/all/' + salesEntryId;
+			await this.getWRFServerData(myURL).then(d => {
+					const parsedD = JSON.parse(d);
+					console.log(parsedD.phs[0]);
+					if (parsedD) {
+						this.setState({
+							productHeader: {
+								ph_id: parsedD.phs[0].ph_id,
+								group_id: parsedD.phs[0].group_id,
+								order_num: parsedD.phs[0].order_num,
+								notes: parsedD.phs[0].notes,
+								reference_number: parsedD.phs[0].reference_number,
+								crafting_required: parsedD.phs[0].crafting_required,
+								status: parsedD.phs[0].status,
+								created_on: parsedD.phs[0].created_on,
+								created_by: parsedD.phs[0].created_by,
+								updated_on: parsedD.phs[0].updated_on,
+								updated_by: parsedD.phs[0].updated_by,
+							},
+							customer: parsedD.phs[0].customer,
+							productDetails: parsedD.phs[0].product_details
+						});
+					}
+				}
+			);
+		}
+
+		const questionUrl = devBaseURL + 'question';
+		await this.getWRFServerData(questionUrl).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({questions: parsedD});
 			if (parsedD) {
-				let qVals: Map<number, QuestionValues> = new Map;
+				let pds: ProductDetails[] = [];
 				parsedD.forEach((e: any) => {
-					qVals.set(e.q_id, {[e.short_name]: ''});
+					if (isExistingEntry) {
+						let response_exists = this.state.productDetails.filter((pd: ProductDetails) => pd.q_fk === e.q_id);
+						if (response_exists.length > 0) {
+							pds.push(response_exists[0]);
+						} else {
+							pds.push({ph_fk: this.state.productHeader.ph_id, q_fk: e.q_id, cat_fk: e.cat_fk, created_by: this.props.email, updated_by: this.props.email})
+						}
+					} else {
+						pds.push({q_fk: e.q_id, cat_fk: e.cat_fk, created_by: this.props.email, updated_by: this.props.email})
+					}
 				});
-				this.setState({questionValues: qVals});
+				this.setState({productDetails: pds});
 			}
 		});
 
-		const catUrl = baseURL + 'category/';
-		this.getWRFServerData(catUrl).then(d => {
+		const catUrl = devBaseURL + 'category/';
+		await this.getWRFServerData(catUrl).then(d => {
 				const parsedD = JSON.parse(d);
 				if (parsedD) {
 					this.setState({categories: parsedD});
 				}
 			}
 		);
-
-		const primaryNavBarHeight =  window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue("height");
-		const hdrHeight =  window.getComputedStyle(document.getElementById('sales-entry-hdr'), null).getPropertyValue("height");
-		this.setState({containerHeight: `(${primaryNavBarHeight} + ${hdrHeight})`, navbarHeight: primaryNavBarHeight})
+		console.log(this.state.productDetails);
 	}
 
 	public getWRFServerData = (builtURI: string): Promise<any> => {
@@ -106,6 +168,19 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			.catch((e: any) => {
 				console.log('ERROR!!!!');
 				console.log(e);
+			});
+	};
+
+	public postWRFServerData(body: any, endpoint: string, put: boolean): Promise<any> {
+		this.post_options.body = body;
+		this.post_options.uri = devBaseURL + endpoint;
+		this.post_options.method = put ? 'PUT' : 'POST';
+		return rp(this.post_options)
+			.then(function (parsedBody: any) {
+				return parsedBody;
+			})
+			.catch(function (err: any) {
+				return err;
 			});
 	};
 
@@ -150,6 +225,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			return <button
 				type='button'
 				className='btn btn-outline-primary margin-t-10'
+				disabled={this.state.productHeader.ph_id === null || this.state.productHeader.ph_id === undefined}
 				onClick={(e)=>{this.setState({page: 1})}}>Next - Product Details</button>
 		}
 		if (page == 1) {
@@ -164,15 +240,85 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		}
 	}
 
+	public onProductDetailsSubmit = (event: any, validate: boolean) => {
+		const {productDetails} = this.state;
+
+		let pdsToUpdate = productDetails.filter((pd: ProductDetails) => {
+			return (pd.response !== null && pd.response !== undefined);
+		});
+
+		pdsToUpdate.map((pd: ProductDetails) => {
+			if(!pd.created_by) {
+				pd.created_by = this.props.email;
+			}
+			pd.updated_by = this.props.email;
+		});
+		this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
+			.then((newPDs: any)=>{
+				const updatedPDs: ProductDetails[] = newPDs.details;
+				let {productDetails} = this.state;
+				updatedPDs.forEach((upd: ProductDetails) => {
+					let idx = -1;
+					productDetails.some((pd: ProductDetails, internal_i: number) => {
+						if (pd.pd_id == upd.pd_id || pd.q_fk == upd.q_fk) {
+							idx = internal_i;
+							return true;
+						}
+						return false;
+					});
+					productDetails[idx].updated_on = upd.updated_on;
+					productDetails[idx].response = upd.response;
+					console.log(productDetails[idx]);
+				});
+				console.log('AFTER');
+				console.log(productDetails);
+				this.setState({productDetails: productDetails});
+				console.log('STATE AFTER');
+				console.log(this.state.productDetails);
+			})
+			.catch((e) => {
+				console.log(e);
+				console.log('DONE - Error');
+			});
+
+		event.preventDefault();
+	};
+
 	public onCustomerSubmit = (event: any) => {
-		console.log(event);
-		console.log('ON CUSTOMER SUBMIT IN NEW SALES ENTRY (parent)');
-		console.log(this.state.customer);
+		const {productHeader, customer} = this.state;
+		const isNewProduct = !productHeader.ph_id;
+
+		if(!productHeader.created_by) {
+			productHeader.created_by = this.props.email;
+		}
+		if(!customer.created_by) {
+			customer.created_by = this.props.email;
+		}
+
+		productHeader.updated_by = this.props.email;
+		customer.updated_by = this.props.email;
+		this.postWRFServerData({...productHeader, customer}, 'product', false)
+			.then((productStuff: any)=>{
+				const ph_id = productStuff.newProduct.ph_id;
+				let pds: ProductDetails[] = this.state.productDetails;
+				if(isNewProduct) {
+					pds.map((e: ProductDetails) => {
+						e.ph_fk = ph_id
+					});
+				}
+				this.setState({productHeader: {...productStuff.newProduct}, customer: {...productStuff.newProduct.customer}, productDetails: pds});
+				console.log(this.state.productDetails);
+			})
+			.catch((e) => {
+				console.log(e);
+				console.log('DONE - Error');
+			});
+
 		event.preventDefault();
 	};
 
 	private renderPage() {
-		const {page, customer, productHeader, questions, questionValues, categories} = this.state;
+		const {page, customer, productHeader, questions, categories, productDetails} = this.state;
 		if (page == 0) {
 			return (
 				<div>
@@ -194,14 +340,16 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		} else if (page == 1) {
 			return <SalesEntryFormComponent
 				questions={questions}
-				questionValues={questionValues}
 				categories={categories}
+				productDetails={productDetails}
+				submitHandler={this.onProductDetailsSubmit}
 			/>
 		} else if (page == 2) {
 			return <SalesEntryFormComponent
 				questions={questions}
-				questionValues={questionValues}
 				categories={categories}
+				productDetails={productDetails}
+				submitHandler={this.onProductDetailsSubmit}
 			/>
 		} else  {
 			return (
@@ -246,19 +394,19 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 }
 
 const authCondition = (authUser: any) => {
-	console.log('AUTH CONDITION');
-	console.log(authUser);
-	console.log(authUser.roles);
-	console.log(ROLES.ADMIN);
-	console.log(authUser.roles[ROLES.ADMIN]);
+	// console.log('AUTH CONDITION');
+	// console.log(authUser);
+	// console.log(authUser.roles);
+	// console.log(ROLES.ADMIN);
+	// console.log(authUser.roles[ROLES.ADMIN]);
 	return authUser && !!authUser.roles[ROLES.ADMIN] || !!authUser.roles[ROLES.SALES];
 };
 
 const defaultRouteRedirect = (authUser: any) => {
-	console.log('DEFAULT REDIRECT - ADMIN INDEX');
-	console.log(authUser);
-	console.log(authUser.roles);
-	console.log(ROLES.ADMIN);
+	// console.log('DEFAULT REDIRECT - ADMIN INDEX');
+	// console.log(authUser);
+	// console.log(authUser.roles);
+	// console.log(ROLES.ADMIN);
 	let route = routes.SIGN_IN;
 	if (authUser) {
 		if (!!authUser.roles[ROLES.ADMIN]) {

@@ -2,6 +2,11 @@ import {faLongArrowAltDown, faLongArrowAltUp} from '@fortawesome/free-solid-svg-
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import * as React from "react";
 import {ProductHeader} from "../../State";
+import * as ROUTES from "../../constants/routes";
+import {newSalesEntryPage} from "../NewSalesEntry";
+import {Route} from "react-router";
+import {SalesEntryFormComponent} from "../SalesEntryForm";
+import {Link} from "react-router-dom";
 
 
 interface InterfaceProps {
@@ -55,7 +60,7 @@ export class ListOfProductOrders extends React.Component<InterfaceProps, IState>
 			let trs = productHeader.map((ph: any) => {
 				return (
 					<tr>
-						<td>{ph['ph_id']}</td>
+						<td><Link to={`${ROUTES.SALES_ENTRY_FORM}?${ph['ph_id']}`}>{ph['ph_id']}</Link></td>
 						<td>{ph['reference_number']}</td>
 						<td>{ph['status']}</td>
 						<td>{ph['created_by']}</td>
