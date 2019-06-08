@@ -100,7 +100,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			console.log(window.location.search.length);
 			salesEntryId = Number.parseInt(window.location.search.slice(1));
 
-			const myURL = devBaseURL + 'product/relationship/all/' + salesEntryId;
+			const myURL = baseURL + 'product/relationship/all/' + salesEntryId;
 			await this.getWRFServerData(myURL).then(d => {
 					const parsedD = JSON.parse(d);
 					console.log(parsedD.phs[0]);
@@ -127,7 +127,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			);
 		}
 
-		const questionUrl = devBaseURL + 'question';
+		const questionUrl = baseURL + 'question';
 		await this.getWRFServerData(questionUrl).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({questions: parsedD});
@@ -149,7 +149,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			}
 		});
 
-		const catUrl = devBaseURL + 'category/';
+		const catUrl = baseURL + 'category/';
 		await this.getWRFServerData(catUrl).then(d => {
 				const parsedD = JSON.parse(d);
 				if (parsedD) {
@@ -173,7 +173,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 
 	public postWRFServerData(body: any, endpoint: string, put: boolean): Promise<any> {
 		this.post_options.body = body;
-		this.post_options.uri = devBaseURL + endpoint;
+		this.post_options.uri = baseURL + endpoint;
 		this.post_options.method = put ? 'PUT' : 'POST';
 		return rp(this.post_options)
 			.then(function (parsedBody: any) {

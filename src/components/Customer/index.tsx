@@ -14,9 +14,6 @@ import {Customer, Questions, QuestionValues, Roles} from '../../State';
 
 const rp = require('request-promise');
 
-const baseURL = 'https://wrf-center.com/api/';
-const devBaseURL = 'http://localhost:8080/';
-
 interface IProps {
 	email?: string;
 	error?: any;

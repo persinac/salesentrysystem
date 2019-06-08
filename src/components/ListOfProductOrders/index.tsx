@@ -25,7 +25,7 @@ class ListOfProductOrdersComponent extends React.Component<IProps, IState> {
 	}
 
 	public componentDidMount() {
-		const productURL = devBaseURL + 'product';
+		const productURL = baseURL + 'product';
 		this.getWRFServerData(productURL).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({productHeader: parsedD});

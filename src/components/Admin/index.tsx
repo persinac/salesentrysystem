@@ -38,7 +38,7 @@ class AdminComponent extends React.Component<{}, IState> {
 			this.setState(() => ({users: snapshot.val()}))
 		);
 
-		const productURL = devBaseURL + 'product';
+		const productURL = baseURL + 'product';
 		this.getWRFServerData(productURL).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({productHeader: parsedD});
