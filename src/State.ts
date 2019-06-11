@@ -32,6 +32,12 @@ export interface Customer {
 	updated_by?: string;
 }
 
+export interface CustomerValidationError {
+	e_name?: string;
+	e_phone_number?: string;
+	e_shipping_address?: string;
+}
+
 export interface ProductHeader {
 	ph_id?: number;
 	group_id?: number;

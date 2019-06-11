@@ -7,15 +7,24 @@ import {CustomerEntryComponent} from '../Customer';
 import * as ROLES from '../../constants/roles';
 import * as routes from '../../constants/routes';
 import '../../styles/general.css';
-import Accordion from 'react-bootstrap/Accordion';
+import '../../styles/error.css';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowDown, faLongArrowAltDown, faLongArrowAltUp, faUser} from '@fortawesome/free-solid-svg-icons';
-import {Customer, ProductDetails, ProductHeader, Questions, QuestionValues, Roles} from '../../State';
+import {
+	Customer,
+	CustomerValidationError,
+	ProductDetails,
+	ProductHeader,
+	Questions,
+	QuestionValues,
+	Roles
+} from '../../State';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {CustomerEntry} from "../Customer/CustomerEntry";
 import {ProductHeaderComponent} from "../ProductHeaderInfo";
 import {authUserContext} from "../../Firebase/AuthUserContext";
 import {array} from "prop-types";
+import {CustomerValidation} from "../../Validation/CustomerValidation";
 
 const rp = require('request-promise');
 
@@ -42,6 +51,7 @@ interface IState {
 	navbarHeight: string;
 	page: number;
 	customer?: Customer;
+	customerErrors?: CustomerValidationError;
 	productHeader?: ProductHeader;
 	productDetails?: ProductDetails[];
 	questions?: Questions[];
@@ -64,6 +74,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		navbarHeight: '',
 		page: 0,
 		customer: {primary_email: '', name: '', phone_number: '', shipping_address: ''},
+		customerErrors: {e_primary_email: '', e_name: '', e_phone_number: '', e_shipping_address: ''},
 		productHeader: {notes: '', reference_number: '', group_id: 0, order_num: 0, status: 'Started', crafting_required: false},
 	};
 
@@ -96,8 +107,6 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		const isExistingEntry = (window.location.search !== null && window.location.search !== undefined && window.location.search.length > 0);
 		let salesEntryId: number = null;
 		if (isExistingEntry) {
-			console.log("window.location.search");
-			console.log(window.location.search.length);
 			salesEntryId = Number.parseInt(window.location.search.slice(1));
 
 			const myURL = baseURL + 'product/relationship/all/' + salesEntryId;
@@ -157,7 +166,6 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 				}
 			}
 		);
-		console.log(this.state.productDetails);
 	}
 
 	public getWRFServerData = (builtURI: string): Promise<any> => {
@@ -268,13 +276,8 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 					});
 					productDetails[idx].updated_on = upd.updated_on;
 					productDetails[idx].response = upd.response;
-					console.log(productDetails[idx]);
 				});
-				console.log('AFTER');
-				console.log(productDetails);
 				this.setState({productDetails: productDetails});
-				console.log('STATE AFTER');
-				console.log(this.state.productDetails);
 			})
 			.catch((e) => {
 				console.log(e);
@@ -297,32 +300,38 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 
 		productHeader.updated_by = this.props.email;
 		customer.updated_by = this.props.email;
-		this.postWRFServerData({...productHeader, customer}, 'product', false)
-			.then((productStuff: any)=>{
-				const ph_id = productStuff.newProduct.ph_id;
-				let pds: ProductDetails[] = this.state.productDetails;
-				if(isNewProduct) {
-					pds.map((e: ProductDetails) => {
-						e.ph_fk = ph_id
-					});
-				}
-				this.setState({productHeader: {...productStuff.newProduct}, customer: {...productStuff.newProduct.customer}, productDetails: pds});
-				console.log(this.state.productDetails);
-			})
-			.catch((e) => {
-				console.log(e);
-				console.log('DONE - Error');
-			});
-
+		//validate customer:
+		let cv: CustomerValidation = new CustomerValidation(this.state.customer);
+		if (cv.validate()) {
+			this.setState({customerErrors: {...cv.getErrors()}});
+			this.postWRFServerData({...productHeader, customer}, 'product', false)
+				.then((productStuff: any)=>{
+					const ph_id = productStuff.newProduct.ph_id;
+					let pds: ProductDetails[] = this.state.productDetails;
+					if(isNewProduct) {
+						pds.map((e: ProductDetails) => {
+							e.ph_fk = ph_id
+						});
+					}
+					this.setState({productHeader: {...productStuff.newProduct}, customer: {...productStuff.newProduct.customer}, productDetails: pds});
+					console.log(this.state.productDetails);
+				})
+				.catch((e) => {
+					console.log(e);
+					console.log('DONE - Error');
+				});
+		} else {
+			this.setState({customerErrors: {...cv.getErrors()}});
+		}
 		event.preventDefault();
 	};
 
 	private renderPage() {
-		const {page, customer, productHeader, questions, categories, productDetails} = this.state;
+		const {page, customer, customerErrors, productHeader, questions, categories, productDetails} = this.state;
 		if (page == 0) {
 			return (
 				<div>
-					<CustomerEntryComponent customer={customer} customerHandler={this.setCustomerStateWithEvent}/>
+					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
 					<ProductHeaderComponent productHeader={productHeader} phHandler={this.setProductStateWithEvent}/>
 					<div className={'row'}>
 						<div className={'width-100'}>
