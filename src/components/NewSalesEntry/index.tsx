@@ -28,9 +28,6 @@ import {CustomerValidation} from "../../Validation/CustomerValidation";
 
 const rp = require('request-promise');
 
-const baseURL = 'https://wrf-center.com/api/';
-const devBaseURL = 'http://localhost:8080/';
-
 interface IProps {
 	email?: string;
 	error?: any;
@@ -109,10 +106,9 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		if (isExistingEntry) {
 			salesEntryId = Number.parseInt(window.location.search.slice(1));
 
-			const myURL = baseURL + 'product/relationship/all/' + salesEntryId;
+			const myURL = process.env.REACT_APP_BASE_API_URL + 'product/relationship/all/' + salesEntryId;
 			await this.getWRFServerData(myURL).then(d => {
 					const parsedD = JSON.parse(d);
-					console.log(parsedD.phs[0]);
 					if (parsedD) {
 						this.setState({
 							productHeader: {
@@ -136,7 +132,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			);
 		}
 
-		const questionUrl = baseURL + 'question';
+		const questionUrl = process.env.REACT_APP_BASE_API_URL + 'question';
 		await this.getWRFServerData(questionUrl).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({questions: parsedD});
@@ -158,7 +154,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			}
 		});
 
-		const catUrl = baseURL + 'category/';
+		const catUrl = process.env.REACT_APP_BASE_API_URL + 'category/';
 		await this.getWRFServerData(catUrl).then(d => {
 				const parsedD = JSON.parse(d);
 				if (parsedD) {
@@ -181,7 +177,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 
 	public postWRFServerData(body: any, endpoint: string, put: boolean): Promise<any> {
 		this.post_options.body = body;
-		this.post_options.uri = baseURL + endpoint;
+		this.post_options.uri = process.env.REACT_APP_BASE_API_URL + endpoint;
 		this.post_options.method = put ? 'PUT' : 'POST';
 		return rp(this.post_options)
 			.then(function (parsedBody: any) {
