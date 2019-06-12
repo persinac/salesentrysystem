@@ -6,9 +6,6 @@ import {withAuthorization} from "../../Firebase/withAuthorization";
 
 const rp = require('request-promise');
 
-const baseURL = 'https://wrf-center.com/api/';
-const devBaseURL = 'http://localhost:8080/';
-
 interface IProps {
 }
 
@@ -25,7 +22,7 @@ class ListOfProductOrdersComponent extends React.Component<IProps, IState> {
 	}
 
 	public componentDidMount() {
-		const productURL = baseURL + 'product';
+		const productURL = process.env.REACT_APP_BASE_API_URL + 'product';
 		this.getWRFServerData(productURL).then(d => {
 			const parsedD = JSON.parse(d);
 			this.setState({productHeader: parsedD});
