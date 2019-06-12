@@ -28,8 +28,8 @@
     "typescript": "next"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start-prod": "serve -s build -l 3000",
+    "start": "react-scripts start : .env.development",
+    "start-prod": "react-scripts start : .env.production",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
