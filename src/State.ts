@@ -52,6 +52,10 @@ export interface ProductHeader {
 	updated_by?: string;
 }
 
+export interface ProductHeaderValidationError {
+	e_reference_number?: string;
+}
+
 export interface ProductDetails {
 	pd_id?: number;
 	ph_fk?: number;
@@ -62,4 +66,43 @@ export interface ProductDetails {
 	created_by?: string;
 	updated_on?: Date;
 	updated_by?: string;
+}
+
+export interface CabinetsValidationError {
+	e_paint_color?: string;
+	e_stain_color?: string;
+	e_length?: string;
+	e_width?: string;
+	e_height?: string;
+	e_quantity?: string;
+}
+
+export interface Cabinet {
+	paint_color?: string;
+	stain_color?: string;
+	front_length?: number;
+	front_width?: number;
+	side_length?: number;
+	side_width?: number;
+	back_length?: number;
+	back_width?: number;
+	height?: number;
+	quantity?: number;
+	material_type?: string;
+}
+
+export interface TopValidationError {
+	e_vendor?: string;
+	e_vendor_po?: string;
+	e_length?: string;
+	e_width?: string;
+	e_quantity?: string;
+}
+
+export interface Tops {
+	vendor?: string;
+	vendor_po?: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
 }

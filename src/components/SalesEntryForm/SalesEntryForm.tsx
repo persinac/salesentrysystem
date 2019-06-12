@@ -3,7 +3,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import * as React from "react";
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import {ProductDetails, Questions} from '../../State';
+import {CabinetsValidationError, ProductDetails, Questions} from '../../State';
+import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
+import {CabinetMapper} from "../../Mapper/CabinetMapper";
 
 const ShortNames = ['total_length',
 'total_depth',
@@ -28,6 +30,7 @@ interface InterfaceProps {
 	all_categories?: any;
 	questions?: Questions[];
 	productDetails: ProductDetails[];
+	cabinetErrors?: CabinetsValidationError;
 }
 
 interface IState {
@@ -106,8 +109,18 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 					placeholder={question['tooltip']}
 					className='form-control'
 				/>
+				{this.attachError(Number(question['cat_fk']), question['short_name'])}
 			</div>
 		);
+	}
+
+	private attachError(category_id: number, short_name: string) {
+		switch (category_id) {
+			case 10:
+				return (<ErrorWrapper errorMessage={CabinetMapper.mapErrorObject(short_name, this.props.cabinetErrors)} id={short_name}/>);
+			default:
+				return null;
+		}
 	}
 
 	private recursivelyBuildQuestions(currCategory: any, groupedInputs?: any) {

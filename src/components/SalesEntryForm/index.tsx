@@ -2,7 +2,7 @@ import * as React from 'react';
 import {SalesEntryForm} from './SalesEntryForm';
 import '../../styles/general.css';
 import Accordion from 'react-bootstrap/Accordion';
-import {ProductDetails, Questions, QuestionValues, Roles} from '../../State';
+import {CabinetsValidationError, ProductDetails, Questions, QuestionValues, Roles} from '../../State';
 
 interface IProps {
 	email?: string;
@@ -15,6 +15,7 @@ interface IProps {
 	categories?: any;
 	secondary_categories?: any;
 	submitHandler: any;
+	cabinetErrors?: CabinetsValidationError;
 }
 
 interface IState {
@@ -65,6 +66,7 @@ export class SalesEntryFormComponent extends React.Component<IProps, IState> {
 					all_categories={this.props.categories}
 					questions={this.props.questions}
 					productDetails={this.props.productDetails}
+					cabinetErrors={this.props.cabinetErrors}
 				/>;
 			});
 			return (eles);

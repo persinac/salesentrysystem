@@ -3,6 +3,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import * as React from "react";
 import Card from 'react-bootstrap/Card';
 import {Customer, CustomerValidationError} from "../../State";
+import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
 
 
 interface InterfaceProps {
@@ -56,9 +57,9 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.customerHandler(event, 'name')}
 									type='text'
 									placeholder={'name'}
-									className={this.props.customerErrors.e_name ? 'form-control error' : 'form-control'}
+									className={'form-control'}
 								/>
-								{this.props.customerErrors.e_name ? this.ErrorValidationLabel(this.props.customerErrors.e_name) : null}
+								<ErrorWrapper errorMessage={this.props.customerErrors.e_name} id={'cust-q-2'}/>
 							</div>
 							<div className={`col-md-6 mb-3`}>
 								<input
@@ -67,9 +68,9 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.customerHandler(event, 'phone_number')}
 									type='text'
 									placeholder={'primary_phone_number'}
-									className={this.props.customerErrors.e_phone_number ? 'form-control error' : 'form-control'}
+									className={'form-control'}
 								/>
-								{this.props.customerErrors.e_phone_number ? this.ErrorValidationLabel(this.props.customerErrors.e_phone_number) : null}
+								<ErrorWrapper errorMessage={this.props.customerErrors.e_phone_number} id={'cust-q-3'}/>
 							</div>
 							<div className={`col-md-6 mb-3`}>
 								<input
@@ -78,9 +79,9 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.customerHandler(event, 'shipping_address')}
 									type='text'
 									placeholder={'shipping_address'}
-									className={this.props.customerErrors.e_shipping_address ? 'form-control error' : 'form-control'}
+									className={'form-control'}
 								/>
-								{this.props.customerErrors.e_shipping_address ? this.ErrorValidationLabel(this.props.customerErrors.e_shipping_address) : null}
+								<ErrorWrapper errorMessage={this.props.customerErrors.e_shipping_address} id={'cust-q-4'}/>
 							</div>
 						</div>
 					</Card.Body>
@@ -88,9 +89,4 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 			</div>
 		);
 	}
-	private ErrorValidationLabel = (txtLbl: string) => (
-		<label htmlFor="" style={{ color: "red" }}>
-			{txtLbl}
-		</label>
-	);
 }

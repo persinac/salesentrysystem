@@ -11,20 +11,24 @@ import '../../styles/error.css';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowDown, faLongArrowAltDown, faLongArrowAltUp, faUser} from '@fortawesome/free-solid-svg-icons';
 import {
+	Cabinet, CabinetsValidationError,
 	Customer,
 	CustomerValidationError,
 	ProductDetails,
-	ProductHeader,
+	ProductHeader, ProductHeaderValidationError,
 	Questions,
 	QuestionValues,
-	Roles
+	Roles, Tops
 } from '../../State';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
-import {CustomerEntry} from "../Customer/CustomerEntry";
 import {ProductHeaderComponent} from "../ProductHeaderInfo";
-import {authUserContext} from "../../Firebase/AuthUserContext";
-import {array} from "prop-types";
 import {CustomerValidation} from "../../Validation/CustomerValidation";
+import {ProductHeaderValidation} from "../../Validation/ProductHeaderValidation";
+import {CabinetMapper} from "../../Mapper/CabinetMapper";
+import {ProductDetailsMapper} from "../../Structure/types";
+import {Mapper} from "../../Mapper/Mapper";
+import {CabinetValidation} from "../../Validation/CabinetValidation";
+import {TopMapper} from "../../Mapper/TopMapper";
 
 const rp = require('request-promise');
 
@@ -50,11 +54,13 @@ interface IState {
 	customer?: Customer;
 	customerErrors?: CustomerValidationError;
 	productHeader?: ProductHeader;
+	productHeaderErrors?: ProductHeaderValidationError;
 	productDetails?: ProductDetails[];
 	questions?: Questions[];
 	categories?: any;
 	secondary_categories?: any;
 	productId?: number;
+	cabinetErrors?: CabinetsValidationError;
 }
 
 class NewSalesEntryComponent extends React.Component<IProps, IState> {
@@ -73,6 +79,8 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		customer: {primary_email: '', name: '', phone_number: '', shipping_address: ''},
 		customerErrors: {e_primary_email: '', e_name: '', e_phone_number: '', e_shipping_address: ''},
 		productHeader: {notes: '', reference_number: '', group_id: 0, order_num: 0, status: 'Started', crafting_required: false},
+		productHeaderErrors: {e_reference_number: ''},
+		cabinetErrors: {e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''}
 	};
 
 	private post_options = {
@@ -245,7 +253,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 	}
 
 	public onProductDetailsSubmit = (event: any, validate: boolean) => {
-		const {productDetails} = this.state;
+		const {productDetails, questions} = this.state;
 
 		let pdsToUpdate = productDetails.filter((pd: ProductDetails) => {
 			return (pd.response !== null && pd.response !== undefined);
@@ -257,34 +265,57 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			}
 			pd.updated_by = this.props.email;
 		});
-		this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
-			.then((newPDs: any)=>{
-				const updatedPDs: ProductDetails[] = newPDs.details;
-				let {productDetails} = this.state;
-				updatedPDs.forEach((upd: ProductDetails) => {
-					let idx = -1;
-					productDetails.some((pd: ProductDetails, internal_i: number) => {
-						if (pd.pd_id == upd.pd_id || pd.q_fk == upd.q_fk) {
-							idx = internal_i;
-							return true;
-						}
-						return false;
+		console.log('PRE-FINDING');
+		console.log(productDetails);
+
+		let cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, 10);
+		let top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, 5);
+		let cm: Cabinet = CabinetMapper.mapObject(cab_details);
+		let tm: Tops = TopMapper.mapObject(top_details);
+
+		console.log(tm);
+
+		//validate cab:
+		let cv: CabinetValidation = new CabinetValidation(cm, tm);
+		console.log(cv.validate());
+		console.log(cv.getErrors());
+
+		const cab_validate = cv.validate();
+
+		if (cab_validate) {
+			this.setState({cabinetErrors: {...cv.getErrors()}});
+			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
+				.then((newPDs: any) => {
+					const updatedPDs: ProductDetails[] = newPDs.details;
+					let {productDetails} = this.state;
+					updatedPDs.forEach((upd: ProductDetails) => {
+						let idx = -1;
+						productDetails.some((pd: ProductDetails, internal_i: number) => {
+							if (pd.pd_id == upd.pd_id || pd.q_fk == upd.q_fk) {
+								idx = internal_i;
+								return true;
+							}
+							return false;
+						});
+						productDetails[idx].updated_on = upd.updated_on;
+						productDetails[idx].response = upd.response;
 					});
-					productDetails[idx].updated_on = upd.updated_on;
-					productDetails[idx].response = upd.response;
+					this.setState({productDetails: productDetails});
+				})
+				.catch((e) => {
+					console.log(e);
+					console.log('DONE - Error');
 				});
-				this.setState({productDetails: productDetails});
-			})
-			.catch((e) => {
-				console.log(e);
-				console.log('DONE - Error');
-			});
+		} else {
+			this.setState({cabinetErrors: {...cv.getErrors()}});
+		}
 
 		event.preventDefault();
 	};
 
 	public onCustomerSubmit = (event: any) => {
 		const {productHeader, customer} = this.state;
+		console.log({...productHeader, customer});
 		const isNewProduct = !productHeader.ph_id;
 
 		if(!productHeader.created_by) {
@@ -298,8 +329,12 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		customer.updated_by = this.props.email;
 		//validate customer:
 		let cv: CustomerValidation = new CustomerValidation(this.state.customer);
-		if (cv.validate()) {
-			this.setState({customerErrors: {...cv.getErrors()}});
+		let phv: ProductHeaderValidation = new ProductHeaderValidation(this.state.productHeader);
+		const cv_validate = cv.validate();
+		const phv_validate = phv.validate();
+
+		if (cv_validate && phv_validate) {
+			this.setState({customerErrors: {...cv.getErrors()}, productHeaderErrors: {...phv.getErrors()}});
 			this.postWRFServerData({...productHeader, customer}, 'product', false)
 				.then((productStuff: any)=>{
 					const ph_id = productStuff.newProduct.ph_id;
@@ -309,26 +344,37 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 							e.ph_fk = ph_id
 						});
 					}
-					this.setState({productHeader: {...productStuff.newProduct}, customer: {...productStuff.newProduct.customer}, productDetails: pds});
-					console.log(this.state.productDetails);
+					this.setState({
+						productHeader: {...productStuff.newProduct},
+						customer: {...productStuff.newProduct.customer},
+						productDetails: pds}
+						);
+					console.log({...productStuff.newProduct.customer});
 				})
 				.catch((e) => {
 					console.log(e);
 					console.log('DONE - Error');
 				});
 		} else {
-			this.setState({customerErrors: {...cv.getErrors()}});
+			this.setState({customerErrors: {...cv.getErrors()}, productHeaderErrors: {...phv.getErrors()}});
 		}
 		event.preventDefault();
 	};
 
 	private renderPage() {
-		const {page, customer, customerErrors, productHeader, questions, categories, productDetails} = this.state;
+		const {page,
+			customer,
+			customerErrors,
+			productHeader,
+			productHeaderErrors,
+			questions,
+			categories,
+			productDetails} = this.state;
 		if (page == 0) {
 			return (
 				<div>
 					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
-					<ProductHeaderComponent productHeader={productHeader} phHandler={this.setProductStateWithEvent}/>
+					<ProductHeaderComponent productHeader={productHeader} productHeaderErrors={productHeaderErrors} phHandler={this.setProductStateWithEvent}/>
 					<div className={'row'}>
 						<div className={'width-100'}>
 							<div className={'floater-rght'}>
@@ -348,6 +394,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 				categories={categories}
 				productDetails={productDetails}
 				submitHandler={this.onProductDetailsSubmit}
+				cabinetErrors={this.state.cabinetErrors}
 			/>
 		} else if (page == 2) {
 			return <SalesEntryFormComponent
@@ -355,12 +402,13 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 				categories={categories}
 				productDetails={productDetails}
 				submitHandler={this.onProductDetailsSubmit}
+				cabinetErrors={this.state.cabinetErrors}
 			/>
 		} else  {
 			return (
 				<div>
-					<CustomerEntryComponent customer={customer} customerHandler={this.setCustomerStateWithEvent}/>
-					<ProductHeaderComponent productHeader={productHeader} phHandler={this.setProductStateWithEvent}/>
+					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
+					<ProductHeaderComponent productHeader={productHeader} productHeaderErrors={productHeaderErrors} phHandler={this.setProductStateWithEvent}/>
 					<div className={'row'}>
 						<div className={'width-100'}>
 							<div className={'floater-rght'}>
@@ -385,6 +433,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 				[columnType]: val
 			}
 		}));
+		console.log(this.state.customer);
 	}
 
 	private setProductStateWithEvent(event: any, columnType: string): void {

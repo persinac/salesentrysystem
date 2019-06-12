@@ -13,7 +13,7 @@ export class CustomerValidation extends Validation{
 		this.errors = {e_name: '', e_phone_number: '', e_shipping_address: ''};
 	}
 
-	public validate(): any {
+	public validate(): boolean {
 		this.checkName();
 		this.checkPrimaryPhone();
 		this.checkShipping();
@@ -29,20 +29,26 @@ export class CustomerValidation extends Validation{
 	}
 
 	private checkShipping() {
-		if (this.customer.shipping_address.length === 0) {
+		const {shipping_address} = this.customer;
+		if (shipping_address.length === 0) {
 			this.errors.e_shipping_address = 'Shipping address cannot be blank';
 		}
 	}
 
 	private checkName() {
-		if (this.customer.name.length === 0) {
+		const {name} = this.customer;
+		if (name.length === 0) {
 			this.errors.e_name = 'Name cannot be blank';
 		}
 	}
 
 	private checkPrimaryPhone() {
-		if (this.customer.phone_number.length === 0) {
+		let regexp: RegExp = new RegExp('^[0-9]*$');
+		const {phone_number} = this.customer;
+		if (phone_number.length === 0) {
 			this.errors.e_phone_number = 'Phone number cannot be blank';
+		} else if (!regexp.test(phone_number)) {
+			this.errors.e_phone_number = 'Phone number can only include numbers';
 		}
 	}
 
