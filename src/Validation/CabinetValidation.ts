@@ -23,6 +23,7 @@ export class CabinetValidation extends Validation{
 	public validate(): boolean {
 		this.checkQuantity();
 		this.checkLength();
+		this.checkWidth();
 
 		return (this.errors.e_height.length === 0 &&
 			this.errors.e_length.length === 0 &&
@@ -46,13 +47,42 @@ export class CabinetValidation extends Validation{
 		}
 	}
 
+	/***
+	 * Once we have the total size component constructed, we'll need to validate against that, too
+	 * This will need to be updated once multiple UNIQUE cab measurements are entered
+	 */
 	private checkLength() {
-		const {length} = this.cab_details;
+		const {length, quantity} = this.cab_details;
 		const {length: top_length} = this.top_details;
 		if (String(length).length === 0) {
 			this.errors.e_length = 'Cabinet length cannot be blank';
-		} else if (length > (top_length-2)) {
-			this.errors.e_length = 'Cabinet length must be less than top length by 2in';
+		} else if ((Number(length) * Number(quantity)) > (Number(top_length) - 2)) {
+			this.errors.e_length = 'Total cabinet length must be less than top length by 2in';
+		}
+	}
+
+	/***
+	 * Once we have the total size component constructed, we'll need to validate against that, too
+	 * This will need to be updated once multiple UNIQUE cab measurements are entered
+	 * Need to grab the max width from all cab width(s)
+	 */
+	private checkWidth() {
+		const {width} = this.top_details;
+		const {width: cab_width} = this.cab_details;
+		if (String(cab_width).length === 0) {
+			this.errors.e_width = 'Cabinet width cannot be blank';
+		} else if (Number(width) <= (Number(cab_width) + 2)) {
+			this.errors.e_width = 'Cabinet width must be greater than Top width by 2in';
+		}
+	}
+
+	/***
+	 * Once we have the total size component constructed, we'll need to validate against that, too
+	 */
+	private checkHeight() {
+		const {height} = this.cab_details;
+		if (String(height).length === 0) {
+			this.errors.e_height = 'Cabinet height cannot be blank';
 		}
 	}
 }

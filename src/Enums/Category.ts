@@ -1,0 +1,15 @@
+export enum Categories {
+	COLOR = 1,
+	FEATURES_LUXURIES = 2,
+	SIZE = 3,
+	STYLE = 4,
+	TOP = 5,
+	DRAWER_FRONTS = 6,
+	BASEBOARDS = 7,
+	SHELVING = 8,
+	DOORS = 9,
+	CABINETS = 10,
+	LEGS = 11,
+	DRAWERS = 12,
+	HARDWARE = 13
+}
