@@ -1,3 +1,5 @@
+import {TypeGuards} from "./Enums/Enums";
+
 export interface IAppState {
 	authUser: any;
 }
@@ -68,7 +70,104 @@ export interface ProductDetails {
 	updated_by?: string;
 }
 
+/***
+* Begin specific component grouping
+***/
+export interface Baseboards {
+	type: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
+}
+
+export interface Cabinet {
+	type: string;
+	paint_color?: string;
+	stain_color?: string;
+	length?: number;
+	width?: number;
+	height?: number;
+	quantity?: number;
+	material_type?: string;
+}
+
+export interface Doors {
+	type: string;
+	vendor?: string;
+	vendor_po?: string;
+	paint_color?: string;
+	stain_color?: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
+	material_type?: string;
+}
+
+export interface Drawers {
+	type: string;
+	vendor?: string;
+	vendor_po?: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
+	material_type?: string;
+}
+
+export interface DrawerFronts {
+	type: string;
+	vendor?: string;
+	vendor_po?: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
+}
+
+export interface Legs {
+	type: string;
+	vendor?: string;
+	vendor_po?: string;
+	paint_color?: string;
+	stain_color?: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
+}
+
+export interface Shelving {
+	type: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
+}
+
+export interface Tops {
+	type: string;
+	vendor?: string;
+	vendor_po?: string;
+	length?: number;
+	width?: number;
+	quantity?: number;
+}
+
+export interface TotalSize {
+	type: string;
+	length?: number;
+	depth?: number;
+	height?: number;
+}
+
+/***
+ * Begin specific ERROR component grouping
+ ***/
+export interface BaseboardsValidationError {
+	type: string;
+	e_length?: string;
+	e_width?: string;
+	e_quantity?: string;
+}
+
 export interface CabinetsValidationError {
+	type: string;
 	e_paint_color?: string;
 	e_stain_color?: string;
 	e_length?: string;
@@ -77,21 +176,57 @@ export interface CabinetsValidationError {
 	e_quantity?: string;
 }
 
-export interface Cabinet {
-	paint_color?: string;
-	stain_color?: string;
-	front_length?: number;
-	front_width?: number;
-	side_length?: number;
-	side_width?: number;
-	back_length?: number;
-	back_width?: number;
-	height?: number;
-	quantity?: number;
-	material_type?: string;
+export interface DoorsValidationError {
+	type: string;
+	e_vendor?: string;
+	e_vendor_po?: string;
+	e_paint_color?: string;
+	e_stain_color?: string;
+	e_length?: number;
+	e_width?: number;
+	e_quantity?: number;
+	e_material_type?: string;
+}
+
+export interface DrawersValidationError {
+	type: string;
+	e_vendor?: string;
+	e_vendor_po?: string;
+	e_length?: number;
+	e_width?: number;
+	e_quantity?: number;
+	e_material_type?: string;
+}
+
+export interface DrawerFrontsValidationError {
+	type: string;
+	e_vendor?: string;
+	e_vendor_po?: string;
+	e_length?: number;
+	e_width?: number;
+	e_quantity?: number;
+}
+
+export interface LegsValidationError {
+	type: string;
+	e_vendor?: string;
+	e_vendor_po?: string;
+	e_paint_color?: string;
+	e_stain_color?: string;
+	e_length?: number;
+	e_width?: number;
+	e_quantity?: number;
+}
+
+export interface ShelvingValidationError {
+	type: string;
+	e_length?: string;
+	e_width?: string;
+	e_quantity?: string;
 }
 
 export interface TopValidationError {
+	type: string;
 	e_vendor?: string;
 	e_vendor_po?: string;
 	e_length?: string;
@@ -99,10 +234,9 @@ export interface TopValidationError {
 	e_quantity?: string;
 }
 
-export interface Tops {
-	vendor?: string;
-	vendor_po?: string;
-	length?: number;
-	width?: number;
-	quantity?: number;
+export interface TotalSizeValidationError {
+	type: string;
+	e_length?: string;
+	e_depth?: string;
+	e_height?: string;
 }

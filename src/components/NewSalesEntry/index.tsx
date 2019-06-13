@@ -1,15 +1,10 @@
 import * as React from 'react';
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import {auth, db} from '../../Firebase';
 import {withAuthorization} from '../../Firebase/withAuthorization';
 import {CustomerEntryComponent} from '../Customer';
 import * as ROLES from '../../constants/roles';
 import * as routes from '../../constants/routes';
 import '../../styles/general.css';
 import '../../styles/error.css';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faArrowDown, faLongArrowAltDown, faLongArrowAltUp, faUser} from '@fortawesome/free-solid-svg-icons';
 import {
 	Cabinet, CabinetsValidationError,
 	Customer,
@@ -24,11 +19,10 @@ import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {ProductHeaderComponent} from "../ProductHeaderInfo";
 import {CustomerValidation} from "../../Validation/CustomerValidation";
 import {ProductHeaderValidation} from "../../Validation/ProductHeaderValidation";
-import {CabinetMapper} from "../../Mapper/CabinetMapper";
-import {ProductDetailsMapper} from "../../Structure/types";
+import {ProductComponent, ProductDetailsMapper} from "../../Structure/types";
 import {Mapper} from "../../Mapper/Mapper";
 import {CabinetValidation} from "../../Validation/CabinetValidation";
-import {TopMapper} from "../../Mapper/TopMapper";
+import {TypeGuards} from "../../Enums/Enums";
 
 const rp = require('request-promise');
 
@@ -80,7 +74,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		customerErrors: {e_primary_email: '', e_name: '', e_phone_number: '', e_shipping_address: ''},
 		productHeader: {notes: '', reference_number: '', group_id: 0, order_num: 0, status: 'Started', crafting_required: false},
 		productHeaderErrors: {e_reference_number: ''},
-		cabinetErrors: {e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''}
+		cabinetErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''}
 	};
 
 	private post_options = {
@@ -270,20 +264,16 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 
 		let cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, 10);
 		let top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, 5);
-		let cm: Cabinet = CabinetMapper.mapObject(cab_details);
-		let tm: Tops = TopMapper.mapObject(top_details);
+		let cm: ProductComponent = Mapper.mapProductComponent(cab_details, {type: TypeGuards.CABINET} as Cabinet);
+		let tm: ProductComponent = Mapper.mapProductComponent(top_details, {type: TypeGuards.TOPS} as Tops);
 
-		console.log(tm);
-
-		//validate cab:
+		// validate cab:
 		let cv: CabinetValidation = new CabinetValidation(cm, tm);
-		console.log(cv.validate());
-		console.log(cv.getErrors());
 
+		// have to run validation first, so that errors get set if needed
 		const cab_validate = cv.validate();
 
 		if (cab_validate) {
-			this.setState({cabinetErrors: {...cv.getErrors()}});
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
 				.then((newPDs: any) => {
 					const updatedPDs: ProductDetails[] = newPDs.details;
@@ -306,9 +296,8 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 					console.log(e);
 					console.log('DONE - Error');
 				});
-		} else {
-			this.setState({cabinetErrors: {...cv.getErrors()}});
 		}
+		this.setState({cabinetErrors: {...cv.getErrors()}});
 
 		event.preventDefault();
 	};
@@ -327,7 +316,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 
 		productHeader.updated_by = this.props.email;
 		customer.updated_by = this.props.email;
-		//validate customer:
+		// validate customer:
 		let cv: CustomerValidation = new CustomerValidation(this.state.customer);
 		let phv: ProductHeaderValidation = new ProductHeaderValidation(this.state.productHeader);
 		const cv_validate = cv.validate();

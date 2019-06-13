@@ -5,22 +5,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import {CabinetsValidationError, ProductDetails, Questions} from '../../State';
 import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
-import {CabinetMapper} from "../../Mapper/CabinetMapper";
-
-const ShortNames = ['total_length',
-'total_depth',
-'total_height',
-'cab_quantity',
-'cab_fl',
-'cab_fw',
-'cab_sl',
-'cab_sw',
-'cab_bl',
-'cab_bw',
-'cab_mt',
-'paint' ,
-'doors_mt'];
-
+import {Mapper} from "../../Mapper/Mapper";
 
 interface InterfaceProps {
 	users?: any;
@@ -117,7 +102,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	private attachError(category_id: number, short_name: string) {
 		switch (category_id) {
 			case 10:
-				return (<ErrorWrapper errorMessage={CabinetMapper.mapErrorObject(short_name, this.props.cabinetErrors)} id={short_name}/>);
+				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.cabinetErrors)} id={short_name}/>);
 			default:
 				return null;
 		}

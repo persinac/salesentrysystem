@@ -1,5 +1,6 @@
 import {Validation} from "./Validation";
 import {Cabinet, CabinetsValidationError, ProductDetails, Tops} from "../State";
+import {TypeGuards} from "../Enums/Enums";
 
 export class CabinetValidation extends Validation{
 
@@ -13,6 +14,7 @@ export class CabinetValidation extends Validation{
 		this.cab_details = cabinet;
 		this.top_details = top;
 		this.errors = {
+			type: TypeGuards.CABINET_VALIDATION_ERROR,
 			e_height: '', e_length: '', e_paint_color: '',
 			e_quantity: '', e_stain_color: '', e_width: ''
 		};
@@ -45,11 +47,11 @@ export class CabinetValidation extends Validation{
 	}
 
 	private checkLength() {
-		const {front_length} = this.cab_details;
+		const {length} = this.cab_details;
 		const {length: top_length} = this.top_details;
-		if (String(front_length).length === 0) {
+		if (String(length).length === 0) {
 			this.errors.e_length = 'Cabinet length cannot be blank';
-		} else if (front_length > (top_length-2)) {
+		} else if (length > (top_length-2)) {
 			this.errors.e_length = 'Cabinet length must be less than top length by 2in';
 		}
 	}
