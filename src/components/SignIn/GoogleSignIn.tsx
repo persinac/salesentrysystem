@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import * as routes from "../../constants/routes";
 import { auth, db } from "../../Firebase";
 import {Roles} from "../../State";

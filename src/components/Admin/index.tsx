@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {db} from '../../Firebase';
 import {withAuthorization} from '../../Firebase/withAuthorization';
 import {Admin} from './Admin';

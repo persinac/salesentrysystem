@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import {auth, db} from '../../Firebase';

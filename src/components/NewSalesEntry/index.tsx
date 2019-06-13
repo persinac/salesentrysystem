@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import {Categories} from '../../Enums/Category';
 import {withAuthorization} from '../../Firebase/withAuthorization';
 import {TopValidation} from '../../Validation/TopValidation';
@@ -25,6 +25,7 @@ import {ProductComponent, ProductDetailsMapper} from '../../Structure/types';
 import {Mapper} from '../../Mapper/Mapper';
 import {CabinetValidation} from '../../Validation/CabinetValidation';
 import {TypeGuards} from '../../Enums/Enums';
+import { newSalesEntryContext } from '../../Context/NewSalesEntryContext';
 
 const rp = require('request-promise');
 
@@ -99,7 +100,7 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		this.state = {...NewSalesEntryComponent.INITIAL_STATE};
 	}
 
-	public componentDidMount() {
+	public componentDidMount = () => {
 		this.buildData();
 		const primaryNavBarHeight =  window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue('height');
 		const hdrHeight =  window.getComputedStyle(document.getElementById('sales-entry-hdr'), null).getPropertyValue('height');
@@ -386,21 +387,25 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 				</div>
 			);
 		} else if (page === 1) {
-			return <SalesEntryFormComponent
-				questions={questions}
-				categories={categories}
-				productDetails={productDetails}
-				submitHandler={this.onProductDetailsSubmit}
-				cabinetErrors={this.state.cabinetErrors}
-			/>;
+			return (
+					<SalesEntryFormComponent
+						questions={questions}
+						categories={categories}
+						productDetails={productDetails}
+						submitHandler={this.onProductDetailsSubmit}
+						cabinetErrors={this.state.cabinetErrors}
+					/>
+			);
 		} else if (page === 2) {
-			return <SalesEntryFormComponent
-				questions={questions}
-				categories={categories}
-				productDetails={productDetails}
-				submitHandler={this.onProductDetailsSubmit}
-				cabinetErrors={this.state.cabinetErrors}
-			/>;
+			return (
+					<SalesEntryFormComponent
+						questions={questions}
+						categories={categories}
+						productDetails={productDetails}
+						submitHandler={this.onProductDetailsSubmit}
+						cabinetErrors={this.state.cabinetErrors}
+					/>
+			);
 		} else  {
 			return (
 				<div>

@@ -1,8 +1,8 @@
-import {Validation} from "./Validation";
-import {Cabinet, CabinetsValidationError, ProductDetails, Tops} from "../State";
-import {TypeGuards} from "../Enums/Enums";
+import {TypeGuards} from '../Enums/Enums';
+import {Cabinet, CabinetsValidationError, Tops} from '../State';
+import {Validation} from './Validation';
 
-export class CabinetValidation extends Validation{
+export class CabinetValidation extends Validation {
 
 	private cab_details: Cabinet;
 	private top_details: Tops | null;
@@ -44,6 +44,8 @@ export class CabinetValidation extends Validation{
 			this.errors.e_quantity = 'Cabinet quantity cannot be blank';
 		} else if (quantity > 4) {
 			this.errors.e_quantity = 'Cannot have more than 4 cabinets';
+		} else if (quantity < 1) {
+			this.errors.e_quantity = 'Must have at least 1 cabinet';
 		}
 	}
 

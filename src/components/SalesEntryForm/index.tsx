@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {SalesEntryForm} from './SalesEntryForm';
 import '../../styles/general.css';
 import Accordion from 'react-bootstrap/Accordion';
