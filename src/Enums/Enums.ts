@@ -18,6 +18,7 @@ export enum DoorsQuestionsShortNames {
 	dr_qty = 'quantity',
 	dr_lngth = 'length',
 	dr_wdth = 'width',
+	dr_height = 'height',
 	dr_mt = 'material_type',
 	dr_vndr = 'vendor',
 	dr_vndr_po = 'vendor_po'
@@ -28,6 +29,7 @@ export enum DrawersQuestionsShortNames {
 	dwr_qty = 'quantity',
 	dwr_lngth = 'length',
 	dwr_wdth = 'width',
+	dwr_height = 'height',
 	dwr_mt = 'material_type',
 	dwr_vndr = 'vendor',
 	dwr_vndr_po = 'vendor_po'
@@ -38,6 +40,7 @@ export enum DrawerFrontsQuestionsShortNames {
 	dwrfrnts_qty = 'quantity',
 	dwrfrnts_lngth = 'length',
 	dwrfrnts_wdth = 'width',
+	dwrfrnts_height = 'height',
 	dwrfrnts_vndr = 'vendor',
 	dwrfrnts_vndr_po = 'vendor_po'
 }
@@ -47,6 +50,7 @@ export enum LegsQuestionsShortNames {
 	legs_qty = 'quantity',
 	legs_lngth = 'length',
 	legs_wdth = 'width',
+	legs_height = 'height',
 	legs_vndr = 'vendor',
 	legs_vndr_po = 'vendor_po'
 }

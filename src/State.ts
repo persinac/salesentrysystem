@@ -99,6 +99,7 @@ export interface Doors {
 	stain_color?: string;
 	length?: number;
 	width?: number;
+	height?: number;
 	quantity?: number;
 	material_type?: string;
 }
@@ -109,6 +110,7 @@ export interface Drawers {
 	vendor_po?: string;
 	length?: number;
 	width?: number;
+	height?: number;
 	quantity?: number;
 	material_type?: string;
 }
@@ -119,6 +121,7 @@ export interface DrawerFronts {
 	vendor_po?: string;
 	length?: number;
 	width?: number;
+	height?: number;
 	quantity?: number;
 }
 
@@ -130,6 +133,7 @@ export interface Legs {
 	stain_color?: string;
 	length?: number;
 	width?: number;
+	height?: number;
 	quantity?: number;
 }
 
@@ -182,9 +186,10 @@ export interface DoorsValidationError {
 	e_vendor_po?: string;
 	e_paint_color?: string;
 	e_stain_color?: string;
-	e_length?: number;
-	e_width?: number;
-	e_quantity?: number;
+	e_length?: string;
+	e_width?: string;
+	e_height?: string;
+	e_quantity?: string;
 	e_material_type?: string;
 }
 
@@ -192,9 +197,10 @@ export interface DrawersValidationError {
 	type: string;
 	e_vendor?: string;
 	e_vendor_po?: string;
-	e_length?: number;
-	e_width?: number;
-	e_quantity?: number;
+	e_length?: string;
+	e_width?: string;
+	e_height?: string;
+	e_quantity?: string;
 	e_material_type?: string;
 }
 
@@ -202,9 +208,10 @@ export interface DrawerFrontsValidationError {
 	type: string;
 	e_vendor?: string;
 	e_vendor_po?: string;
-	e_length?: number;
-	e_width?: number;
-	e_quantity?: number;
+	e_length?: string;
+	e_width?: string;
+	e_height?: string;
+	e_quantity?: string;
 }
 
 export interface LegsValidationError {
@@ -213,9 +220,10 @@ export interface LegsValidationError {
 	e_vendor_po?: string;
 	e_paint_color?: string;
 	e_stain_color?: string;
-	e_length?: number;
-	e_width?: number;
-	e_quantity?: number;
+	e_length?: string;
+	e_width?: string;
+	e_height?: string;
+	e_quantity?: string;
 }
 
 export interface ShelvingValidationError {
@@ -239,4 +247,27 @@ export interface TotalSizeValidationError {
 	e_length?: string;
 	e_depth?: string;
 	e_height?: string;
+}
+
+export interface SalesEntryState {
+	email: string;
+	error: any;
+	password: string;
+	roles: Roles;
+	data: any;
+	containerHeight: string;
+	navbarHeight: string;
+	page: number;
+	customer?: Customer;
+	customerErrors?: CustomerValidationError;
+	productHeader?: ProductHeader;
+	productHeaderErrors?: ProductHeaderValidationError;
+	productDetails?: ProductDetails[];
+	questions?: Questions[];
+	categories?: any;
+	secondary_categories?: any;
+	productId?: number;
+	cabinetErrors?: CabinetsValidationError;
+	topErrors?: TopValidationError;
+	drawerErrors?: DrawersValidationError;
 }

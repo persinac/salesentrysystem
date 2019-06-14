@@ -24,6 +24,7 @@ export class CabinetValidation extends Validation {
 		this.checkQuantity();
 		this.checkLength();
 		this.checkWidth();
+		this.checkHeight();
 
 		return (this.errors.e_height.length === 0 &&
 			this.errors.e_length.length === 0 &&

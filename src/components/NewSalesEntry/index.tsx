@@ -10,14 +10,13 @@ import '../../styles/error.css';
 import {
 	Cabinet, CabinetsValidationError,
 	Customer,
-	CustomerValidationError,
+	CustomerValidationError, Drawers, DrawersValidationError,
 	ProductDetails,
 	ProductHeader, ProductHeaderValidationError,
 	Questions,
 	QuestionValues,
-	Roles, Tops, TopValidationError
+	Roles, SalesEntryState, Tops, TopValidationError
 } from '../../State';
-import {SalesEntryFormComponent} from '../SalesEntryForm';
 import {ProductHeaderComponent} from '../ProductHeaderInfo';
 import {CustomerValidation} from '../../Validation/CustomerValidation';
 import {ProductHeaderValidation} from '../../Validation/ProductHeaderValidation';
@@ -26,6 +25,8 @@ import {Mapper} from '../../Mapper/Mapper';
 import {CabinetValidation} from '../../Validation/CabinetValidation';
 import {TypeGuards} from '../../Enums/Enums';
 import { newSalesEntryContext } from '../../Context/NewSalesEntryContext';
+import {SalesEntryFormComponent} from "../SalesEntryForm";
+import {DrawerValidation} from "../../Validation/DrawerValidation";
 
 const rp = require('request-promise');
 
@@ -59,9 +60,10 @@ interface IState {
 	productId?: number;
 	cabinetErrors?: CabinetsValidationError;
 	topErrors?: TopValidationError;
+	drawerErrors?: DrawersValidationError;
 }
 
-class NewSalesEntryComponent extends React.Component<IProps, IState> {
+class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	private static INITIAL_STATE = {
 		email: '',
 		error: {},
@@ -79,7 +81,8 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		productHeader: {notes: '', reference_number: '', group_id: 0, order_num: 0, status: 'Started', crafting_required: false},
 		productHeaderErrors: {e_reference_number: ''},
 		cabinetErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		topErrors: {type: TypeGuards.TOP_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''}
+		topErrors: {type: TypeGuards.TOP_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
+		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''}
 	};
 
 	private post_options = {
@@ -205,28 +208,30 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 		};
 		const {email, password, error, data} = this.state;
 		return (
-			<div className={'bg-light height-100'} style={containerStyle}>
-				<div className={'container'}>
-					<div className={'py-5 text-center'} id={'sales-entry-hdr'}>
-						<h2>Sales Entry</h2>
-						<p>Accessible if sales or admin</p>
-					</div>
-					<div className={'row'} style={rowStyle}>
-						<div className={'col-md-4 order-md-2 mb-4'}>
-							<p className={'lead'}>Maybe use this sidebar as a component summary? Price/Margin?</p>
+			<newSalesEntryContext.Provider value={this.state}>
+				<div className={'bg-light height-100'} style={containerStyle}>
+					<div className={'container'}>
+						<div className={'py-5 text-center'} id={'sales-entry-hdr'}>
+							<h2>Sales Entry</h2>
+							<p>Accessible if sales or admin</p>
 						</div>
-						<div className={'col-md-8 order-md-1'}>
-							{this.renderPage()}
-							<hr />
+						<div className={'row'} style={rowStyle}>
+							<div className={'col-md-4 order-md-2 mb-4'}>
+								<p className={'lead'}>Maybe use this sidebar as a component summary? Price/Margin?</p>
+							</div>
+							<div className={'col-md-8 order-md-1'}>
+								{this.renderPage()}
+								<hr />
+							</div>
 						</div>
-					</div>
-					<div>
-						<div className={'row'}>
-							{this.renderButtons()}
+						<div>
+							<div className={'row'}>
+								{this.renderButtons()}
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</newSalesEntryContext.Provider>
 		);
 	}
 
@@ -269,20 +274,30 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 
 		const fresh_cab: Cabinet = {type: TypeGuards.CABINET};
 		const fresh_top: Tops = {type: TypeGuards.TOPS};
+		const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
 		const top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.TOP);
+		const dwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DRAWERS);
 		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, fresh_cab);
 		const tm: ProductComponent = Mapper.mapProductComponent(top_details, fresh_top);
+		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
 
+		console.log(dwm);
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
+		const dwrv: DrawerValidation = new DrawerValidation(cm, dwm);
 
+		console.log(dwrv);
 		// have to run validation first, so that errors get set if needed
 		const cab_validate = cv.validate();
 		const top_validate = tv.validate();
+		const dwr_validate = dwrv.validate();
 
-		if (cab_validate && top_validate) {
+		console.log(dwr_validate);
+		console.log(dwrv.getErrors());
+
+		if (cab_validate && top_validate && dwr_validate) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
 				.then((newPDs: any) => {
 					const updatedPDs: ProductDetails[] = newPDs.details;
@@ -306,7 +321,11 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 					console.log('DONE - Error');
 				});
 		}
-		this.setState({cabinetErrors: {...cv.getErrors()}, topErrors: {...tv.getErrors()}});
+		this.setState({
+			cabinetErrors: {...cv.getErrors()},
+			topErrors: {...tv.getErrors()},
+			drawerErrors: {...dwrv.getErrors()}
+		});
 
 		event.preventDefault();
 	}
@@ -388,23 +407,15 @@ class NewSalesEntryComponent extends React.Component<IProps, IState> {
 			);
 		} else if (page === 1) {
 			return (
-					<SalesEntryFormComponent
-						questions={questions}
-						categories={categories}
-						productDetails={productDetails}
-						submitHandler={this.onProductDetailsSubmit}
-						cabinetErrors={this.state.cabinetErrors}
-					/>
+				<newSalesEntryContext.Consumer>
+					{context => (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />)}
+				</newSalesEntryContext.Consumer>
 			);
 		} else if (page === 2) {
 			return (
-					<SalesEntryFormComponent
-						questions={questions}
-						categories={categories}
-						productDetails={productDetails}
-						submitHandler={this.onProductDetailsSubmit}
-						cabinetErrors={this.state.cabinetErrors}
-					/>
+				<newSalesEntryContext.Consumer>
+					{context => (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />)}
+				</newSalesEntryContext.Consumer>
 			);
 		} else  {
 			return (
@@ -475,5 +486,7 @@ const defaultRouteRedirect = (authUser: any) => {
 	}
 	return route;
 };
+
+NewSalesEntryComponent.contextType = newSalesEntryContext;
 
 export const newSalesEntryPage = withAuthorization(authCondition, defaultRouteRedirect)(NewSalesEntryComponent);

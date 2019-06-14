@@ -3,19 +3,15 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React from "react";
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import {CabinetsValidationError, ProductDetails, Questions} from '../../State';
+import {ProductDetails, Questions, SalesEntryState} from '../../State';
 import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
 import {Mapper} from "../../Mapper/Mapper";
+import {Categories} from "../../Enums/Category";
 
 interface InterfaceProps {
-	users?: any;
-	some_data?: any;
 	category_id?: number;
 	category_title?: string;
-	all_categories?: any;
-	questions?: Questions[];
-	productDetails: ProductDetails[];
-	cabinetErrors?: CabinetsValidationError;
+	context: SalesEntryState;
 }
 
 interface IState {
@@ -31,7 +27,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		this.state = {
 			doesContainShow: false,
 			currentQuestionIdx: 0,
-			productDetails: this.props.productDetails
+			productDetails: this.props.context.productDetails
 		};
 	}
 
@@ -46,12 +42,16 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	componentDidMount(): void {
-		const currCategory = this.props.all_categories.filter((f: any) => f.category_id === this.props.category_id);
+		const currCategory = this.props.context.categories.filter((f: any) => {
+			return f.category_id === this.props.category_id
+		});
 		const element = document.getElementById(`parent-question-${currCategory[0].category_id}`);
-		if (element.childElementCount > 1) {
-			element.classList.add('sales-form-card-overflow-height-300');
-		} else {
-			element.classList.add('sales-form-card-overflow-height-auto');
+		if (element !== undefined && element !== null) {
+			if (element.childElementCount > 1) {
+				element.classList.add('sales-form-card-overflow-height-300');
+			} else {
+				element.classList.add('sales-form-card-overflow-height-auto');
+			}
 		}
 	}
 
@@ -101,8 +101,12 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 
 	private attachError(category_id: number, short_name: string) {
 		switch (category_id) {
-			case 10:
-				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.cabinetErrors)} id={short_name}/>);
+			case Categories.CABINETS:
+				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetErrors)} id={short_name}/>);
+			case Categories.TOP:
+				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
+			case Categories.DRAWERS:
+				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
 			default:
 				return null;
 		}
@@ -115,7 +119,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			// for each category
 			let groupedSubCatInputs = currCategory.map((sc: any) => {
 				// - grab the questions that correspond to that category
-				let filteredQs: any = this.props.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
+				let filteredQs: any = this.props.context.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
 
 				// - construct a header
 				const header = sc.category_hierarchy > 1 ? this.buildHeader(sc.category) : null;
@@ -134,7 +138,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 					});
 					return ( this.createNewRow(builtQuestions) );
 				});
-				let subCats: any = this.props.all_categories.filter((filter: any) => filter.belongs_to === sc.category_id);
+				let subCats: any = this.props.context.categories.filter((filter: any) => filter.belongs_to === sc.category_id);
 				if (subCats.length > 0) {
 					return this.recursivelyBuildQuestions(subCats, divRowQuestionsByGrouping);
 				} else {
@@ -158,8 +162,8 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private questionBuilder() {
-		if (this.props.questions) {
-			const currCategory = this.props.all_categories.filter((f: any) => f.category_id === this.props.category_id);
+		if (this.props.context.questions) {
+			const currCategory = this.props.context.categories.filter((f: any) => f.category_id === this.props.category_id);
 			return (
 				<div id={`parent-question-${currCategory[0].category_id}`} >
 					{this.recursivelyBuildQuestions(currCategory)}
@@ -169,7 +173,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	public render() {
-		const {questions, category_id}: any = this.props;
+		const {context: {questions}, category_id} = this.props;
 		if (category_id && questions) {
 			return this.renderCard(questions);
 		} else {

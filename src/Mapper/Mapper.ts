@@ -2,7 +2,11 @@ import {ProductDetailsMapper, ProductComponent, ProductComponentErrors} from "..
 import {ProductDetails, Questions} from "../State";
 import {
 	CabinetErrorShortNamesMapping,
-	CabinetQuestionsShortNames,
+	CabinetQuestionsShortNames, DoorsErrorShortNamesMapping,
+	DoorsQuestionsShortNames,
+	DrawersErrorShortNamesMapping,
+	DrawersQuestionsShortNames,
+	TopErrorShortNamesMapping,
 	TopQuestionsShortNames,
 	TypeGuards
 } from "../Enums/Enums";
@@ -36,6 +40,14 @@ export class Mapper {
 				enumKeys = Object.keys(TopQuestionsShortNames);
 				returnObject = Object(TopQuestionsShortNames);
 				break;
+			case TypeGuards.DRAWERS:
+				enumKeys = Object.keys(DrawersQuestionsShortNames);
+				returnObject = Object(DrawersQuestionsShortNames);
+				break;
+			case TypeGuards.DOORS:
+				enumKeys = Object.keys(DoorsQuestionsShortNames);
+				returnObject = Object(DoorsQuestionsShortNames);
+				break;
 			default: throw new Error("Unexpected object: " + object);
 		}
 
@@ -53,7 +65,13 @@ export class Mapper {
 				value = Object(errors)[Object(CabinetErrorShortNamesMapping)[givenShortName]];
 				break;
 			case TypeGuards.TOP_VALIDATION_ERROR:
-				value = Object(errors)[Object(CabinetErrorShortNamesMapping)[givenShortName]];
+				value = Object(errors)[Object(TopErrorShortNamesMapping)[givenShortName]];
+				break;
+			case TypeGuards.DRAWERS_VALIDATION_ERROR:
+				value = Object(errors)[Object(DrawersErrorShortNamesMapping)[givenShortName]];
+				break;
+			case TypeGuards.DOORS_VALIDATION_ERROR:
+				value = Object(errors)[Object(DoorsErrorShortNamesMapping)[givenShortName]];
 				break;
 			default: throw new Error("Unexpected object: " + errors);
 		}
