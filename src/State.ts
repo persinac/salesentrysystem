@@ -270,4 +270,5 @@ export interface SalesEntryState {
 	cabinetErrors?: CabinetsValidationError;
 	topErrors?: TopValidationError;
 	drawerErrors?: DrawersValidationError;
+	doorErrors?: DoorsValidationError;
 }

@@ -83,7 +83,7 @@ export class DoorsValidation extends Validation {
 	private checkHeight() {
 		const {width} = this.door_details;
 		if (String(width).length === 0) {
-			this.errors.e_height = 'Drawer height cannot be blank';
+			this.errors.e_height = 'Door height cannot be blank';
 		}
 	}
 }

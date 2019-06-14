@@ -10,7 +10,7 @@ import '../../styles/error.css';
 import {
 	Cabinet, CabinetsValidationError,
 	Customer,
-	CustomerValidationError, Drawers, DrawersValidationError,
+	CustomerValidationError, Doors, Drawers, DrawersValidationError,
 	ProductDetails,
 	ProductHeader, ProductHeaderValidationError,
 	Questions,
@@ -27,6 +27,7 @@ import {TypeGuards} from '../../Enums/Enums';
 import { newSalesEntryContext } from '../../Context/NewSalesEntryContext';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {DrawerValidation} from "../../Validation/DrawerValidation";
+import {DoorsValidation} from "../../Validation/DoorsValidation";
 
 const rp = require('request-promise');
 
@@ -38,29 +39,6 @@ interface IProps {
 	height?: string;
 	productId?: number;
 	context?: any;
-}
-
-interface IState {
-	email: string;
-	error: any;
-	password: string;
-	roles: Roles;
-	data: any;
-	containerHeight: string;
-	navbarHeight: string;
-	page: number;
-	customer?: Customer;
-	customerErrors?: CustomerValidationError;
-	productHeader?: ProductHeader;
-	productHeaderErrors?: ProductHeaderValidationError;
-	productDetails?: ProductDetails[];
-	questions?: Questions[];
-	categories?: any;
-	secondary_categories?: any;
-	productId?: number;
-	cabinetErrors?: CabinetsValidationError;
-	topErrors?: TopValidationError;
-	drawerErrors?: DrawersValidationError;
 }
 
 class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
@@ -82,7 +60,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		productHeaderErrors: {e_reference_number: ''},
 		cabinetErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
 		topErrors: {type: TypeGuards.TOP_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
-		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''}
+		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
+		doorErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''}
 	};
 
 	private post_options = {
@@ -206,7 +185,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const containerStyle = {
 			height: `calc(100% - ${navbarHeight})`
 		};
-		const {email, password, error, data} = this.state;
 		return (
 			<newSalesEntryContext.Provider value={this.state}>
 				<div className={'bg-light height-100'} style={containerStyle}>
@@ -269,35 +247,35 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			}
 			pd.updated_by = this.props.email;
 		});
-		console.log('PRE-FINDING');
-		console.log(productDetails);
 
 		const fresh_cab: Cabinet = {type: TypeGuards.CABINET};
 		const fresh_top: Tops = {type: TypeGuards.TOPS};
 		const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
+		const fresh_door: Doors = {type: TypeGuards.DOORS};
+
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
 		const top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.TOP);
 		const dwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DRAWERS);
+		const dr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DOORS);
+
 		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, fresh_cab);
 		const tm: ProductComponent = Mapper.mapProductComponent(top_details, fresh_top);
 		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
+		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
 
-		console.log(dwm);
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
 		const dwrv: DrawerValidation = new DrawerValidation(cm, dwm);
+		const drv: DoorsValidation = new DoorsValidation(dr);
 
-		console.log(dwrv);
 		// have to run validation first, so that errors get set if needed
 		const cab_validate = cv.validate();
 		const top_validate = tv.validate();
 		const dwr_validate = dwrv.validate();
+		const drv_validate = drv.validate();
 
-		console.log(dwr_validate);
-		console.log(dwrv.getErrors());
-
-		if (cab_validate && top_validate && dwr_validate) {
+		if (cab_validate && top_validate && dwr_validate && drv_validate) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
 				.then((newPDs: any) => {
 					const updatedPDs: ProductDetails[] = newPDs.details;
@@ -324,7 +302,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		this.setState({
 			cabinetErrors: {...cv.getErrors()},
 			topErrors: {...tv.getErrors()},
-			drawerErrors: {...dwrv.getErrors()}
+			drawerErrors: {...dwrv.getErrors()},
+			doorErrors: {...drv.getErrors()}
 		});
 
 		event.preventDefault();
@@ -351,7 +330,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const phv_validate = phv.validate();
 
 		if (cv_validate && phv_validate) {
-			this.setState({customerErrors: {...cv.getErrors()}, productHeaderErrors: {...phv.getErrors()}});
 			this.postWRFServerData({...productHeader, customer}, 'product', false)
 				.then((productStuff: any) => {
 					const ph_id = productStuff.newProduct.ph_id;
@@ -372,9 +350,10 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					console.log(e);
 					console.log('DONE - Error');
 				});
-		} else {
-			this.setState({customerErrors: {...cv.getErrors()}, productHeaderErrors: {...phv.getErrors()}});
 		}
+
+		this.setState({customerErrors: {...cv.getErrors()}, productHeaderErrors: {...phv.getErrors()}});
+
 		event.preventDefault();
 	}
 
@@ -383,10 +362,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			customer,
 			customerErrors,
 			productHeader,
-			productHeaderErrors,
-			questions,
-			categories,
-			productDetails} = this.state;
+			productHeaderErrors} = this.state;
 		if (page === 0) {
 			return (
 				<div>
@@ -406,17 +382,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				</div>
 			);
 		} else if (page === 1) {
-			return (
-				<newSalesEntryContext.Consumer>
-					{context => (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />)}
-				</newSalesEntryContext.Consumer>
-			);
+			return ( <SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} /> );
 		} else if (page === 2) {
-			return (
-				<newSalesEntryContext.Consumer>
-					{context => (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />)}
-				</newSalesEntryContext.Consumer>
-			);
+			return ( <SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} /> );
 		} else  {
 			return (
 				<div>

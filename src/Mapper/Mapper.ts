@@ -60,6 +60,7 @@ export class Mapper {
 
 	public static mapErrorObject(givenShortName: string, errors: ProductComponentErrors): string {
 		let value: string = '';
+		console.log(errors);
 		switch (errors.type) {
 			case TypeGuards.CABINET_VALIDATION_ERROR:
 				value = Object(errors)[Object(CabinetErrorShortNamesMapping)[givenShortName]];

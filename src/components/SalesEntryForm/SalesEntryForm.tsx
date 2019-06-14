@@ -107,6 +107,8 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
 			case Categories.DRAWERS:
 				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
+			case Categories.DOORS:
+				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorErrors)} id={short_name}/>);
 			default:
 				return null;
 		}
