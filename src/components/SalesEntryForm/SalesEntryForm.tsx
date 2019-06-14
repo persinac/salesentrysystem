@@ -62,9 +62,9 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		return shouldRerender;
 	}
 
-	private createNewRow(questions: any) {
+	private createNewRow(questions: any, id: string) {
 		return (
-			<div className={'row'}>
+			<div className={'row'} id={id}>
 				{questions}
 			</div>
 		);
@@ -115,8 +115,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private recursivelyBuildQuestions(currCategory: any, groupedInputs?: any) {
-		const maxQsPerRow = 2;
-		const classyClass = `col-md-${12/maxQsPerRow} mb-3`;
+		const minQsPerRow = 2;
 		if(currCategory) {
 			// for each category
 			let groupedSubCatInputs = currCategory.map((sc: any) => {
@@ -134,11 +133,15 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 					//  - get questions that are in the current grouping
 					let groupFilteredQs: any = filteredQs.filter((filter: any) => filter.grouping === groupNum);
 
+					const row_id: string = String(groupFilteredQs[0].unique_dim);
+					const qsPerRow: number = groupFilteredQs.length > minQsPerRow ? groupFilteredQs.length : minQsPerRow;
+					const classyClass = `col-md-${12/qsPerRow} mb-3`;
+
 					//  - construct the questions inputs
 					const builtQuestions = groupFilteredQs.map((q: any) => {
 						return this.injectGroupingInput(q, classyClass);
 					});
-					return ( this.createNewRow(builtQuestions) );
+					return ( this.createNewRow(builtQuestions, row_id) );
 				});
 				let subCats: any = this.props.context.categories.filter((filter: any) => filter.belongs_to === sc.category_id);
 				if (subCats.length > 0) {
@@ -217,8 +220,19 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private setDynStateWithEvent(event: any, index: number, columnType: string): void {
+		const val: any = (event.target as any).value;
+		if (columnType === 'cab_quantity') {
+			console.log('CAB QUANT CHANGE');
+			if (String(val).length > 0) {
+				if (Number(val) === 1) {
+					document.getElementById('cab_2').style.display = 'none';
+				} else {
+					document.getElementById('cab_2').style.display = 'flex';
+				}
+			}
+		}
 		this.setState({
-			productDetails: this.onUpdateItem(index, columnType, (event.target as any).value)
+			productDetails: this.onUpdateItem(index, columnType, val)
 		});
 	}
 
