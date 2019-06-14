@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 import { BsPrefixComponent } from './helpers';
 import AccordionToggle from './AccordionToggle';

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import * as routes from '../../constants/routes';
 import { SignUpForm } from './SignUp';

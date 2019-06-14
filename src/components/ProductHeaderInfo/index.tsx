@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import {auth, db} from '../../Firebase';
@@ -9,7 +9,7 @@ import '../../styles/general.css';
 import Accordion from 'react-bootstrap/Accordion';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowDown, faLongArrowAltDown, faLongArrowAltUp, faUser} from '@fortawesome/free-solid-svg-icons';
-import {ProductHeader, Questions, QuestionValues, Roles} from '../../State';
+import {ProductHeader, ProductHeaderValidationError, Questions, QuestionValues, Roles} from '../../State';
 import {ProductHeaderInfo} from "./ProductHeaderInfo";
 
 const rp = require('request-promise');
@@ -21,6 +21,7 @@ interface IProps {
 	password?: string;
 	height?: string;
 	productHeader: ProductHeader;
+	productHeaderErrors?: ProductHeaderValidationError;
 	phHandler: any;
 }
 
@@ -70,7 +71,11 @@ export class ProductHeaderComponent extends React.Component<IProps, IState> {
 		return (
 			<div className={'row'}>
 				<div className={'width-100'}>
-					<ProductHeaderInfo productHeader={this.props.productHeader} phHandler={this.props.phHandler}/>
+					<ProductHeaderInfo
+						productHeader={this.props.productHeader}
+						productHeaderErrors={this.props.productHeaderErrors}
+						phHandler={this.props.phHandler}
+					/>
 				</div>
 			</div>
 		);

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { authUserContext } from "../../Firebase/AuthUserContext";
 import { withAuthorization } from "../../Firebase/withAuthorization";
 import { PasswordForgetForm } from "../PasswordForget/PasswordForgetForm";

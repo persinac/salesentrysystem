@@ -1,14 +1,16 @@
 import {faLongArrowAltDown, faLongArrowAltUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import * as React from "react";
+import React from "react";
 import Card from 'react-bootstrap/Card';
-import {ProductHeader} from "../../State";
+import {ProductHeader, ProductHeaderValidationError} from "../../State";
+import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
 
 
 interface InterfaceProps {
 	users?: any;
 	some_data?: any;
 	productHeader?: ProductHeader;
+	productHeaderErrors?: ProductHeaderValidationError;
 	phHandler?: any;
 }
 
@@ -38,6 +40,7 @@ export class ProductHeaderInfo extends React.Component<InterfaceProps, IState> {
 
 	private renderCard() {
 		const {notes, reference_number} = this.props.productHeader;
+		console.log(this.props.productHeaderErrors);
 		return (
 			<div className={'the-lonely-card'}>
 				<Card>
@@ -51,8 +54,9 @@ export class ProductHeaderInfo extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.phHandler(event, 'reference_number')}
 									type='text'
 									placeholder={'reference_number'}
-									className='form-control'
+									className={'form-control'}
 								/>
+								<ErrorWrapper errorMessage={this.props.productHeaderErrors.e_reference_number} id={'p-q-2'}/>
 							</div>
 							<div className={`col-md-12 mb-3`}>
 								<textarea

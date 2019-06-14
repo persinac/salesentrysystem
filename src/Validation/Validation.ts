@@ -2,5 +2,5 @@ export abstract class Validation {
 
 	protected constructor() {}
 
-	public abstract validate(): any;
+	public abstract validate(): boolean;
 }

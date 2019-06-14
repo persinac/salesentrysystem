@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { auth } from "../../Firebase";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";

@@ -1,11 +1,8 @@
 import {faLongArrowAltDown, faLongArrowAltUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import * as React from "react";
+import React from "react";
 import {ProductHeader} from "../../State";
 import * as ROUTES from "../../constants/routes";
-import {newSalesEntryPage} from "../NewSalesEntry";
-import {Route} from "react-router";
-import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {Link} from "react-router-dom";
 
 

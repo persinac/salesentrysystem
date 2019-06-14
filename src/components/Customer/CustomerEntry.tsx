@@ -1,8 +1,9 @@
 import {faLongArrowAltDown, faLongArrowAltUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import * as React from "react";
+import React from "react";
 import Card from 'react-bootstrap/Card';
-import {Customer} from "../../State";
+import {Customer, CustomerValidationError} from "../../State";
+import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
 
 
 interface InterfaceProps {
@@ -10,6 +11,7 @@ interface InterfaceProps {
 	some_data?: any;
 	customer?: Customer;
 	customerHandler?: any;
+	customerErrors?: CustomerValidationError;
 }
 
 interface IState {
@@ -31,7 +33,7 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 
 	private renderCard() {
 		const {primary_email, name, phone_number, shipping_address} = this.props.customer;
-		// console.log(this.state);
+		console.log(this.props.customerErrors);
 		return (
 			<div className={'the-lonely-card'}>
 				<Card>
@@ -45,7 +47,7 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.customerHandler(event, 'primary_email')}
 									type='text'
 									placeholder={'email'}
-									className='form-control'
+									className={'form-control'}
 								/>
 							</div>
 							<div className={`col-md-6 mb-3`}>
@@ -55,8 +57,9 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.customerHandler(event, 'name')}
 									type='text'
 									placeholder={'name'}
-									className='form-control'
+									className={'form-control'}
 								/>
+								<ErrorWrapper errorMessage={this.props.customerErrors.e_name} id={'cust-q-2'}/>
 							</div>
 							<div className={`col-md-6 mb-3`}>
 								<input
@@ -65,8 +68,9 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.customerHandler(event, 'phone_number')}
 									type='text'
 									placeholder={'primary_phone_number'}
-									className='form-control'
+									className={'form-control'}
 								/>
+								<ErrorWrapper errorMessage={this.props.customerErrors.e_phone_number} id={'cust-q-3'}/>
 							</div>
 							<div className={`col-md-6 mb-3`}>
 								<input
@@ -75,8 +79,9 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 									onChange={(event: any) => this.props.customerHandler(event, 'shipping_address')}
 									type='text'
 									placeholder={'shipping_address'}
-									className='form-control'
+									className={'form-control'}
 								/>
+								<ErrorWrapper errorMessage={this.props.customerErrors.e_shipping_address} id={'cust-q-4'}/>
 							</div>
 						</div>
 					</Card.Body>
