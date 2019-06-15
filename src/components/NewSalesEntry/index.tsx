@@ -382,9 +382,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				</div>
 			);
 		} else if (page === 1) {
-			return ( <SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} /> );
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />);
 		} else if (page === 2) {
-			return ( <SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} /> );
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />);
 		} else  {
 			return (
 				<div>
