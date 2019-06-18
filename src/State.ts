@@ -1,4 +1,4 @@
-import {TypeGuards} from "./Enums/Enums";
+import {TypeGuards} from "./Enums/InterfaceErrorMapping";
 
 export interface IAppState {
 	authUser: any;

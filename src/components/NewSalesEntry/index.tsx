@@ -23,7 +23,7 @@ import {ProductHeaderValidation} from '../../Validation/ProductHeaderValidation'
 import {ProductComponent, ProductDetailsMapper} from '../../Structure/types';
 import {Mapper} from '../../Mapper/Mapper';
 import {CabinetValidation} from '../../Validation/CabinetValidation';
-import {TypeGuards} from '../../Enums/Enums';
+import {TypeGuards} from '../../Enums/InterfaceErrorMapping';
 import { newSalesEntryContext } from '../../Context/NewSalesEntryContext';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {DrawerValidation} from "../../Validation/DrawerValidation";

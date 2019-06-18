@@ -8,6 +8,7 @@ import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
 import {Mapper} from "../../Mapper/Mapper";
 import {Categories} from "../../Enums/Category";
 import {number} from "prop-types";
+import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtility";
 
 interface InterfaceProps {
 	category_id?: number;
@@ -64,12 +65,21 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private createNewRow(questions: any, id: string) {
-		return (
-			<div className={'row'} id={id}>
-				{id === 'cab_2' ? <div className={'col-lg-12'}><p className={'lead'}>Cabinet 2</p></div> : null }
-				{questions}
-			</div>
-		);
+		if (id.trim().length > 0) {
+			const subHeader: SubHeaderQuantity = QuestionsUtility.determineQuantityQuestionSubHeader(id);
+			return (
+				<div className={'row'} id={id}>
+					<div className={'col-lg-12'}><p className={'lead'}>{subHeader.title}</p></div>
+					{questions}
+				</div>
+			);
+		} else {
+			return (
+				<div className={'row'}>
+					{questions}
+				</div>
+			);
+		}
 	}
 
 	private buildHeader(category: string) {

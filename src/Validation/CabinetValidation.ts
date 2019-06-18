@@ -1,4 +1,4 @@
-import {TypeGuards} from '../Enums/Enums';
+import {TypeGuards} from '../Enums/InterfaceErrorMapping';
 import {Cabinet, CabinetsValidationError, Tops} from '../State';
 import {Validation} from './Validation';
 

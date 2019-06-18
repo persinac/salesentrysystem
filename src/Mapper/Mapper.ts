@@ -9,7 +9,7 @@ import {
 	TopErrorShortNamesMapping,
 	TopQuestionsShortNames,
 	TypeGuards
-} from "../Enums/Enums";
+} from "../Enums/InterfaceErrorMapping";
 
 export class Mapper {
 	public static unionQuestionsDetails(
