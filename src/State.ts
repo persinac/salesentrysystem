@@ -91,6 +91,13 @@ export interface Cabinet {
 	material_type?: string;
 }
 
+export interface CabinetMeasurement {
+	type: string;
+	length?: number;
+	width?: number;
+	height?: number;
+}
+
 export interface Doors {
 	type: string;
 	vendor?: string;
@@ -268,6 +275,9 @@ export interface SalesEntryState {
 	secondary_categories?: any;
 	productId?: number;
 	cabinetErrors?: CabinetsValidationError;
+	cabinetTwoErrors?: CabinetsValidationError;
+	cabinetThreeErrors?: CabinetsValidationError;
+	cabinetFourErrors?: CabinetsValidationError;
 	topErrors?: TopValidationError;
 	drawerErrors?: DrawersValidationError;
 	doorErrors?: DoorsValidationError;

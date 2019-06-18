@@ -50,7 +50,7 @@ export class TopValidation extends Validation {
 		const {length: cab_length, quantity} = this.cab_details;
 		if (String(length).length === 0) {
 			this.errors.e_length = 'Top length cannot be blank';
-		} else if (Number(length) <= ((Number(cab_length) * Number(quantity)) + 2)) {
+		} else if (Number(length) < ((Number(cab_length) * Number(quantity)) + 2)) {
 			this.errors.e_length = 'Top length must be greater than total cabinet length by 2in';
 		}
 	}
@@ -65,7 +65,7 @@ export class TopValidation extends Validation {
 		const {width: cab_width} = this.cab_details;
 		if (String(width).length === 0) {
 			this.errors.e_width = 'Top width cannot be blank';
-		} else if (Number(width) <= (Number(cab_width) + 2)) {
+		} else if (Number(width) < (Number(cab_width) + 2)) {
 			this.errors.e_width = 'Top width must be greater than max cabinet width by 2in';
 		}
 	}

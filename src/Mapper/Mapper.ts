@@ -10,6 +10,13 @@ import {
 	TopQuestionsShortNames,
 	TypeGuards
 } from "../Enums/InterfaceErrorMapping";
+import {
+	CabinetFourErrorShortNamesMapping,
+	CabinetFourQuestionsShortNames, CabinetThreeErrorShortNamesMapping,
+	CabinetThreeQuestionsShortNames,
+	CabinetTwoErrorShortNamesMapping,
+	CabinetTwoQuestionsShortNames
+} from "../Enums/ExtraQuantityMapping";
 
 export class Mapper {
 	public static unionQuestionsDetails(
@@ -25,7 +32,7 @@ export class Mapper {
 					merged_details[question.short_name] = pd;
 				}
 			});
-			return merged_details
+			return merged_details;
 		}
 
 	public static mapProductComponent(details: ProductDetailsMapper, object: ProductComponent): ProductComponent {
@@ -35,6 +42,18 @@ export class Mapper {
 			case TypeGuards.CABINET:
 				enumKeys = Object.keys(CabinetQuestionsShortNames);
 				returnObject = Object(CabinetQuestionsShortNames);
+				break;
+			case TypeGuards.CABINET_2:
+				enumKeys = Object.keys(CabinetTwoQuestionsShortNames);
+				returnObject = Object(CabinetTwoQuestionsShortNames);
+				break;
+			case TypeGuards.CABINET_3:
+				enumKeys = Object.keys(CabinetThreeQuestionsShortNames);
+				returnObject = Object(CabinetThreeQuestionsShortNames);
+				break;
+			case TypeGuards.CABINET_4:
+				enumKeys = Object.keys(CabinetFourQuestionsShortNames);
+				returnObject = Object(CabinetFourQuestionsShortNames);
 				break;
 			case TypeGuards.TOPS:
 				enumKeys = Object.keys(TopQuestionsShortNames);
@@ -54,7 +73,6 @@ export class Mapper {
 		enumKeys.forEach((sn: string) => {
 			Object(object)[returnObject[sn]] = details[sn].response
 		});
-
 		return object;
 	}
 
@@ -63,6 +81,15 @@ export class Mapper {
 		switch (errors.type) {
 			case TypeGuards.CABINET_VALIDATION_ERROR:
 				value = Object(errors)[Object(CabinetErrorShortNamesMapping)[givenShortName]];
+				break;
+			case TypeGuards.CABINET_VALIDATION_ERROR_2:
+				value = Object(errors)[Object(CabinetTwoErrorShortNamesMapping)[givenShortName]];
+				break;
+			case TypeGuards.CABINET_VALIDATION_ERROR_3:
+				value = Object(errors)[Object(CabinetThreeErrorShortNamesMapping)[givenShortName]];
+				break;
+			case TypeGuards.CABINET_VALIDATION_ERROR_4:
+				value = Object(errors)[Object(CabinetFourErrorShortNamesMapping)[givenShortName]];
 				break;
 			case TypeGuards.TOP_VALIDATION_ERROR:
 				value = Object(errors)[Object(TopErrorShortNamesMapping)[givenShortName]];

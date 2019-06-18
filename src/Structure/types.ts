@@ -1,6 +1,6 @@
 import {
 	Cabinet,
-	CabinetsValidationError,
+	CabinetsValidationError, CabinetMeasurement,
 	Doors,
 	DoorsValidationError,
 	DrawerFronts, DrawerFrontsValidationError,
@@ -19,7 +19,9 @@ import {
 
 export type ProductDetailsMapper = Record<string, ProductDetails>;
 
-export type ProductComponent = Cabinet | Doors | Drawers | DrawerFronts | Legs | Shelving | Tops | TotalSize;
+export type ProductComponent = Cabinet | CabinetMeasurement |
+	Doors | Drawers | DrawerFronts |
+	Legs | Shelving | Tops | TotalSize;
 
 export type ProductComponentErrors =
 	CabinetsValidationError | DoorsValidationError |

@@ -114,7 +114,18 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	private attachError(category_id: number, short_name: string) {
 		switch (category_id) {
 			case Categories.CABINETS:
-				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetErrors)} id={short_name}/>);
+				const cab_2_regex = new RegExp('_2');
+				const cab_3_regex = new RegExp('_3');
+				const cab_4_regex = new RegExp('_4');
+				if (cab_2_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetTwoErrors)} id={short_name}/>);
+				} if (cab_3_regex.test(short_name)) {
+				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetThreeErrors)} id={short_name}/>);
+				} if (cab_4_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetFourErrors)} id={short_name}/>);
+				} else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetErrors)} id={short_name}/>);
+				}
 			case Categories.TOP:
 				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
 			case Categories.DRAWERS:
@@ -257,7 +268,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 
 	private showExtraRows = (columnName: string, value: any): void => {
 		if (columnName === 'cab_quantity') {
-			console.log('CAB QUANT CHANGE');
 			this.setExtraRowsStyle(value, 'cab_', 4);
 		} else if (columnName === 'dr_quantity') {
 			this.setExtraRowsStyle(value, 'dr_', 8);
