@@ -7,6 +7,8 @@ import {ProductDetails, Questions, SalesEntryState} from '../../State';
 import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
 import {Mapper} from "../../Mapper/Mapper";
 import {Categories} from "../../Enums/Category";
+import {number} from "prop-types";
+import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtility";
 
 interface InterfaceProps {
 	category_id?: number;
@@ -62,12 +64,22 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		return shouldRerender;
 	}
 
-	private createNewRow(questions: any) {
-		return (
-			<div className={'row'}>
-				{questions}
-			</div>
-		);
+	private createNewRow(questions: any, id: string) {
+		if (id.trim().length > 0) {
+			const subHeader: SubHeaderQuantity = QuestionsUtility.determineQuantityQuestionSubHeader(id);
+			return (
+				<div className={'row'} id={id}>
+					<div className={'col-lg-12'}><p className={'lead'}>{subHeader.title}</p></div>
+					{questions}
+				</div>
+			);
+		} else {
+			return (
+				<div className={'row'}>
+					{questions}
+				</div>
+			);
+		}
 	}
 
 	private buildHeader(category: string) {
@@ -77,7 +89,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	private injectGroupingInput(question: any, classyMcClasserson: string) {
 		let idx = -1;
 		this.state.productDetails.some((pd: ProductDetails, internal_i: number) => {
-			if (pd.q_fk == question.q_id) {
+			if (pd.q_fk === question.q_id) {
 				idx = internal_i;
 				return true;
 			}
@@ -100,11 +112,27 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private attachError(category_id: number, short_name: string) {
+		const second_regex = new RegExp('_2');
+		const third_regex = new RegExp('_3');
+		const fourth_regex = new RegExp('_4');
 		switch (category_id) {
 			case Categories.CABINETS:
-				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetErrors)} id={short_name}/>);
+
+				if (second_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetTwoErrors)} id={short_name}/>);
+				} else if (third_regex.test(short_name)) {
+				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetThreeErrors)} id={short_name}/>);
+				} else if (fourth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetFourErrors)} id={short_name}/>);
+				} else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetErrors)} id={short_name}/>);
+				}
 			case Categories.TOP:
-				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
+				if (second_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topTwoErrors)} id={short_name}/>);
+				} else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
+				}
 			case Categories.DRAWERS:
 				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
 			case Categories.DOORS:
@@ -115,13 +143,12 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private recursivelyBuildQuestions(currCategory: any, groupedInputs?: any) {
-		const maxQsPerRow = 2;
-		const classyClass = `col-md-${12/maxQsPerRow} mb-3`;
-		if(currCategory) {
+		const minQsPerRow = 2;
+		if (currCategory) {
 			// for each category
-			let groupedSubCatInputs = currCategory.map((sc: any) => {
+			const groupedSubCatInputs = currCategory.map((sc: any) => {
 				// - grab the questions that correspond to that category
-				let filteredQs: any = this.props.context.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
+				const filteredQs: any = this.props.context.questions.filter((filter: any) => filter.cat_fk === sc.category_id);
 
 				// - construct a header
 				const header = sc.category_hierarchy > 1 ? this.buildHeader(sc.category) : null;
@@ -129,18 +156,22 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				// unique groups will be built via the questions.grouping
 				const uniqueGroups: number[] = Array.from(new Set(filteredQs.map((item: any) => item.grouping)));
 
-				let divRowQuestionsByGrouping = uniqueGroups.map((groupNum: number) => {
+				const divRowQuestionsByGrouping = uniqueGroups.map((groupNum: number) => {
 					// for each unique grouping
 					//  - get questions that are in the current grouping
-					let groupFilteredQs: any = filteredQs.filter((filter: any) => filter.grouping === groupNum);
+					const groupFilteredQs: any = filteredQs.filter((filter: any) => filter.grouping === groupNum);
+
+					const row_id: string = String(groupFilteredQs[0].unique_dim);
+					const qsPerRow: number = groupFilteredQs.length > minQsPerRow ? groupFilteredQs.length : minQsPerRow;
+					const classyClass = `col-md-${12 / qsPerRow} mb-3`;
 
 					//  - construct the questions inputs
 					const builtQuestions = groupFilteredQs.map((q: any) => {
 						return this.injectGroupingInput(q, classyClass);
 					});
-					return ( this.createNewRow(builtQuestions) );
+					return (this.createNewRow(builtQuestions, row_id));
 				});
-				let subCats: any = this.props.context.categories.filter((filter: any) => filter.belongs_to === sc.category_id);
+				const subCats: any = this.props.context.categories.filter((filter: any) => filter.belongs_to === sc.category_id);
 				if (subCats.length > 0) {
 					return this.recursivelyBuildQuestions(subCats, divRowQuestionsByGrouping);
 				} else {
@@ -217,8 +248,10 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private setDynStateWithEvent(event: any, index: number, columnType: string): void {
+		const val: any = (event.target as any).value;
+		this.showExtraRows(columnType, val);
 		this.setState({
-			productDetails: this.onUpdateItem(index, columnType, (event.target as any).value)
+			productDetails: this.onUpdateItem(index, columnType, val)
 		});
 	}
 
@@ -236,5 +269,61 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		pdItem.response = value;
 		myList[idx] = pdItem;
 		return myList;
+	}
+
+	private showExtraRows = (columnName: string, value: any): void => {
+		if (columnName === 'cab_quantity') {
+			this.setExtraRowsStyle(value, 'cab_', 4);
+		} else if (columnName === 'dr_quantity') {
+			this.setExtraRowsStyle(value, 'dr_', 8);
+		} else if (columnName === 'dwr_quantity') {
+			this.setExtraRowsStyle(value, 'dwr_', 4);
+		} else if (columnName === 'legs_quantity') {
+			this.setExtraRowsStyle(value, 'legs_', 5);
+		} else if (columnName === 'top_quantity') {
+			this.setExtraRowsStyle(value, 'top_', 2);
+		}
+	}
+
+	private setExtraRowsStyle = (val: any, unique_dim_prefix: string, max_rows: number): void => {
+		let listOfNums = Array.from(Array(max_rows + 1).keys());
+		if (String(val).length > 0) {
+			let convertedVal = Number(val);
+			// first if statement, hide all rows if quantity = 1 / 0
+			if (convertedVal < 2) {
+				listOfNums.forEach((num: number) => {
+					if (num > 1) {
+						const ele_id = `${unique_dim_prefix}${num}`;
+						const ele = document.getElementById(ele_id);
+						if (ele !== null && ele !== undefined) {
+							ele.style.display = 'none';
+						}
+					}
+				});
+			} else {
+				convertedVal = convertedVal > max_rows ? max_rows : convertedVal;
+				listOfNums = Array.from(Array(convertedVal + 1).keys());
+				console.log(listOfNums);
+				listOfNums.forEach((num: number) => {
+					if (num > 1) {
+						const ele_id = `${unique_dim_prefix}${num}`;
+						const ele = document.getElementById(ele_id);
+						if (ele !== null && ele !== undefined) {
+							ele.style.display = 'flex';
+						}
+					}
+				});
+			}
+		} else {
+			listOfNums.forEach((num: number) => {
+				if (num > 1) {
+					const ele_id = `${unique_dim_prefix}${num}`;
+					const ele = document.getElementById(ele_id);
+					if (ele !== null && ele !== undefined) {
+						ele.style.display = 'none';
+					}
+				}
+			});
+		}
 	}
 }

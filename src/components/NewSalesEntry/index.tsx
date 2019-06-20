@@ -8,14 +8,8 @@ import * as routes from '../../constants/routes';
 import '../../styles/general.css';
 import '../../styles/error.css';
 import {
-	Cabinet, CabinetsValidationError,
-	Customer,
-	CustomerValidationError, Doors, Drawers, DrawersValidationError,
-	ProductDetails,
-	ProductHeader, ProductHeaderValidationError,
-	Questions,
-	QuestionValues,
-	Roles, SalesEntryState, Tops, TopValidationError
+	Cabinet, Doors, Drawers,
+	ProductDetails, SalesEntryState, Tops
 } from '../../State';
 import {ProductHeaderComponent} from '../ProductHeaderInfo';
 import {CustomerValidation} from '../../Validation/CustomerValidation';
@@ -23,7 +17,7 @@ import {ProductHeaderValidation} from '../../Validation/ProductHeaderValidation'
 import {ProductComponent, ProductDetailsMapper} from '../../Structure/types';
 import {Mapper} from '../../Mapper/Mapper';
 import {CabinetValidation} from '../../Validation/CabinetValidation';
-import {TypeGuards} from '../../Enums/Enums';
+import { TypeGuards } from "../../Enums/TypeGuards";
 import { newSalesEntryContext } from '../../Context/NewSalesEntryContext';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {DrawerValidation} from "../../Validation/DrawerValidation";
@@ -59,7 +53,11 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		productHeader: {notes: '', reference_number: '', group_id: 0, order_num: 0, status: 'Started', crafting_required: false},
 		productHeaderErrors: {e_reference_number: ''},
 		cabinetErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		cabinetTwoErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_2, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		cabinetThreeErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_3, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		cabinetFourErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_4, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
 		topErrors: {type: TypeGuards.TOP_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
+		topTwoErrors: {type: TypeGuards.TOP_VALIDATION_ERROR_2, e_length: '', e_width: '', e_quantity: ''},
 		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
 		doorErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''}
 	};
@@ -87,7 +85,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const primaryNavBarHeight =  window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue('height');
 		const hdrHeight =  window.getComputedStyle(document.getElementById('sales-entry-hdr'), null).getPropertyValue('height');
 		this.setState({containerHeight: `(${primaryNavBarHeight} + ${hdrHeight})`, navbarHeight: primaryNavBarHeight});
-	}
+	};
 
 	private async buildData() {
 		const isExistingEntry = (window.location.search !== null && window.location.search !== undefined && window.location.search.length > 0);
@@ -191,7 +189,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					<div className={'container'}>
 						<div className={'py-5 text-center'} id={'sales-entry-hdr'}>
 							<h2>Sales Entry</h2>
-							<p>Accessible if sales or admin</p>
 						</div>
 						<div className={'row'} style={rowStyle}>
 							<div className={'col-md-4 order-md-2 mb-4'}>
@@ -263,6 +260,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
 		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
 
+		console.log(tm);
+
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
@@ -274,6 +273,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const top_validate = tv.validate();
 		const dwr_validate = dwrv.validate();
 		const drv_validate = drv.validate();
+
+		console.log(cv.getErrors());
 
 		if (cab_validate && top_validate && dwr_validate && drv_validate) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
@@ -299,15 +300,20 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					console.log('DONE - Error');
 				});
 		}
+
 		this.setState({
-			cabinetErrors: {...cv.getErrors()},
-			topErrors: {...tv.getErrors()},
+			cabinetErrors: {...cv.getSpecificError(0)},
+			cabinetTwoErrors: {...cv.getSpecificError(1)},
+			cabinetThreeErrors: {...cv.getSpecificError(2)},
+			cabinetFourErrors: {...cv.getSpecificError(3)},
+			topErrors: {...tv.getSpecificError(0)},
+			topTwoErrors: {...tv.getSpecificError(1)},
 			drawerErrors: {...dwrv.getErrors()},
 			doorErrors: {...drv.getErrors()}
 		});
 
 		event.preventDefault();
-	}
+	};
 
 	public onCustomerSubmit = (event: any) => {
 		const {productHeader, customer} = this.state;
@@ -382,9 +388,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				</div>
 			);
 		} else if (page === 1) {
-			return ( <SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} /> );
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />);
 		} else if (page === 2) {
-			return ( <SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} /> );
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />);
 		} else  {
 			return (
 				<div>

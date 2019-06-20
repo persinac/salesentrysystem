@@ -19,7 +19,9 @@ import {
 
 export type ProductDetailsMapper = Record<string, ProductDetails>;
 
-export type ProductComponent = Cabinet | Doors | Drawers | DrawerFronts | Legs | Shelving | Tops | TotalSize;
+export type ProductComponent = Cabinet |
+	Doors | Drawers | DrawerFronts |
+	Legs | Shelving | Tops | TotalSize;
 
 export type ProductComponentErrors =
 	CabinetsValidationError | DoorsValidationError |
