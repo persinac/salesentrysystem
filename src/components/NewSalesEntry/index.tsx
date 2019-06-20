@@ -8,14 +8,8 @@ import * as routes from '../../constants/routes';
 import '../../styles/general.css';
 import '../../styles/error.css';
 import {
-	Cabinet, CabinetsValidationError,
-	Customer,
-	CustomerValidationError, Doors, Drawers, DrawersValidationError,
-	ProductDetails,
-	ProductHeader, ProductHeaderValidationError,
-	Questions,
-	QuestionValues,
-	Roles, SalesEntryState, Tops, TopValidationError
+	Cabinet, Doors, Drawers,
+	ProductDetails, SalesEntryState, Tops
 } from '../../State';
 import {ProductHeaderComponent} from '../ProductHeaderInfo';
 import {CustomerValidation} from '../../Validation/CustomerValidation';
@@ -23,7 +17,7 @@ import {ProductHeaderValidation} from '../../Validation/ProductHeaderValidation'
 import {ProductComponent, ProductDetailsMapper} from '../../Structure/types';
 import {Mapper} from '../../Mapper/Mapper';
 import {CabinetValidation} from '../../Validation/CabinetValidation';
-import {TypeGuards} from '../../Enums/InterfaceErrorMapping';
+import { TypeGuards } from "../../Enums/TypeGuards";
 import { newSalesEntryContext } from '../../Context/NewSalesEntryContext';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {DrawerValidation} from "../../Validation/DrawerValidation";
@@ -63,6 +57,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		cabinetThreeErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_3, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
 		cabinetFourErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_4, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
 		topErrors: {type: TypeGuards.TOP_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
+		topTwoErrors: {type: TypeGuards.TOP_VALIDATION_ERROR_2, e_length: '', e_width: '', e_quantity: ''},
 		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
 		doorErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''}
 	};
@@ -251,31 +246,24 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		});
 
 		const fresh_cab: Cabinet = {type: TypeGuards.CABINET};
-		const fresh_cab_2: Cabinet = {type: TypeGuards.CABINET_2};
-		const fresh_cab_3: Cabinet = {type: TypeGuards.CABINET_3};
-		const fresh_cab_4: Cabinet = {type: TypeGuards.CABINET_4};
 		const fresh_top: Tops = {type: TypeGuards.TOPS};
 		const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
 		const fresh_door: Doors = {type: TypeGuards.DOORS};
 
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
-		const cab_details_2: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
-		const cab_details_3: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
-		const cab_details_4: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
 		const top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.TOP);
 		const dwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DRAWERS);
 		const dr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DOORS);
 
 		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, fresh_cab);
-		const cm2: ProductComponent = Mapper.mapProductComponent(cab_details_2, fresh_cab_2);
-		const cm3: ProductComponent = Mapper.mapProductComponent(cab_details_3, fresh_cab_3);
-		const cm4: ProductComponent = Mapper.mapProductComponent(cab_details_4, fresh_cab_4);
 		const tm: ProductComponent = Mapper.mapProductComponent(top_details, fresh_top);
 		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
 		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
 
+		console.log(tm);
+
 		// validate components:
-		const cv: CabinetValidation = new CabinetValidation([cm, cm2, cm3, cm4], tm);
+		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
 		const dwrv: DrawerValidation = new DrawerValidation(cm, dwm);
 		const drv: DoorsValidation = new DoorsValidation(dr);
@@ -285,6 +273,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const top_validate = tv.validate();
 		const dwr_validate = dwrv.validate();
 		const drv_validate = drv.validate();
+
+		console.log(cv.getErrors());
 
 		if (cab_validate && top_validate && dwr_validate && drv_validate) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
@@ -316,7 +306,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			cabinetTwoErrors: {...cv.getSpecificError(1)},
 			cabinetThreeErrors: {...cv.getSpecificError(2)},
 			cabinetFourErrors: {...cv.getSpecificError(3)},
-			topErrors: {...tv.getErrors()},
+			topErrors: {...tv.getSpecificError(0)},
+			topTwoErrors: {...tv.getSpecificError(1)},
 			drawerErrors: {...dwrv.getErrors()},
 			doorErrors: {...drv.getErrors()}
 		});

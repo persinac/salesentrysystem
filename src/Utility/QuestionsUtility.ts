@@ -24,7 +24,6 @@ class UniqueDimMapper {
 
 export class QuestionsUtility {
 	public static determineQuantityQuestionSubHeader(id: string): SubHeaderQuantity {
-
 		switch (id) {
 			case UniqueDimMapper.CAB_1.toString():
 				return {id: id, title: UniqueDimMapper.CAB_1.title};

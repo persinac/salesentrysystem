@@ -1,5 +1,3 @@
-import {TypeGuards} from "./Enums/InterfaceErrorMapping";
-
 export interface IAppState {
 	authUser: any;
 }
@@ -81,7 +79,7 @@ export interface Baseboards {
 }
 
 export interface Cabinet {
-	type: string;
+	type: string; // will always be cabinet
 	paint_color?: string;
 	stain_color?: string;
 	length?: number;
@@ -89,13 +87,7 @@ export interface Cabinet {
 	height?: number;
 	quantity?: number;
 	material_type?: string;
-}
-
-export interface CabinetMeasurement {
-	type: string;
-	length?: number;
-	width?: number;
-	height?: number;
+	measurement?: MeasurementDetails[];
 }
 
 export interface Doors {
@@ -155,15 +147,21 @@ export interface Tops {
 	type: string;
 	vendor?: string;
 	vendor_po?: string;
-	length?: number;
-	width?: number;
 	quantity?: number;
+	measurement?: MeasurementDetails[];
 }
 
 export interface TotalSize {
 	type: string;
 	length?: number;
 	depth?: number;
+	height?: number;
+}
+
+export interface MeasurementDetails {
+	type: string; // top_1, dwr_2, cab_3, etc...
+	length?: number;
+	width?: number;
 	height?: number;
 }
 
@@ -279,6 +277,7 @@ export interface SalesEntryState {
 	cabinetThreeErrors?: CabinetsValidationError;
 	cabinetFourErrors?: CabinetsValidationError;
 	topErrors?: TopValidationError;
+	topTwoErrors?: TopValidationError;
 	drawerErrors?: DrawersValidationError;
 	doorErrors?: DoorsValidationError;
 }

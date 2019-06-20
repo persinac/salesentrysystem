@@ -33,7 +33,6 @@ export class CustomerEntry extends React.Component<InterfaceProps, IState> {
 
 	private renderCard() {
 		const {primary_email, name, phone_number, shipping_address} = this.props.customer;
-		console.log(this.props.customerErrors);
 		return (
 			<div className={'the-lonely-card'}>
 				<Card>

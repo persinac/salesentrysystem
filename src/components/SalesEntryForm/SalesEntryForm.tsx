@@ -112,22 +112,27 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private attachError(category_id: number, short_name: string) {
+		const second_regex = new RegExp('_2');
+		const third_regex = new RegExp('_3');
+		const fourth_regex = new RegExp('_4');
 		switch (category_id) {
 			case Categories.CABINETS:
-				const cab_2_regex = new RegExp('_2');
-				const cab_3_regex = new RegExp('_3');
-				const cab_4_regex = new RegExp('_4');
-				if (cab_2_regex.test(short_name)) {
+
+				if (second_regex.test(short_name)) {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetTwoErrors)} id={short_name}/>);
-				} if (cab_3_regex.test(short_name)) {
+				} else if (third_regex.test(short_name)) {
 				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetThreeErrors)} id={short_name}/>);
-				} if (cab_4_regex.test(short_name)) {
+				} else if (fourth_regex.test(short_name)) {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetFourErrors)} id={short_name}/>);
 				} else {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetErrors)} id={short_name}/>);
 				}
 			case Categories.TOP:
-				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
+				if (second_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topTwoErrors)} id={short_name}/>);
+				} else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
+				}
 			case Categories.DRAWERS:
 				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
 			case Categories.DOORS:

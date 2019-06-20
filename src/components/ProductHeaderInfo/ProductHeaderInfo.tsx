@@ -40,7 +40,6 @@ export class ProductHeaderInfo extends React.Component<InterfaceProps, IState> {
 
 	private renderCard() {
 		const {notes, reference_number} = this.props.productHeader;
-		console.log(this.props.productHeaderErrors);
 		return (
 			<div className={'the-lonely-card'}>
 				<Card>

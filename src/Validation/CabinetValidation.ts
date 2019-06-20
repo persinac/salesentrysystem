@@ -1,23 +1,25 @@
-import {TypeGuards} from '../Enums/InterfaceErrorMapping';
-import {Cabinet, CabinetsValidationError, Tops} from '../State';
+import {TypeGuards} from '../Enums/TypeGuards';
+import {Cabinet, CabinetsValidationError, MeasurementDetails, Tops} from '../State';
 import {Validation} from './Validation';
+import {MAX_CABS} from "../constants/ProductDetails";
+import {MeasurementHelper} from "../Utility/MeasurementHelper";
 
 export class CabinetValidation extends Validation {
 
-	readonly MAX_CABS: number = 4;
-
-	private cab_details: Cabinet[];
+	private cab_details: Cabinet;
+	private cab_extras: MeasurementDetails[];
 	private num_of_cabs: number;
 	private max_list_of_cab_nums: number[];
 	private list_of_cab_nums: number[];
 	private top_details: Tops | null;
 	private errors: CabinetsValidationError[];
 
-	constructor(cabinet: Cabinet[], top: Tops | null) {
+	constructor(cabinet: Cabinet, top: Tops | null) {
 		super();
 
 		this.cab_details = cabinet;
-		this.num_of_cabs = Number(cabinet[0].quantity);
+		this.cab_extras = cabinet.measurement;
+		this.num_of_cabs = Number(cabinet.quantity);
 		this.top_details = top;
 		this.errors = [];
 		this.list_of_cab_nums = Array.from(Array(this.num_of_cabs).keys());
@@ -25,7 +27,7 @@ export class CabinetValidation extends Validation {
 	}
 
 	private createListOfCabErrors(): void {
-		this.max_list_of_cab_nums = Array.from(Array(this.MAX_CABS).keys());
+		this.max_list_of_cab_nums = Array.from(Array(MAX_CABS).keys());
 
 		this.max_list_of_cab_nums.forEach((i) => {
 			this.errors.push(
@@ -81,10 +83,12 @@ export class CabinetValidation extends Validation {
 	 * This will need to be updated once multiple UNIQUE cab measurements are entered
 	 */
 	private checkLength() {
-		const {length: top_length} = this.top_details;
 		const length_arr: number[] = [];
+		const top_length = MeasurementHelper.measurementLengthSum(this.top_details.measurement);
+
 		this.list_of_cab_nums.forEach((i) => {
-			const curr_cab = this.cab_details[i];
+			const curr_cab = this.cab_extras[i];
+			console.log(curr_cab);
 			if (String(curr_cab.length).length === 0) {
 				this.errors[i].e_length = 'Cabinet length cannot be blank';
 			} else {
@@ -97,7 +101,9 @@ export class CabinetValidation extends Validation {
 		const arrSum: number = length_arr.reduce((a,b) => a + b, 0);
 		if (arrSum > (top_length - 2)) {
 			this.list_of_cab_nums.forEach((i) => {
-				this.errors[i].e_length = 'Total cabinet length must be less than top length by 2in';
+				if (this.errors[i].e_length.length === 0) {
+					this.errors[i].e_length = 'Total cabinet length must be less than top length by 2in';
+				}
 			});
 		}
 	}
@@ -108,11 +114,11 @@ export class CabinetValidation extends Validation {
 	 * Need to grab the max width from all cab width(s)
 	 */
 	private checkWidth() {
-		const {width} = this.top_details;
 		const width_arr: number[] = [];
+		const top_width = MeasurementHelper.measurementWidthSum(this.top_details.measurement);
 
 		this.list_of_cab_nums.forEach((i) => {
-			const curr_cab = this.cab_details[i];
+			const curr_cab = this.cab_extras[i];
 			if (String(curr_cab.width).length === 0) {
 				this.errors[i].e_width = 'Cabinet width cannot be blank';
 			} else {
@@ -123,13 +129,11 @@ export class CabinetValidation extends Validation {
 		});
 
 		const arrSum: number = width_arr.reduce((a,b) => a + b, 0);
-		console.log('Width Sum');
-		console.log(arrSum);
-		console.log((width - 2));
-		console.log(arrSum > (width - 2));
-		if (arrSum > (width - 2)) {
+		if (arrSum > (top_width - 2)) {
 			this.list_of_cab_nums.forEach((i) => {
-				this.errors[i].e_width = 'Total cabinet width must be less than Top width by 2in';
+				if (this.errors[i].e_width.length === 0) {
+					this.errors[i].e_width = 'Total cabinet width must be less than Top width by 2in';
+				}
 			});
 		}
 	}
@@ -139,7 +143,7 @@ export class CabinetValidation extends Validation {
 	 */
 	private checkHeight() {
 		this.list_of_cab_nums.forEach((i) => {
-			const curr_cab = this.cab_details[i];
+			const curr_cab = this.cab_extras[i];
 			if (String(curr_cab.height).length === 0) {
 				this.errors[i].e_height = 'Cabinet height cannot be blank';
 			}
@@ -157,6 +161,5 @@ export class CabinetValidation extends Validation {
 			case 3:
 				return TypeGuards.CABINET_VALIDATION_ERROR_4;
 		}
-
 	}
 }
