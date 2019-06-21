@@ -18,13 +18,17 @@ export enum CabinetDetailsQuestionsShortNames {
 
 // maps to interface: Doors
 export enum DoorsQuestionsShortNames {
-	dr_qty = 'quantity',
-	dr_lngth = 'length',
-	dr_wdth = 'width',
-	dr_height = 'height',
+	dr_quantity = 'quantity',
 	dr_mt = 'material_type',
 	dr_vndr = 'vendor',
 	dr_vndr_po = 'vendor_po'
+}
+
+// maps to interface: Doors
+export enum DoorsMeasurementShortNames {
+	dr_lngth = 'length',
+	dr_wdth = 'width',
+	dr_height = 'height'
 }
 
 // maps to interface: Drawers

@@ -18,6 +18,7 @@ export enum DoorsErrorShortNamesMapping {
 	dr_qty = 'e_quantity',
 	dr_lngth = 'e_length',
 	dr_wdth = 'e_width',
+	dr_height = 'e_height',
 	dr_mt = 'e_material_type',
 	dr_vndr = 'e_vendor',
 	dr_vndr_po = 'e_vendor_po'

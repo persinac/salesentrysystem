@@ -96,11 +96,9 @@ export interface Doors {
 	vendor_po?: string;
 	paint_color?: string;
 	stain_color?: string;
-	length?: number;
-	width?: number;
-	height?: number;
 	quantity?: number;
 	material_type?: string;
+	measurement?: MeasurementDetails[];
 }
 
 export interface Drawers {
@@ -280,4 +278,11 @@ export interface SalesEntryState {
 	topTwoErrors?: TopValidationError;
 	drawerErrors?: DrawersValidationError;
 	doorErrors?: DoorsValidationError;
+	doorTwoErrors?: DoorsValidationError;
+	doorThreeErrors?: DoorsValidationError;
+	doorFourErrors?: DoorsValidationError;
+	doorFiveErrors?: DoorsValidationError;
+	doorSixErrors?: DoorsValidationError;
+	doorSevenErrors?: DoorsValidationError;
+	doorEightErrors?: DoorsValidationError;
 }
