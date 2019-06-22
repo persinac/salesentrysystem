@@ -128,10 +128,8 @@ export interface Legs {
 	vendor_po?: string;
 	paint_color?: string;
 	stain_color?: string;
-	length?: number;
-	width?: number;
-	height?: number;
 	quantity?: number;
+	measurement?: MeasurementDetails[];
 }
 
 export interface Shelving {
@@ -285,4 +283,9 @@ export interface SalesEntryState {
 	doorSixErrors?: DoorsValidationError;
 	doorSevenErrors?: DoorsValidationError;
 	doorEightErrors?: DoorsValidationError;
+	legErrors?: LegsValidationError;
+	legTwoErrors?: LegsValidationError;
+	legThreeErrors?: LegsValidationError;
+	legFourErrors?: LegsValidationError;
+	legFiveErrors?: LegsValidationError;
 }

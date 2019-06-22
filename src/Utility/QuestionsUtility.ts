@@ -23,6 +23,11 @@ class UniqueDimMapper {
 	static readonly DOOR_6 = new UniqueDimMapper(`${ShortNamePrefix.DOOR}_6`, 'Door 6');
 	static readonly DOOR_7 = new UniqueDimMapper(`${ShortNamePrefix.DOOR}_7`, 'Door 7');
 	static readonly DOOR_8 = new UniqueDimMapper(`${ShortNamePrefix.DOOR}_8`, 'Door 8');
+	static readonly LEG_1 = new UniqueDimMapper(`${ShortNamePrefix.LEGS}_1`, 'Leg 1');
+	static readonly LEG_2 = new UniqueDimMapper(`${ShortNamePrefix.LEGS}_2`, 'Leg 2');
+	static readonly LEG_3 = new UniqueDimMapper(`${ShortNamePrefix.LEGS}_3`, 'Leg 3');
+	static readonly LEG_4 = new UniqueDimMapper(`${ShortNamePrefix.LEGS}_4`, 'Leg 4');
+	static readonly LEG_5 = new UniqueDimMapper(`${ShortNamePrefix.LEGS}_5`, 'Leg 5');
 
 	private constructor(private key: string, public readonly title: string) {}
 
@@ -62,6 +67,16 @@ export class QuestionsUtility {
 				return {id: id, title: UniqueDimMapper.DOOR_7.title};
 			case UniqueDimMapper.DOOR_8.toString():
 				return {id: id, title: UniqueDimMapper.DOOR_8.title};
+			case UniqueDimMapper.LEG_1.toString():
+				return {id: id, title: UniqueDimMapper.LEG_1.title};
+			case UniqueDimMapper.LEG_2.toString():
+				return {id: id, title: UniqueDimMapper.LEG_2.title};
+			case UniqueDimMapper.LEG_3.toString():
+				return {id: id, title: UniqueDimMapper.LEG_3.title};
+			case UniqueDimMapper.LEG_4.toString():
+				return {id: id, title: UniqueDimMapper.LEG_4.title};
+			case UniqueDimMapper.LEG_5.toString():
+				return {id: id, title: UniqueDimMapper.LEG_5.title};
 			default:
 				return {id: id, title: ''};
 		}

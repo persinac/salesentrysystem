@@ -1,9 +1,9 @@
 import {ProductComponent, ProductComponentErrors, ProductDetailsMapper} from "../Structure/types";
-import {Cabinet, Doors, MeasurementDetails, ProductDetails, Questions, Tops} from "../State";
+import {Cabinet, Doors, Legs, MeasurementDetails, ProductDetails, Questions, Tops} from "../State";
 import {
 	CabinetErrorShortNamesMapping,
 	DoorsErrorShortNamesMapping,
-	DrawersErrorShortNamesMapping,
+	DrawersErrorShortNamesMapping, LegsErrorShortNamesMapping,
 	TopErrorShortNamesMapping
 } from "../Enums/InterfaceErrorMapping";
 import {
@@ -12,11 +12,11 @@ import {
 	DoorsQuestionsShortNames,
 	DrawersQuestionsShortNames,
 	TopQuestionsShortNames,
-	TopMeasurementShortNames, DoorsMeasurementShortNames
+	TopMeasurementShortNames, DoorsMeasurementShortNames, LegsMeasurementShortNames, LegsQuestionsShortNames
 } from "../Enums/InterfaceMapping";
 import { TypeGuards } from "../Enums/TypeGuards";
 
-import {MAX_CABS, MAX_DOORS, MAX_TOPS} from "../constants/ProductDetails";
+import {MAX_CABS, MAX_DOORS, MAX_LEGS, MAX_TOPS} from "../constants/ProductDetails";
 import {ShortNamePrefix} from "../Enums/ShortNamePrefix";
 
 export class Mapper {
@@ -97,6 +97,23 @@ export class Mapper {
 				returnObject = Object(DoorsQuestionsShortNames);
 				(<Doors>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.DOOR, MAX_DOORS, this.determineDoorNum);
 				break;
+			case TypeGuards.LEGS:
+				maxQuantityOfComponent = Array.from(Array(MAX_LEGS + 1).keys());
+				maxQuantityOfComponent.forEach((num: number) => {
+					if (num > 0) {
+						if (num === 1) {
+							Object.keys(LegsMeasurementShortNames).forEach((k: string) => detailKeys.push(k));
+						} else {
+							Object.keys(LegsMeasurementShortNames).forEach((k: any) => {
+								detailKeys.push(`${k}_${num}`);
+							});
+						}
+					}
+				});
+				enumKeys = Object.keys(LegsQuestionsShortNames);
+				returnObject = Object(LegsQuestionsShortNames);
+				(<Legs>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.LEGS, MAX_LEGS, this.determineLegsNum);
+				break;
 			default: throw new Error("Unexpected object: " + object);
 		}
 
@@ -131,6 +148,16 @@ export class Mapper {
 			case TypeGuards.DOORS_VALIDATION_ERROR_7:
 			case TypeGuards.DOORS_VALIDATION_ERROR_8:
 				value = Object(errors)[Object(DoorsErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
+				break;
+			case TypeGuards.LEGS_VALIDATION_ERROR:
+			case TypeGuards.LEGS_VALIDATION_ERROR_2:
+			case TypeGuards.LEGS_VALIDATION_ERROR_3:
+			case TypeGuards.LEGS_VALIDATION_ERROR_4:
+			case TypeGuards.LEGS_VALIDATION_ERROR_5:
+				console.log(errors);
+				console.log(this.mapErrorValidations(givenShortName));
+				value = Object(errors)[Object(LegsErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
+				console.log(value);
 				break;
 			default: throw new Error("Unexpected object: " + errors);
 		}
@@ -250,6 +277,24 @@ export class Mapper {
 			return TypeGuards.DOORS_8;
 		} else {
 			return TypeGuards.DOORS;
+		}
+	}
+
+	public static determineLegsNum(cabNumber: string): TypeGuards {
+		const _2_regex = new RegExp('2');
+		const _3_regex = new RegExp('3');
+		const _4_regex = new RegExp('4');
+		const _5_regex = new RegExp('5');
+		if (_2_regex.test(cabNumber)) {
+			return TypeGuards.LEGS_2;
+		} else if (_3_regex.test(cabNumber)) {
+			return TypeGuards.LEGS_3;
+		} else if (_4_regex.test(cabNumber)) {
+			return TypeGuards.LEGS_4;
+		} else if (_5_regex.test(cabNumber)) {
+			return TypeGuards.LEGS_5;
+		} else {
+			return TypeGuards.LEGS;
 		}
 	}
 

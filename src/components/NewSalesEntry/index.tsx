@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import {Categories} from '../../Enums/Category';
 import {withAuthorization} from '../../Firebase/withAuthorization';
 import {TopValidation} from '../../Validation/TopValidation';
@@ -7,21 +7,20 @@ import * as ROLES from '../../constants/roles';
 import * as routes from '../../constants/routes';
 import '../../styles/general.css';
 import '../../styles/error.css';
-import {
-	Cabinet, Doors, Drawers,
-	ProductDetails, SalesEntryState, Tops
-} from '../../State';
+import {Cabinet, Doors, Drawers, Legs, ProductDetails, SalesEntryState, Tops} from '../../State';
 import {ProductHeaderComponent} from '../ProductHeaderInfo';
 import {CustomerValidation} from '../../Validation/CustomerValidation';
 import {ProductHeaderValidation} from '../../Validation/ProductHeaderValidation';
 import {ProductComponent, ProductDetailsMapper} from '../../Structure/types';
 import {Mapper} from '../../Mapper/Mapper';
 import {CabinetValidation} from '../../Validation/CabinetValidation';
-import { TypeGuards } from "../../Enums/TypeGuards";
-import { newSalesEntryContext } from '../../Context/NewSalesEntryContext';
+import {TypeGuards} from "../../Enums/TypeGuards";
+import {newSalesEntryContext} from '../../Context/NewSalesEntryContext';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {DrawerValidation} from "../../Validation/DrawerValidation";
 import {DoorsValidation} from "../../Validation/DoorsValidation";
+import {LegsErrorShortNamesMapping} from "../../Enums/InterfaceErrorMapping";
+import {LegsValidation} from "../../Validation/LegsValidation";
 
 const rp = require('request-promise');
 
@@ -66,7 +65,12 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		doorFiveErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_quantity: ''},
 		doorSixErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_6, e_length: '', e_width: '', e_quantity: ''},
 		doorSevenErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_7, e_length: '', e_width: '', e_quantity: ''},
-		doorEightErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_8, e_length: '', e_width: '', e_quantity: ''}
+		doorEightErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_8, e_length: '', e_width: '', e_quantity: ''},
+		legErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR, e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		legTwoErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_2, e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		legThreeErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		legFourErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		legFiveErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: '', e_quantity: ''}
 	};
 
 	private post_options = {
@@ -256,30 +260,35 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const fresh_top: Tops = {type: TypeGuards.TOPS};
 		const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
 		const fresh_door: Doors = {type: TypeGuards.DOORS};
+		const fresh_leg: Legs = {type: TypeGuards.LEGS};
 
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
 		const top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.TOP);
 		const dwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DRAWERS);
 		const dr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DOORS);
+		const legs_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.LEGS);
 
 		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, fresh_cab);
 		const tm: ProductComponent = Mapper.mapProductComponent(top_details, fresh_top);
 		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
 		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
+		const leg: ProductComponent = Mapper.mapProductComponent(legs_details, fresh_leg);
 
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
 		const dwrv: DrawerValidation = new DrawerValidation(cm, dwm);
 		const drv: DoorsValidation = new DoorsValidation(dr);
+		const legv: LegsValidation = new LegsValidation(leg);
 
 		// have to run validation first, so that errors get set if needed
 		const cab_validate = cv.validate();
 		const top_validate = tv.validate();
 		const dwr_validate = dwrv.validate();
 		const drv_validate = drv.validate();
+		const legv_validate = legv.validate();
 
-		if (cab_validate && top_validate && dwr_validate && drv_validate) {
+		if (cab_validate && top_validate && dwr_validate && drv_validate && legv_validate) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
 				.then((newPDs: any) => {
 					const updatedPDs: ProductDetails[] = newPDs.details;
@@ -304,6 +313,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				});
 		}
 
+		console.log({...legv.getSpecificError(0)});
+		console.log({...legv.getSpecificError(1)});
 		this.setState({
 			cabinetErrors: {...cv.getSpecificError(0)},
 			cabinetTwoErrors: {...cv.getSpecificError(1)},
@@ -319,7 +330,12 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			doorFiveErrors: {...drv.getSpecificError(4)},
 			doorSixErrors: {...drv.getSpecificError(5)},
 			doorSevenErrors: {...drv.getSpecificError(6)},
-			doorEightErrors: {...drv.getSpecificError(7)}
+			doorEightErrors: {...drv.getSpecificError(7)},
+			legErrors: {...legv.getSpecificError(0)},
+			legTwoErrors: {...legv.getSpecificError(1)},
+			legThreeErrors: {...legv.getSpecificError(2)},
+			legFourErrors: {...legv.getSpecificError(3)},
+			legFiveErrors: {...legv.getSpecificError(4)}
 		});
 
 		event.preventDefault();
