@@ -154,10 +154,7 @@ export class Mapper {
 			case TypeGuards.LEGS_VALIDATION_ERROR_3:
 			case TypeGuards.LEGS_VALIDATION_ERROR_4:
 			case TypeGuards.LEGS_VALIDATION_ERROR_5:
-				console.log(errors);
-				console.log(this.mapErrorValidations(givenShortName));
 				value = Object(errors)[Object(LegsErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
-				console.log(value);
 				break;
 			default: throw new Error("Unexpected object: " + errors);
 		}

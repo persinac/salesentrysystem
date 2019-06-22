@@ -88,7 +88,6 @@ export class CabinetValidation extends Validation {
 
 		this.list_of_cab_nums.forEach((i) => {
 			const curr_cab = this.cab_measurements[i];
-			console.log(curr_cab);
 			if (String(curr_cab.length).length === 0) {
 				this.errors[i].e_length = 'Cabinet length cannot be blank';
 			} else {

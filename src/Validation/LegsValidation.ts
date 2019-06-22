@@ -46,7 +46,6 @@ export class LegsValidation extends Validation {
 		this.checkWidth();
 		this.checkHeight();
 
-		console.log(this.errors);
 		const list_of_validation: boolean[] = [];
 
 		this.list_of_qty.forEach((i) => {
@@ -83,9 +82,6 @@ export class LegsValidation extends Validation {
 
 		this.list_of_qty.forEach((i) => {
 			const curr = this.legs_measurement[i];
-			console.log(curr.length);
-			console.log(String(curr.length).length);
-			console.log(curr.length === undefined);
 			if (String(curr.length).length === 0 || curr.length === undefined) {
 				this.errors[i].e_length = 'Leg length cannot be blank';
 			} else {

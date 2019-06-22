@@ -313,8 +313,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				});
 		}
 
-		console.log({...legv.getSpecificError(0)});
-		console.log({...legv.getSpecificError(1)});
 		this.setState({
 			cabinetErrors: {...cv.getSpecificError(0)},
 			cabinetTwoErrors: {...cv.getSpecificError(1)},

@@ -70,7 +70,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const legsQuantityQID = this.props.context.questions.filter((q: any) => {
 				return q['short_name'] === 'legs_quantity';
 			});
-			console.log(drQuantityQID[0]['q_id']);
 
 			const cabQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === cabQuantityQID[0]['q_id'];
@@ -85,7 +84,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				return pd['q_fk'] === legsQuantityQID[0]['q_id'];
 			});
 
-			console.log(legsQuantity[0]['response']);
 			this.showExtraRows('cab_quantity', cabQuantity[0]['response']);
 			this.showExtraRows('top_quantity', topQuantity[0]['response']);
 			this.showExtraRows('dr_quantity', drQuantity[0]['response']);
