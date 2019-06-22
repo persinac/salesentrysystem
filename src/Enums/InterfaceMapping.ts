@@ -54,12 +54,16 @@ export enum DrawerFrontsQuestionsShortNames {
 
 // maps to interface: Legs
 export enum LegsQuestionsShortNames {
-	legs_qty = 'quantity',
-	legs_lngth = 'length',
-	legs_wdth = 'width',
-	legs_height = 'height',
+	legs_quantity = 'quantity',
 	legs_vndr = 'vendor',
 	legs_vndr_po = 'vendor_po'
+}
+
+// maps to interface: Legs
+export enum LegsMeasurementShortNames {
+	legs_lngth = 'length',
+	legs_wdth = 'width',
+	legs_height = 'height'
 }
 
 // maps to interface: Shelving

@@ -67,7 +67,9 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const drQuantityQID = this.props.context.questions.filter((q: any) => {
 				return q['short_name'] === 'dr_quantity';
 			});
-			console.log(drQuantityQID[0]['q_id']);
+			const legsQuantityQID = this.props.context.questions.filter((q: any) => {
+				return q['short_name'] === 'legs_quantity';
+			});
 
 			const cabQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === cabQuantityQID[0]['q_id'];
@@ -78,10 +80,14 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const drQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === drQuantityQID[0]['q_id'];
 			});
+			const legsQuantity = this.props.context.productDetails.filter((pd: any) => {
+				return pd['q_fk'] === legsQuantityQID[0]['q_id'];
+			});
 
 			this.showExtraRows('cab_quantity', cabQuantity[0]['response']);
 			this.showExtraRows('top_quantity', topQuantity[0]['response']);
 			this.showExtraRows('dr_quantity', drQuantity[0]['response']);
+			this.showExtraRows('legs_quantity', legsQuantity[0]['response']);
 		}
 	}
 
@@ -94,7 +100,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 
 	private createNewRow(questions: any, id: string) {
 		if (id.trim().length > 0) {
-			console.log(id);
 			const subHeader: SubHeaderQuantity = QuestionsUtility.determineQuantityQuestionSubHeader(id);
 			return (
 				<div className={'row'} id={id}>
@@ -184,6 +189,18 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorEightErrors)} id={short_name}/>);
 				}  else {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorErrors)} id={short_name}/>);
+				}
+			case Categories.LEGS:
+				if (second_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.legTwoErrors)} id={short_name}/>);
+				} else if (third_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.legThreeErrors)} id={short_name}/>);
+				} else if (fourth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.legFourErrors)} id={short_name}/>);
+				} else if (fifth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.legFiveErrors)} id={short_name}/>);
+				} else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.legErrors)} id={short_name}/>);
 				}
 			default:
 				return null;
@@ -336,7 +353,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	private setExtraRowsStyle = (val: any, unique_dim_prefix: string, max_rows: number): void => {
 		let listOfNums = Array.from(Array(max_rows + 1).keys());
 		let maxListOfNums = Array.from(Array(max_rows + 1).keys());
-		if (String(val).length > 0) {
+		if (String(val).length > 0 && val !== undefined) {
 			let convertedVal = Number(val);
 			// first if statement, hide all rows if quantity = 1 / 0
 			if (convertedVal < 2) {

@@ -79,7 +79,6 @@ export class TopValidation extends Validation {
 	private checkLength() {
 		const length_arr: number[] = [];
 		const cab_length = MeasurementHelper.measurementLengthSum(this.cab_details.measurement);
-		console.log(cab_length);
 
 		this.list_of_top_nums.forEach((i) => {
 			const curr_top = this.top_measurement[i];

@@ -45,9 +45,10 @@ export enum DrawerFrontsErrorShortNamesMapping {
 
 // maps to interface: LegsValidationError
 export enum LegsErrorShortNamesMapping {
-	legs_qty = 'e_quantity',
+	legs_quantity = 'e_quantity',
 	legs_lngth = 'e_length',
 	legs_wdth = 'e_width',
+	legs_height = 'e_height',
 	legs_vndr = 'e_vendor',
 	legs_vndr_po = 'e_vendor_po'
 }
