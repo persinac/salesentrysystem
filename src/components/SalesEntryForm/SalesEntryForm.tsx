@@ -9,6 +9,7 @@ import {Mapper} from "../../Mapper/Mapper";
 import {Categories} from "../../Enums/Category";
 import {number} from "prop-types";
 import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtility";
+import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_TOPS} from "../../constants/ProductDetails";
 
 interface InterfaceProps {
 	category_id?: number;
@@ -55,6 +56,33 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				element.classList.add('sales-form-card-overflow-height-auto');
 			}
 		}
+		// TODO: Clean this mess up. Not ideal.
+		if (currCategory[0].category_id === 4 || currCategory[0].category_id === 2) {
+			const cabQuantityQID = this.props.context.questions.filter((q: any) => {
+				return q['short_name'] === 'cab_quantity';
+			});
+			const topQuantityQID = this.props.context.questions.filter((q: any) => {
+				return q['short_name'] === 'top_quantity';
+			});
+			const drQuantityQID = this.props.context.questions.filter((q: any) => {
+				return q['short_name'] === 'dr_quantity';
+			});
+			console.log(drQuantityQID[0]['q_id']);
+
+			const cabQuantity = this.props.context.productDetails.filter((pd: any) => {
+				return pd['q_fk'] === cabQuantityQID[0]['q_id'];
+			});
+			const topQuantity = this.props.context.productDetails.filter((pd: any) => {
+				return pd['q_fk'] === topQuantityQID[0]['q_id'];
+			});
+			const drQuantity = this.props.context.productDetails.filter((pd: any) => {
+				return pd['q_fk'] === drQuantityQID[0]['q_id'];
+			});
+
+			this.showExtraRows('cab_quantity', cabQuantity[0]['response']);
+			this.showExtraRows('top_quantity', topQuantity[0]['response']);
+			this.showExtraRows('dr_quantity', drQuantity[0]['response']);
+		}
 	}
 
 	shouldComponentUpdate(nextProps: InterfaceProps, nextState: IState) {
@@ -66,6 +94,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 
 	private createNewRow(questions: any, id: string) {
 		if (id.trim().length > 0) {
+			console.log(id);
 			const subHeader: SubHeaderQuantity = QuestionsUtility.determineQuantityQuestionSubHeader(id);
 			return (
 				<div className={'row'} id={id}>
@@ -115,9 +144,12 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		const second_regex = new RegExp('_2');
 		const third_regex = new RegExp('_3');
 		const fourth_regex = new RegExp('_4');
+		const fifth_regex = new RegExp('_5');
+		const sixth_regex = new RegExp('_6');
+		const seventh_regex = new RegExp('_7');
+		const eigth_regex = new RegExp('_8');
 		switch (category_id) {
 			case Categories.CABINETS:
-
 				if (second_regex.test(short_name)) {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.cabinetTwoErrors)} id={short_name}/>);
 				} else if (third_regex.test(short_name)) {
@@ -136,7 +168,23 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			case Categories.DRAWERS:
 				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
 			case Categories.DOORS:
-				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorErrors)} id={short_name}/>);
+				if (second_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorTwoErrors)} id={short_name}/>);
+				} else if (third_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorThreeErrors)} id={short_name}/>);
+				} else if (fourth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorFourErrors)} id={short_name}/>);
+				} else if (fifth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorFiveErrors)} id={short_name}/>);
+				} else if (sixth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorSixErrors)} id={short_name}/>);
+				}  else if (seventh_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorSevenErrors)} id={short_name}/>);
+				}  else if (eigth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorEightErrors)} id={short_name}/>);
+				}  else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorErrors)} id={short_name}/>);
+				}
 			default:
 				return null;
 		}
@@ -273,20 +321,21 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 
 	private showExtraRows = (columnName: string, value: any): void => {
 		if (columnName === 'cab_quantity') {
-			this.setExtraRowsStyle(value, 'cab_', 4);
+			this.setExtraRowsStyle(value, 'cab_', MAX_CABS);
 		} else if (columnName === 'dr_quantity') {
-			this.setExtraRowsStyle(value, 'dr_', 8);
+			this.setExtraRowsStyle(value, 'dr_', MAX_DOORS);
 		} else if (columnName === 'dwr_quantity') {
-			this.setExtraRowsStyle(value, 'dwr_', 4);
+			this.setExtraRowsStyle(value, 'dwr_', MAX_DRAWERS);
 		} else if (columnName === 'legs_quantity') {
-			this.setExtraRowsStyle(value, 'legs_', 5);
+			this.setExtraRowsStyle(value, 'legs_', MAX_LEGS);
 		} else if (columnName === 'top_quantity') {
-			this.setExtraRowsStyle(value, 'top_', 2);
+			this.setExtraRowsStyle(value, 'top_', MAX_TOPS);
 		}
-	}
+	};
 
 	private setExtraRowsStyle = (val: any, unique_dim_prefix: string, max_rows: number): void => {
 		let listOfNums = Array.from(Array(max_rows + 1).keys());
+		let maxListOfNums = Array.from(Array(max_rows + 1).keys());
 		if (String(val).length > 0) {
 			let convertedVal = Number(val);
 			// first if statement, hide all rows if quantity = 1 / 0
@@ -303,13 +352,20 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			} else {
 				convertedVal = convertedVal > max_rows ? max_rows : convertedVal;
 				listOfNums = Array.from(Array(convertedVal + 1).keys());
-				console.log(listOfNums);
-				listOfNums.forEach((num: number) => {
+				maxListOfNums.forEach((num: number) => {
 					if (num > 1) {
-						const ele_id = `${unique_dim_prefix}${num}`;
-						const ele = document.getElementById(ele_id);
-						if (ele !== null && ele !== undefined) {
-							ele.style.display = 'flex';
+						if (listOfNums.includes(num)) {
+							const ele_id = `${unique_dim_prefix}${num}`;
+							const ele = document.getElementById(ele_id);
+							if (ele !== null && ele !== undefined) {
+								ele.style.display = 'flex';
+							}
+						} else {
+							const ele_id = `${unique_dim_prefix}${num}`;
+							const ele = document.getElementById(ele_id);
+							if (ele !== null && ele !== undefined) {
+								ele.style.display = 'none';
+							}
 						}
 					}
 				});

@@ -7,7 +7,7 @@ import {MeasurementHelper} from "../Utility/MeasurementHelper";
 export class CabinetValidation extends Validation {
 
 	private cab_details: Cabinet;
-	private cab_extras: MeasurementDetails[];
+	private cab_measurements: MeasurementDetails[];
 	private num_of_cabs: number;
 	private max_list_of_cab_nums: number[];
 	private list_of_cab_nums: number[];
@@ -18,15 +18,15 @@ export class CabinetValidation extends Validation {
 		super();
 
 		this.cab_details = cabinet;
-		this.cab_extras = cabinet.measurement;
+		this.cab_measurements = cabinet.measurement;
 		this.num_of_cabs = Number(cabinet.quantity);
 		this.top_details = top;
 		this.errors = [];
 		this.list_of_cab_nums = Array.from(Array(this.num_of_cabs).keys());
-		this.createListOfCabErrors();
+		this.createListOfErrors();
 	}
 
-	private createListOfCabErrors(): void {
+	private createListOfErrors(): void {
 		this.max_list_of_cab_nums = Array.from(Array(MAX_CABS).keys());
 
 		this.max_list_of_cab_nums.forEach((i) => {
@@ -87,7 +87,7 @@ export class CabinetValidation extends Validation {
 		const top_length = MeasurementHelper.measurementLengthSum(this.top_details.measurement);
 
 		this.list_of_cab_nums.forEach((i) => {
-			const curr_cab = this.cab_extras[i];
+			const curr_cab = this.cab_measurements[i];
 			console.log(curr_cab);
 			if (String(curr_cab.length).length === 0) {
 				this.errors[i].e_length = 'Cabinet length cannot be blank';
@@ -118,7 +118,7 @@ export class CabinetValidation extends Validation {
 		const top_width = MeasurementHelper.measurementWidthSum(this.top_details.measurement);
 
 		this.list_of_cab_nums.forEach((i) => {
-			const curr_cab = this.cab_extras[i];
+			const curr_cab = this.cab_measurements[i];
 			if (String(curr_cab.width).length === 0) {
 				this.errors[i].e_width = 'Cabinet width cannot be blank';
 			} else {
@@ -143,7 +143,7 @@ export class CabinetValidation extends Validation {
 	 */
 	private checkHeight() {
 		this.list_of_cab_nums.forEach((i) => {
-			const curr_cab = this.cab_extras[i];
+			const curr_cab = this.cab_measurements[i];
 			if (String(curr_cab.height).length === 0) {
 				this.errors[i].e_height = 'Cabinet height cannot be blank';
 			}

@@ -59,7 +59,14 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		topErrors: {type: TypeGuards.TOP_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
 		topTwoErrors: {type: TypeGuards.TOP_VALIDATION_ERROR_2, e_length: '', e_width: '', e_quantity: ''},
 		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
-		doorErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''}
+		doorErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
+		doorTwoErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_2, e_length: '', e_width: '', e_quantity: ''},
+		doorThreeErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_quantity: ''},
+		doorFourErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_quantity: ''},
+		doorFiveErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_quantity: ''},
+		doorSixErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_6, e_length: '', e_width: '', e_quantity: ''},
+		doorSevenErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_7, e_length: '', e_width: '', e_quantity: ''},
+		doorEightErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_8, e_length: '', e_width: '', e_quantity: ''}
 	};
 
 	private post_options = {
@@ -260,8 +267,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
 		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
 
-		console.log(tm);
-
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
@@ -273,8 +278,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const top_validate = tv.validate();
 		const dwr_validate = dwrv.validate();
 		const drv_validate = drv.validate();
-
-		console.log(cv.getErrors());
 
 		if (cab_validate && top_validate && dwr_validate && drv_validate) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
@@ -309,7 +312,14 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			topErrors: {...tv.getSpecificError(0)},
 			topTwoErrors: {...tv.getSpecificError(1)},
 			drawerErrors: {...dwrv.getErrors()},
-			doorErrors: {...drv.getErrors()}
+			doorErrors: {...drv.getSpecificError(0)},
+			doorTwoErrors: {...drv.getSpecificError(1)},
+			doorThreeErrors: {...drv.getSpecificError(2)},
+			doorFourErrors: {...drv.getSpecificError(3)},
+			doorFiveErrors: {...drv.getSpecificError(4)},
+			doorSixErrors: {...drv.getSpecificError(5)},
+			doorSevenErrors: {...drv.getSpecificError(6)},
+			doorEightErrors: {...drv.getSpecificError(7)}
 		});
 
 		event.preventDefault();

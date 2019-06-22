@@ -1,5 +1,5 @@
 import {ProductComponent, ProductComponentErrors, ProductDetailsMapper} from "../Structure/types";
-import {Cabinet, MeasurementDetails, ProductDetails, Questions, Tops} from "../State";
+import {Cabinet, Doors, MeasurementDetails, ProductDetails, Questions, Tops} from "../State";
 import {
 	CabinetErrorShortNamesMapping,
 	DoorsErrorShortNamesMapping,
@@ -12,11 +12,12 @@ import {
 	DoorsQuestionsShortNames,
 	DrawersQuestionsShortNames,
 	TopQuestionsShortNames,
-	TopMeasurementShortNames
+	TopMeasurementShortNames, DoorsMeasurementShortNames
 } from "../Enums/InterfaceMapping";
 import { TypeGuards } from "../Enums/TypeGuards";
 
-import {MAX_CABS, MAX_TOPS} from "../constants/ProductDetails";
+import {MAX_CABS, MAX_DOORS, MAX_TOPS} from "../constants/ProductDetails";
+import {ShortNamePrefix} from "../Enums/ShortNamePrefix";
 
 export class Mapper {
 	public static unionQuestionsDetails(
@@ -56,7 +57,7 @@ export class Mapper {
 				});
 				enumKeys = Object.keys(CabinetQuestionsShortNames);
 				returnObject = Object(CabinetQuestionsShortNames);
-				(<Cabinet>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, 'cab', MAX_CABS, this.determineCabNum);
+				(<Cabinet>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.CABINET, MAX_CABS, this.determineCabNum);
 				break;
 			case TypeGuards.TOPS:
 				maxQuantityOfComponent = Array.from(Array(MAX_TOPS + 1).keys());
@@ -73,15 +74,28 @@ export class Mapper {
 				});
 				enumKeys = Object.keys(TopQuestionsShortNames);
 				returnObject = Object(TopQuestionsShortNames);
-				(<Tops>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, 'top', MAX_TOPS, this.determineTopNum);
+				(<Tops>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.TOP, MAX_TOPS, this.determineTopNum);
 				break;
 			case TypeGuards.DRAWERS:
 				enumKeys = Object.keys(DrawersQuestionsShortNames);
 				returnObject = Object(DrawersQuestionsShortNames);
 				break;
 			case TypeGuards.DOORS:
+				maxQuantityOfComponent = Array.from(Array(MAX_DOORS + 1).keys());
+				maxQuantityOfComponent.forEach((num: number) => {
+					if (num > 0) {
+						if (num === 1) {
+							Object.keys(DoorsMeasurementShortNames).forEach((k: string) => detailKeys.push(k));
+						} else {
+							Object.keys(DoorsMeasurementShortNames).forEach((k: any) => {
+								detailKeys.push(`${k}_${num}`);
+							});
+						}
+					}
+				});
 				enumKeys = Object.keys(DoorsQuestionsShortNames);
 				returnObject = Object(DoorsQuestionsShortNames);
+				(<Doors>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.DOOR, MAX_DOORS, this.determineDoorNum);
 				break;
 			default: throw new Error("Unexpected object: " + object);
 		}
@@ -109,7 +123,14 @@ export class Mapper {
 				value = Object(errors)[Object(DrawersErrorShortNamesMapping)[givenShortName]];
 				break;
 			case TypeGuards.DOORS_VALIDATION_ERROR:
-				value = Object(errors)[Object(DoorsErrorShortNamesMapping)[givenShortName]];
+			case TypeGuards.DOORS_VALIDATION_ERROR_2:
+			case TypeGuards.DOORS_VALIDATION_ERROR_3:
+			case TypeGuards.DOORS_VALIDATION_ERROR_4:
+			case TypeGuards.DOORS_VALIDATION_ERROR_5:
+			case TypeGuards.DOORS_VALIDATION_ERROR_6:
+			case TypeGuards.DOORS_VALIDATION_ERROR_7:
+			case TypeGuards.DOORS_VALIDATION_ERROR_8:
+				value = Object(errors)[Object(DoorsErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
 				break;
 			default: throw new Error("Unexpected object: " + errors);
 		}
@@ -202,6 +223,33 @@ export class Mapper {
 			return TypeGuards.TOPS_2;
 		} else {
 			return TypeGuards.TOPS;
+		}
+	}
+
+	public static determineDoorNum(number: string): TypeGuards {
+		const dr_2_regex = new RegExp('2');
+		const dr_3_regex = new RegExp('3');
+		const dr_4_regex = new RegExp('4');
+		const dr_5_regex = new RegExp('5');
+		const dr_6_regex = new RegExp('6');
+		const dr_7_regex = new RegExp('7');
+		const dr_8_regex = new RegExp('8');
+		if (dr_2_regex.test(number)) {
+			return TypeGuards.DOORS_2;
+		} else if (dr_3_regex.test(number)) {
+			return TypeGuards.DOORS_3;
+		} else if (dr_4_regex.test(number)) {
+			return TypeGuards.DOORS_4;
+		} else if (dr_5_regex.test(number)) {
+			return TypeGuards.DOORS_5;
+		} else if (dr_6_regex.test(number)) {
+			return TypeGuards.DOORS_6;
+		} else if (dr_7_regex.test(number)) {
+			return TypeGuards.DOORS_7;
+		} else if (dr_8_regex.test(number)) {
+			return TypeGuards.DOORS_8;
+		} else {
+			return TypeGuards.DOORS;
 		}
 	}
 

@@ -1,5 +1,37 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+
+## Adding unique dimensions
+Steps to create unique dims for components:
+1. Insert the max number of components allowed into the DB (follow the nomenclature of cabinets/tops)
+   * Ensure that the `quantity` short_name is: `<component_abbr>_quantity`
+     * Check the respective enum's quantity attribute in `InterfaceMapping.ts`
+   * Ensure that *all* questions that are part of the multiple unique dims have unique_dim field populated
+   * The grouping should be in numerical order. The unique dims should come after other component questions
+2. Add `measurement?: MeasurementDetails[];` to the interface of the question in `State.ts`
+3. In `InterfaceMapping.ts`, modify the specific enum by removing redundant fields (`*_height`) and create a new 
+enum called: `<Component>MeasurementShortNames`
+   * Attributes: 
+     * `<component_abbr>_lngth` = 'length'
+     * `<component_abbr>_wdth` = 'width'
+     * `<component_abbr>_height` = 'height'
+4. For each quantity of component, create a respective TypeGuard enum in `TypeGaurds.ts`
+    * Create the appropriate component: `COMPONENT_X` (no `_x` if first one)
+    * Create the corresponding validation_errors as well
+5. In `Mapper.ts`, in the respective case statement in `mapProductComponent`, copy the maxQuantityOfComponent code into
+the specific case and set the MAX_ to the appropriate component
+   * Adjust the *MeasurementShortNames enum reference in the .forEach
+   * After the `returnObject = ...` statement, add the statement that creates the measurement array (see cabinet / top)
+   * Create respective `determine<component>Num` function (see `determineCabinetNum`)
+6. Now we'll need to update the validation for the component
+7. Basically mimic TopValidation or CabinetValidation for the specific component
+8. Update `SalesEntryState` to have errors for each quantity of component
+9. Add the new validation error attributes to `this.setState` in `\NewSalesEntry\index.tsx` on line 304
+10. In `SalesEntryForm.tsx`, update the attachError function to handle the separate errors
+11. In `Mapper.ts`, update the mapError function to handle your new validation types
+12. In `\NewSalesEntry\index.tsx`, add the state attributes per validation type in the initial state const
+13. Create the respective component helpers/utilities in `QuestionUtility.ts`
+
 ## Available Scripts
 
 In the project directory, you can run:
