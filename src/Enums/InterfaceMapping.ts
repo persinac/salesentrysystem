@@ -33,13 +33,16 @@ export enum DoorsMeasurementShortNames {
 
 // maps to interface: Drawers
 export enum DrawersQuestionsShortNames {
-	dwr_qty = 'quantity',
-	dwr_lngth = 'length',
-	dwr_wdth = 'width',
-	dwr_height = 'height',
+	dwr_quantity = 'quantity',
 	dwr_mt = 'material_type',
 	dwr_vndr = 'vendor',
 	dwr_vndr_po = 'vendor_po'
+}
+
+export enum DrawersMeasurementQuestionsShortNames {
+	dwr_height = 'height',
+	dwr_lngth = 'length',
+	dwr_wdth = 'width'
 }
 
 // maps to interface: DrawerFronts

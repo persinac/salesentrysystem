@@ -105,11 +105,9 @@ export interface Drawers {
 	type: string;
 	vendor?: string;
 	vendor_po?: string;
-	length?: number;
-	width?: number;
-	height?: number;
 	quantity?: number;
 	material_type?: string;
+	measurement?: MeasurementDetails[];
 }
 
 export interface DrawerFronts {
@@ -275,6 +273,9 @@ export interface SalesEntryState {
 	topErrors?: TopValidationError;
 	topTwoErrors?: TopValidationError;
 	drawerErrors?: DrawersValidationError;
+	drawerTwoErrors?: DrawersValidationError;
+	drawerThreeErrors?: DrawersValidationError;
+	drawerFourErrors?: DrawersValidationError;
 	doorErrors?: DoorsValidationError;
 	doorTwoErrors?: DoorsValidationError;
 	doorThreeErrors?: DoorsValidationError;

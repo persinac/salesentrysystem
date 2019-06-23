@@ -15,7 +15,7 @@ export enum CabinetErrorShortNamesMapping {
 
 // maps to interface: DoorsValidationError
 export enum DoorsErrorShortNamesMapping {
-	dr_qty = 'e_quantity',
+	dr_quantity = 'e_quantity',
 	dr_lngth = 'e_length',
 	dr_wdth = 'e_width',
 	dr_height = 'e_height',
@@ -26,9 +26,10 @@ export enum DoorsErrorShortNamesMapping {
 
 // maps to interface: DrawersValidationError
 export enum DrawersErrorShortNamesMapping {
-	dwr_qty = 'e_quantity',
+	dwr_quantity = 'e_quantity',
 	dwr_lngth = 'e_length',
 	dwr_wdth = 'e_width',
+	dwr_height = 'e_height',
 	dwr_mt = 'e_material_type',
 	dwr_vndr = 'e_vendor',
 	dwr_vndr_po = 'e_vendor_po'

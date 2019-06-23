@@ -70,6 +70,9 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const legsQuantityQID = this.props.context.questions.filter((q: any) => {
 				return q['short_name'] === 'legs_quantity';
 			});
+			const dwrQuantityQID = this.props.context.questions.filter((q: any) => {
+				return q['short_name'] === 'dwr_quantity';
+			});
 
 			const cabQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === cabQuantityQID[0]['q_id'];
@@ -83,11 +86,15 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const legsQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === legsQuantityQID[0]['q_id'];
 			});
+			const dwrQuantity = this.props.context.productDetails.filter((pd: any) => {
+				return pd['q_fk'] === dwrQuantityQID[0]['q_id'];
+			});
 
 			this.showExtraRows('cab_quantity', cabQuantity[0]['response']);
 			this.showExtraRows('top_quantity', topQuantity[0]['response']);
 			this.showExtraRows('dr_quantity', drQuantity[0]['response']);
 			this.showExtraRows('legs_quantity', legsQuantity[0]['response']);
+			this.showExtraRows('dwr_quantity', dwrQuantity[0]['response']);
 		}
 	}
 
@@ -171,7 +178,15 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.topErrors)} id={short_name}/>);
 				}
 			case Categories.DRAWERS:
-				return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
+				if (second_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerTwoErrors)} id={short_name}/>);
+				} else if (third_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerThreeErrors)} id={short_name}/>);
+				} else if (fourth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerFourErrors)} id={short_name}/>);
+				} else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
+				}
 			case Categories.DOORS:
 				if (second_regex.test(short_name)) {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorTwoErrors)} id={short_name}/>);

@@ -1,5 +1,5 @@
 import {ProductComponent, ProductComponentErrors, ProductDetailsMapper} from "../Structure/types";
-import {Cabinet, Doors, Legs, MeasurementDetails, ProductDetails, Questions, Tops} from "../State";
+import {Cabinet, Doors, Drawers, Legs, MeasurementDetails, ProductDetails, Questions, Tops} from "../State";
 import {
 	CabinetErrorShortNamesMapping,
 	DoorsErrorShortNamesMapping,
@@ -12,11 +12,15 @@ import {
 	DoorsQuestionsShortNames,
 	DrawersQuestionsShortNames,
 	TopQuestionsShortNames,
-	TopMeasurementShortNames, DoorsMeasurementShortNames, LegsMeasurementShortNames, LegsQuestionsShortNames
+	TopMeasurementShortNames,
+	DoorsMeasurementShortNames,
+	LegsMeasurementShortNames,
+	LegsQuestionsShortNames,
+	DrawersMeasurementQuestionsShortNames
 } from "../Enums/InterfaceMapping";
 import { TypeGuards } from "../Enums/TypeGuards";
 
-import {MAX_CABS, MAX_DOORS, MAX_LEGS, MAX_TOPS} from "../constants/ProductDetails";
+import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_TOPS} from "../constants/ProductDetails";
 import {ShortNamePrefix} from "../Enums/ShortNamePrefix";
 
 export class Mapper {
@@ -76,10 +80,6 @@ export class Mapper {
 				returnObject = Object(TopQuestionsShortNames);
 				(<Tops>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.TOP, MAX_TOPS, this.determineTopNum);
 				break;
-			case TypeGuards.DRAWERS:
-				enumKeys = Object.keys(DrawersQuestionsShortNames);
-				returnObject = Object(DrawersQuestionsShortNames);
-				break;
 			case TypeGuards.DOORS:
 				maxQuantityOfComponent = Array.from(Array(MAX_DOORS + 1).keys());
 				maxQuantityOfComponent.forEach((num: number) => {
@@ -114,6 +114,23 @@ export class Mapper {
 				returnObject = Object(LegsQuestionsShortNames);
 				(<Legs>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.LEGS, MAX_LEGS, this.determineLegsNum);
 				break;
+			case TypeGuards.DRAWERS:
+				maxQuantityOfComponent = Array.from(Array(MAX_DRAWERS + 1).keys());
+				maxQuantityOfComponent.forEach((num: number) => {
+					if (num > 0) {
+						if (num === 1) {
+							Object.keys(DrawersMeasurementQuestionsShortNames).forEach((k: string) => detailKeys.push(k));
+						} else {
+							Object.keys(DrawersMeasurementQuestionsShortNames).forEach((k: any) => {
+								detailKeys.push(`${k}_${num}`);
+							});
+						}
+					}
+				});
+				enumKeys = Object.keys(DrawersQuestionsShortNames);
+				returnObject = Object(DrawersQuestionsShortNames);
+				(<Drawers>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.DRAWER, MAX_DRAWERS, this.determineDoorNum);
+				break;
 			default: throw new Error("Unexpected object: " + object);
 		}
 
@@ -137,7 +154,10 @@ export class Mapper {
 				value = Object(errors)[Object(TopErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
 				break;
 			case TypeGuards.DRAWERS_VALIDATION_ERROR:
-				value = Object(errors)[Object(DrawersErrorShortNamesMapping)[givenShortName]];
+			case TypeGuards.DRAWERS_VALIDATION_ERROR_2:
+			case TypeGuards.DRAWERS_VALIDATION_ERROR_3:
+			case TypeGuards.DRAWERS_VALIDATION_ERROR_4:
+				value = Object(errors)[Object(DrawersErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
 				break;
 			case TypeGuards.DOORS_VALIDATION_ERROR:
 			case TypeGuards.DOORS_VALIDATION_ERROR_2:
@@ -226,31 +246,31 @@ export class Mapper {
 		return givenShortName.replace(/_\d+/, '');
 	}
 
-	public static determineCabNum(cabNumber: string): TypeGuards {
+	public static determineCabNum(num: string): TypeGuards {
 		const cab_2_regex = new RegExp('2');
 		const cab_3_regex = new RegExp('3');
 		const cab_4_regex = new RegExp('4');
-		if (cab_2_regex.test(cabNumber)) {
+		if (cab_2_regex.test(num)) {
 			return TypeGuards.CABINET_2;
-		} if (cab_3_regex.test(cabNumber)) {
+		} if (cab_3_regex.test(num)) {
 			return TypeGuards.CABINET_3;
-		} if (cab_4_regex.test(cabNumber)) {
+		} if (cab_4_regex.test(num)) {
 			return TypeGuards.CABINET_4;
 		} else {
 			return TypeGuards.CABINET;
 		}
 	}
 
-	public static determineTopNum(number: string): TypeGuards {
+	public static determineTopNum(num: string): TypeGuards {
 		const top_2_regex = new RegExp('2');
-		if (top_2_regex.test(number)) {
+		if (top_2_regex.test(num)) {
 			return TypeGuards.TOPS_2;
 		} else {
 			return TypeGuards.TOPS;
 		}
 	}
 
-	public static determineDoorNum(number: string): TypeGuards {
+	public static determineDoorNum(num: string): TypeGuards {
 		const dr_2_regex = new RegExp('2');
 		const dr_3_regex = new RegExp('3');
 		const dr_4_regex = new RegExp('4');
@@ -258,38 +278,53 @@ export class Mapper {
 		const dr_6_regex = new RegExp('6');
 		const dr_7_regex = new RegExp('7');
 		const dr_8_regex = new RegExp('8');
-		if (dr_2_regex.test(number)) {
+		if (dr_2_regex.test(num)) {
 			return TypeGuards.DOORS_2;
-		} else if (dr_3_regex.test(number)) {
+		} else if (dr_3_regex.test(num)) {
 			return TypeGuards.DOORS_3;
-		} else if (dr_4_regex.test(number)) {
+		} else if (dr_4_regex.test(num)) {
 			return TypeGuards.DOORS_4;
-		} else if (dr_5_regex.test(number)) {
+		} else if (dr_5_regex.test(num)) {
 			return TypeGuards.DOORS_5;
-		} else if (dr_6_regex.test(number)) {
+		} else if (dr_6_regex.test(num)) {
 			return TypeGuards.DOORS_6;
-		} else if (dr_7_regex.test(number)) {
+		} else if (dr_7_regex.test(num)) {
 			return TypeGuards.DOORS_7;
-		} else if (dr_8_regex.test(number)) {
+		} else if (dr_8_regex.test(num)) {
 			return TypeGuards.DOORS_8;
 		} else {
 			return TypeGuards.DOORS;
 		}
 	}
 
-	public static determineLegsNum(cabNumber: string): TypeGuards {
+	public static determineLegsNum(num: string): TypeGuards {
 		const _2_regex = new RegExp('2');
 		const _3_regex = new RegExp('3');
 		const _4_regex = new RegExp('4');
 		const _5_regex = new RegExp('5');
-		if (_2_regex.test(cabNumber)) {
+		if (_2_regex.test(num)) {
 			return TypeGuards.LEGS_2;
-		} else if (_3_regex.test(cabNumber)) {
+		} else if (_3_regex.test(num)) {
 			return TypeGuards.LEGS_3;
-		} else if (_4_regex.test(cabNumber)) {
+		} else if (_4_regex.test(num)) {
 			return TypeGuards.LEGS_4;
-		} else if (_5_regex.test(cabNumber)) {
+		} else if (_5_regex.test(num)) {
 			return TypeGuards.LEGS_5;
+		} else {
+			return TypeGuards.LEGS;
+		}
+	}
+
+	public static determineDrawersNum(num: string): TypeGuards {
+		const _2_regex = new RegExp('2');
+		const _3_regex = new RegExp('3');
+		const _4_regex = new RegExp('4');
+		if (_2_regex.test(num)) {
+			return TypeGuards.LEGS_2;
+		} else if (_3_regex.test(num)) {
+			return TypeGuards.LEGS_3;
+		} else if (_4_regex.test(num)) {
+			return TypeGuards.LEGS_4;
 		} else {
 			return TypeGuards.LEGS;
 		}

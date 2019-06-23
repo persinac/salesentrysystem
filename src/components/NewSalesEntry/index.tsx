@@ -52,25 +52,28 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		productHeader: {notes: '', reference_number: '', group_id: 0, order_num: 0, status: 'Started', crafting_required: false},
 		productHeaderErrors: {e_reference_number: ''},
 		cabinetErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		cabinetTwoErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_2, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		cabinetThreeErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_3, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		cabinetFourErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_4, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		cabinetTwoErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_2, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: ''},
+		cabinetThreeErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_3, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: ''},
+		cabinetFourErrors: {type: TypeGuards.CABINET_VALIDATION_ERROR_4, e_paint_color: '', e_stain_color: '', e_length: '', e_width: '', e_height: ''},
 		topErrors: {type: TypeGuards.TOP_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
 		topTwoErrors: {type: TypeGuards.TOP_VALIDATION_ERROR_2, e_length: '', e_width: '', e_quantity: ''},
-		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
+		drawerErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		drawerTwoErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_height: ''},
+		drawerThreeErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_height: ''},
+		drawerFourErrors: {type: TypeGuards.DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_height: ''},
 		doorErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR, e_length: '', e_width: '', e_quantity: ''},
-		doorTwoErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_2, e_length: '', e_width: '', e_quantity: ''},
-		doorThreeErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_quantity: ''},
-		doorFourErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_quantity: ''},
-		doorFiveErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_quantity: ''},
-		doorSixErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_6, e_length: '', e_width: '', e_quantity: ''},
-		doorSevenErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_7, e_length: '', e_width: '', e_quantity: ''},
-		doorEightErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_8, e_length: '', e_width: '', e_quantity: ''},
+		doorTwoErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_2, e_length: '', e_width: ''},
+		doorThreeErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_3, e_length: '', e_width: ''},
+		doorFourErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_4, e_length: '', e_width: ''},
+		doorFiveErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_5, e_length: '', e_width: ''},
+		doorSixErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_6, e_length: '', e_width: ''},
+		doorSevenErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_7, e_length: '', e_width: ''},
+		doorEightErrors: {type: TypeGuards.DOORS_VALIDATION_ERROR_8, e_length: '', e_width: ''},
 		legErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR, e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		legTwoErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_2, e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		legThreeErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		legFourErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_height: '', e_quantity: ''},
-		legFiveErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: '', e_quantity: ''}
+		legTwoErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_2, e_length: '', e_width: '', e_height: ''},
+		legThreeErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_height: ''},
+		legFourErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_height: ''},
+		legFiveErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: ''}
 	};
 
 	private post_options = {
@@ -277,7 +280,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
-		const dwrv: DrawerValidation = new DrawerValidation(cm, dwm);
+		const dwrv: DrawerValidation = new DrawerValidation(dwm);
 		const drv: DoorsValidation = new DoorsValidation(dr);
 		const legv: LegsValidation = new LegsValidation(leg);
 
@@ -320,7 +323,10 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			cabinetFourErrors: {...cv.getSpecificError(3)},
 			topErrors: {...tv.getSpecificError(0)},
 			topTwoErrors: {...tv.getSpecificError(1)},
-			drawerErrors: {...dwrv.getErrors()},
+			drawerErrors: {...dwrv.getSpecificError(0)},
+			drawerTwoErrors: {...dwrv.getSpecificError(1)},
+			drawerThreeErrors: {...dwrv.getSpecificError(2)},
+			drawerFourErrors: {...dwrv.getSpecificError(3)},
 			doorErrors: {...drv.getSpecificError(0)},
 			doorTwoErrors: {...drv.getSpecificError(1)},
 			doorThreeErrors: {...drv.getSpecificError(2)},
