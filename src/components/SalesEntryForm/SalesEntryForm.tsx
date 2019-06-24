@@ -10,6 +10,14 @@ import {Categories} from "../../Enums/Category";
 import {number} from "prop-types";
 import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtility";
 import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_TOPS} from "../../constants/ProductDetails";
+import Select from 'react-select';
+import {
+	CUTLERY_OPTIONS,
+	KNIFE_BLOCK_OPTIONS,
+	PULLOUT_TRASH_OPTIONS,
+	SPICE_RACK_OPTIONS,
+	UTENSIL_OPTIONS, WINE_RACK_OPTIONS
+} from "../../constants/ProductOptions";
 
 interface InterfaceProps {
 	category_id?: number;
@@ -22,6 +30,12 @@ interface IState {
 	productDetails?: ProductDetails[];
 	currentQuestionIdx?: number;
 }
+
+const options = [
+	{ value: '4WCTM18INDM2', label: 'WOOD TOP MOUNT WASTE CONTAINER' },
+	{ value: '4WCTM2150DM2', label: '**DOUBLE WOOD PULLOUT TOP MOUNT WASTE CN' },
+	{ value: '4WCTM24DM2162', label: 'DOUBLE WOOD PULLOUT TOP MOUNT WASTE CNTR' },
+];
 
 export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	constructor(props: any) {
@@ -136,20 +150,151 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			}
 			return false;
 		});
-		return (
-			<div className={classyMcClasserson}>
-				<label htmlFor={question['short_name']}>{question['text']}</label>
-				<input
-					id={question['short_name']}
-					value={this.state.productDetails[idx].response}
-					onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
-					type='text'
-					placeholder={question['tooltip']}
-					className='form-control'
-				/>
-				{this.attachError(Number(question['cat_fk']), question['short_name'])}
-			</div>
-		);
+		if (question['datatype'] === 'boolean') {
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<input
+						id={question['short_name']}
+						checked={!!this.state.productDetails[idx].response}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						type='checkbox'
+						placeholder={question['tooltip']}
+						className='form-control'
+					/>
+					{this.attachError(Number(question['cat_fk']), question['short_name'])}
+				</div>
+			);
+		} else if (question['short_name'] === 'ftr_pot') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				PULLOUT_TRASH_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = PULLOUT_TRASH_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={PULLOUT_TRASH_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (question['short_name'] === 'ftr_knf') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				KNIFE_BLOCK_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = KNIFE_BLOCK_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={KNIFE_BLOCK_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (question['short_name'] === 'ftr_spr') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				SPICE_RACK_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = SPICE_RACK_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={SPICE_RACK_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (question['short_name'] === 'ftr_utn') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				UTENSIL_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = UTENSIL_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={UTENSIL_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (question['short_name'] === 'ftr_wr') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				WINE_RACK_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = WINE_RACK_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={WINE_RACK_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (question['short_name'] === 'ftr_cly') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				CUTLERY_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = CUTLERY_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={CUTLERY_OPTIONS}
+					/>
+				</div>
+			);
+		} else {
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<input
+						id={question['short_name']}
+						value={this.state.productDetails[idx].response}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						type='text'
+						placeholder={question['tooltip']}
+						className='form-control'
+					/>
+					{this.attachError(Number(question['cat_fk']), question['short_name'])}
+				</div>
+			);
+		}
 	}
 
 	private attachError(category_id: number, short_name: string) {
@@ -328,7 +473,13 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private setDynStateWithEvent(event: any, index: number, columnType: string): void {
-		const val: any = (event.target as any).value;
+		let val: any;
+		if (event.label !== undefined) {
+			val = event.value;
+		} else {
+			val = (event.target as any).type === 'checkbox' ? event.target.checked : (event.target as any).value;
+		}
+
 		this.showExtraRows(columnType, val);
 		this.setState({
 			productDetails: this.onUpdateItem(index, columnType, val)
