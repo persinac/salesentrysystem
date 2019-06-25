@@ -9,7 +9,7 @@ import {Mapper} from "../../Mapper/Mapper";
 import {Categories} from "../../Enums/Category";
 import {number} from "prop-types";
 import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtility";
-import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_TOPS} from "../../constants/ProductDetails";
+import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_RO_DRAWERS, MAX_TOPS} from "../../constants/ProductDetails";
 import Select from 'react-select';
 import {
 	CUTLERY_OPTIONS, HARDWARE_OPTIONS,
@@ -87,6 +87,9 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const dwrQuantityQID = this.props.context.questions.filter((q: any) => {
 				return q['short_name'] === 'dwr_quantity';
 			});
+			const rodwrQuantityQID = this.props.context.questions.filter((q: any) => {
+				return q['short_name'] === 'rodwr_quantity';
+			});
 
 			const cabQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === cabQuantityQID[0]['q_id'];
@@ -103,12 +106,16 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const dwrQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === dwrQuantityQID[0]['q_id'];
 			});
+			const rodwrQuantity = this.props.context.productDetails.filter((pd: any) => {
+				return pd['q_fk'] === rodwrQuantityQID[0]['q_id'];
+			});
 
 			this.showExtraRows('cab_quantity', cabQuantity[0]['response']);
 			this.showExtraRows('top_quantity', topQuantity[0]['response']);
 			this.showExtraRows('dr_quantity', drQuantity[0]['response']);
 			this.showExtraRows('legs_quantity', legsQuantity[0]['response']);
 			this.showExtraRows('dwr_quantity', dwrQuantity[0]['response']);
+			this.showExtraRows('rodwr_quantity', rodwrQuantity[0]['response']);
 		}
 	}
 
@@ -352,6 +359,20 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				} else {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.drawerErrors)} id={short_name}/>);
 				}
+			case Categories.ROLLOUT_DRAWERS:
+				if (second_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.rolloutDrawerTwoErrors)} id={short_name}/>);
+				} else if (third_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.rolloutDrawerThreeErrors)} id={short_name}/>);
+				} else if (fourth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.rolloutDrawerFourErrors)} id={short_name}/>);
+				} else if (fourth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.rolloutDrawerFiveErrors)} id={short_name}/>);
+				} else if (fourth_regex.test(short_name)) {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.rolloutDrawerSixErrors)} id={short_name}/>);
+				} else {
+					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.rolloutDrawerErrors)} id={short_name}/>);
+				}
 			case Categories.DOORS:
 				if (second_regex.test(short_name)) {
 					return (<ErrorWrapper errorMessage={Mapper.mapErrorObject(short_name, this.props.context.doorTwoErrors)} id={short_name}/>);
@@ -533,6 +554,8 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			this.setExtraRowsStyle(value, 'legs_', MAX_LEGS);
 		} else if (columnName === 'top_quantity') {
 			this.setExtraRowsStyle(value, 'top_', MAX_TOPS);
+		} else if (columnName === 'rodwr_quantity') {
+			this.setExtraRowsStyle(value, 'rodwr_', MAX_RO_DRAWERS);
 		}
 	};
 

@@ -9,5 +9,6 @@ export enum ShortNamePrefix {
 	DRAWER_FRONTS = 'dwrfrnts',
 	HARDWARE = 'hrdwr',
 	FEATURE = 'ftr',
-	TOP = 'top'
+	TOP = 'top',
+	ROLLOUT_DRAWERS = 'rodwr'
 }

@@ -21,6 +21,7 @@ import {DrawerValidation} from "../../Validation/DrawerValidation";
 import {DoorsValidation} from "../../Validation/DoorsValidation";
 import {LegsErrorShortNamesMapping} from "../../Enums/InterfaceErrorMapping";
 import {LegsValidation} from "../../Validation/LegsValidation";
+import {RolloutDrawerValidation} from "../../Validation/RolloutDrawerValidation";
 
 const rp = require('request-promise');
 
@@ -73,7 +74,13 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		legTwoErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_2, e_length: '', e_width: '', e_height: ''},
 		legThreeErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_height: ''},
 		legFourErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_height: ''},
-		legFiveErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: ''}
+		legFiveErrors: {type: TypeGuards.LEGS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: ''},
+		rolloutDrawerErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR, e_length: '', e_width: '', e_height: '', e_quantity: ''},
+		rolloutDrawerTwoErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_2, e_length: '', e_width: '', e_height: ''},
+		rolloutDrawerThreeErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_height: ''},
+		rolloutDrawerFourErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_height: ''},
+		rolloutDrawerFiveErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: ''},
+		rolloutDrawerSixErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_6, e_length: '', e_width: '', e_height: ''}
 	};
 
 	private post_options = {
@@ -264,18 +271,21 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
 		const fresh_door: Doors = {type: TypeGuards.DOORS};
 		const fresh_leg: Legs = {type: TypeGuards.LEGS};
+		const fresh_ro_drawers: Legs = {type: TypeGuards.ROLLOUT_DRAWERS};
 
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
 		const top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.TOP);
 		const dwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DRAWERS);
 		const dr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.DOORS);
 		const legs_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.LEGS);
+		const rodwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.ROLLOUT_DRAWERS);
 
 		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, fresh_cab);
 		const tm: ProductComponent = Mapper.mapProductComponent(top_details, fresh_top);
 		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
 		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
 		const leg: ProductComponent = Mapper.mapProductComponent(legs_details, fresh_leg);
+		const rodwr: ProductComponent = Mapper.mapProductComponent(rodwr_details, fresh_ro_drawers);
 
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
@@ -283,6 +293,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const dwrv: DrawerValidation = new DrawerValidation(dwm);
 		const drv: DoorsValidation = new DoorsValidation(dr);
 		const legv: LegsValidation = new LegsValidation(leg);
+		const rodwrv: RolloutDrawerValidation = new RolloutDrawerValidation(rodwr);
 
 		// have to run validation first, so that errors get set if needed
 		const cab_validate = cv.validate();
@@ -290,8 +301,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const dwr_validate = dwrv.validate();
 		const drv_validate = drv.validate();
 		const legv_validate = legv.validate();
+		const rodwrv_validate = rodwrv.validate();
 
-		if (cab_validate && top_validate && dwr_validate && drv_validate && legv_validate) {
+		if (cab_validate && top_validate && dwr_validate && drv_validate && legv_validate && rodwrv_validate) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
 				.then((newPDs: any) => {
 					const updatedPDs: ProductDetails[] = newPDs.details;
@@ -339,7 +351,13 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			legTwoErrors: {...legv.getSpecificError(1)},
 			legThreeErrors: {...legv.getSpecificError(2)},
 			legFourErrors: {...legv.getSpecificError(3)},
-			legFiveErrors: {...legv.getSpecificError(4)}
+			legFiveErrors: {...legv.getSpecificError(4)},
+			rolloutDrawerErrors: {...rodwrv.getSpecificError(0)},
+			rolloutDrawerTwoErrors: {...rodwrv.getSpecificError(1)},
+			rolloutDrawerThreeErrors: {...rodwrv.getSpecificError(2)},
+			rolloutDrawerFourErrors: {...rodwrv.getSpecificError(3)},
+			rolloutDrawerFiveErrors: {...rodwrv.getSpecificError(4)},
+			rolloutDrawerSixErrors: {...rodwrv.getSpecificError(5)}
 		});
 
 		event.preventDefault();
