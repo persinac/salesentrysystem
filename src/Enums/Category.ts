@@ -11,5 +11,6 @@ export enum Categories {
 	CABINETS = 10,
 	LEGS = 11,
 	DRAWERS = 12,
-	HARDWARE = 13
+	HARDWARE = 13,
+	ROLLOUT_DRAWERS = 14
 }

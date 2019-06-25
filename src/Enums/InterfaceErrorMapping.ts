@@ -36,6 +36,17 @@ export enum DrawersErrorShortNamesMapping {
 }
 
 // maps to interface: DrawersValidationError
+export enum RolloutDrawersErrorShortNamesMapping {
+	rodwr_quantity = 'e_quantity',
+	rodwr_lngth = 'e_length',
+	rodwr_wdth = 'e_width',
+	rodwr_height = 'e_height',
+	rodwr_mt = 'e_material_type',
+	rodwr_vndr = 'e_vendor',
+	rodwr_vndr_po = 'e_vendor_po'
+}
+
+// maps to interface: DrawersValidationError
 export enum DrawerFrontsErrorShortNamesMapping {
 	dwrfrnts_qty = 'e_quantity',
 	dwrfrnts_lngth = 'e_length',

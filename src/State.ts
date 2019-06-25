@@ -110,6 +110,15 @@ export interface Drawers {
 	measurement?: MeasurementDetails[];
 }
 
+export interface RolloutDrawers {
+	type: string;
+	vendor?: string;
+	vendor_po?: string;
+	quantity?: number;
+	material_type?: string;
+	measurement?: MeasurementDetails[];
+}
+
 export interface DrawerFronts {
 	type: string;
 	vendor?: string;
@@ -203,6 +212,17 @@ export interface DrawersValidationError {
 	e_material_type?: string;
 }
 
+export interface RolloutDrawersValidationError {
+	type: string;
+	e_vendor?: string;
+	e_vendor_po?: string;
+	e_length?: string;
+	e_width?: string;
+	e_height?: string;
+	e_quantity?: string;
+	e_material_type?: string;
+}
+
 export interface DrawerFrontsValidationError {
 	type: string;
 	e_vendor?: string;
@@ -276,6 +296,12 @@ export interface SalesEntryState {
 	drawerTwoErrors?: DrawersValidationError;
 	drawerThreeErrors?: DrawersValidationError;
 	drawerFourErrors?: DrawersValidationError;
+	rolloutDrawerErrors?: DrawersValidationError;
+	rolloutDrawerTwoErrors?: RolloutDrawersValidationError;
+	rolloutDrawerThreeErrors?: RolloutDrawersValidationError;
+	rolloutDrawerFourErrors?: RolloutDrawersValidationError;
+	rolloutDrawerFiveErrors?: RolloutDrawersValidationError;
+	rolloutDrawerSixErrors?: RolloutDrawersValidationError;
 	doorErrors?: DoorsValidationError;
 	doorTwoErrors?: DoorsValidationError;
 	doorThreeErrors?: DoorsValidationError;

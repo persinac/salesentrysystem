@@ -45,6 +45,20 @@ export enum DrawersMeasurementQuestionsShortNames {
 	dwr_wdth = 'width'
 }
 
+// maps to interface: RolloutDrawers
+export enum RolloutDrawersQuestionsShortNames {
+	rodwr_quantity = 'quantity',
+	rodwr_mt = 'material_type',
+	rodwr_vndr = 'vendor',
+	rodwr_vndr_po = 'vendor_po'
+}
+
+export enum RolloutDrawersMeasurementShortNames {
+	rodwr_height = 'height',
+	rodwr_lngth = 'length',
+	rodwr_wdth = 'width'
+}
+
 // maps to interface: DrawerFronts
 export enum DrawerFrontsQuestionsShortNames {
 	dwrfrnts_qty = 'quantity',

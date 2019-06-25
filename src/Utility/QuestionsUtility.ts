@@ -32,6 +32,12 @@ class UniqueDimMapper {
 	static readonly DRAWER_2 = new UniqueDimMapper(`${ShortNamePrefix.DRAWER}_2`, 'Drawer 2');
 	static readonly DRAWER_3 = new UniqueDimMapper(`${ShortNamePrefix.DRAWER}_3`, 'Drawer 3');
 	static readonly DRAWER_4 = new UniqueDimMapper(`${ShortNamePrefix.DRAWER}_4`, 'Drawer 4');
+	static readonly ROLLOUT_DRAWER_1 = new UniqueDimMapper(`${ShortNamePrefix.ROLLOUT_DRAWERS}_1`, 'Rollout Drawer 1');
+	static readonly ROLLOUT_DRAWER_2 = new UniqueDimMapper(`${ShortNamePrefix.ROLLOUT_DRAWERS}_2`, 'Rollout Drawer 2');
+	static readonly ROLLOUT_DRAWER_3 = new UniqueDimMapper(`${ShortNamePrefix.ROLLOUT_DRAWERS}_3`, 'Rollout Drawer 3');
+	static readonly ROLLOUT_DRAWER_4 = new UniqueDimMapper(`${ShortNamePrefix.ROLLOUT_DRAWERS}_4`, 'Rollout Drawer 4');
+	static readonly ROLLOUT_DRAWER_5 = new UniqueDimMapper(`${ShortNamePrefix.ROLLOUT_DRAWERS}_5`, 'Rollout Drawer 5');
+	static readonly ROLLOUT_DRAWER_6 = new UniqueDimMapper(`${ShortNamePrefix.ROLLOUT_DRAWERS}_6`, 'Rollout Drawer 6');
 
 	private constructor(private key: string, public readonly title: string) {}
 
@@ -89,6 +95,18 @@ export class QuestionsUtility {
 				return {id: id, title: UniqueDimMapper.DRAWER_3.title};
 			case UniqueDimMapper.DRAWER_4.toString():
 				return {id: id, title: UniqueDimMapper.DRAWER_4.title};
+			case UniqueDimMapper.ROLLOUT_DRAWER_1.toString():
+				return {id: id, title: UniqueDimMapper.ROLLOUT_DRAWER_1.title};
+			case UniqueDimMapper.ROLLOUT_DRAWER_2.toString():
+				return {id: id, title: UniqueDimMapper.ROLLOUT_DRAWER_2.title};
+			case UniqueDimMapper.ROLLOUT_DRAWER_3.toString():
+				return {id: id, title: UniqueDimMapper.ROLLOUT_DRAWER_3.title};
+			case UniqueDimMapper.ROLLOUT_DRAWER_4.toString():
+				return {id: id, title: UniqueDimMapper.ROLLOUT_DRAWER_4.title};
+			case UniqueDimMapper.ROLLOUT_DRAWER_5.toString():
+				return {id: id, title: UniqueDimMapper.ROLLOUT_DRAWER_5.title};
+			case UniqueDimMapper.ROLLOUT_DRAWER_6.toString():
+				return {id: id, title: UniqueDimMapper.ROLLOUT_DRAWER_6.title};
 			default:
 				return {id: id, title: ''};
 		}

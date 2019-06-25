@@ -1,9 +1,19 @@
 import {ProductComponent, ProductComponentErrors, ProductDetailsMapper} from "../Structure/types";
-import {Cabinet, Doors, Drawers, Legs, MeasurementDetails, ProductDetails, Questions, Tops} from "../State";
+import {
+	Cabinet,
+	Doors,
+	Drawers,
+	Legs,
+	MeasurementDetails,
+	ProductDetails,
+	Questions,
+	RolloutDrawers,
+	Tops
+} from "../State";
 import {
 	CabinetErrorShortNamesMapping,
 	DoorsErrorShortNamesMapping,
-	DrawersErrorShortNamesMapping, LegsErrorShortNamesMapping,
+	DrawersErrorShortNamesMapping, LegsErrorShortNamesMapping, RolloutDrawersErrorShortNamesMapping,
 	TopErrorShortNamesMapping
 } from "../Enums/InterfaceErrorMapping";
 import {
@@ -16,11 +26,11 @@ import {
 	DoorsMeasurementShortNames,
 	LegsMeasurementShortNames,
 	LegsQuestionsShortNames,
-	DrawersMeasurementQuestionsShortNames
+	DrawersMeasurementQuestionsShortNames, RolloutDrawersQuestionsShortNames, RolloutDrawersMeasurementShortNames
 } from "../Enums/InterfaceMapping";
 import { TypeGuards } from "../Enums/TypeGuards";
 
-import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_TOPS} from "../constants/ProductDetails";
+import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_RO_DRAWERS, MAX_TOPS} from "../constants/ProductDetails";
 import {ShortNamePrefix} from "../Enums/ShortNamePrefix";
 
 export class Mapper {
@@ -129,7 +139,24 @@ export class Mapper {
 				});
 				enumKeys = Object.keys(DrawersQuestionsShortNames);
 				returnObject = Object(DrawersQuestionsShortNames);
-				(<Drawers>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.DRAWER, MAX_DRAWERS, this.determineDoorNum);
+				(<Drawers>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.DRAWER, MAX_DRAWERS, this.determineDrawersNum);
+				break;
+			case TypeGuards.ROLLOUT_DRAWERS:
+				maxQuantityOfComponent = Array.from(Array(MAX_RO_DRAWERS + 1).keys());
+				maxQuantityOfComponent.forEach((num: number) => {
+					if (num > 0) {
+						if (num === 1) {
+							Object.keys(RolloutDrawersMeasurementShortNames).forEach((k: string) => detailKeys.push(k));
+						} else {
+							Object.keys(RolloutDrawersMeasurementShortNames).forEach((k: any) => {
+								detailKeys.push(`${k}_${num}`);
+							});
+						}
+					}
+				});
+				enumKeys = Object.keys(RolloutDrawersQuestionsShortNames);
+				returnObject = Object(RolloutDrawersQuestionsShortNames);
+				(<RolloutDrawers>object).measurement = this.setupMapMeasurements(detailKeys, returnObject, details, ShortNamePrefix.ROLLOUT_DRAWERS, MAX_RO_DRAWERS, this.determineRolloutDrawersNum);
 				break;
 			default: throw new Error("Unexpected object: " + object);
 		}
@@ -158,6 +185,14 @@ export class Mapper {
 			case TypeGuards.DRAWERS_VALIDATION_ERROR_3:
 			case TypeGuards.DRAWERS_VALIDATION_ERROR_4:
 				value = Object(errors)[Object(DrawersErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
+				break;
+			case TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR:
+			case TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_2:
+			case TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_3:
+			case TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_4:
+			case TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_5:
+			case TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_6:
+				value = Object(errors)[Object(RolloutDrawersErrorShortNamesMapping)[this.mapErrorValidations(givenShortName)]];
 				break;
 			case TypeGuards.DOORS_VALIDATION_ERROR:
 			case TypeGuards.DOORS_VALIDATION_ERROR_2:
@@ -320,13 +355,34 @@ export class Mapper {
 		const _3_regex = new RegExp('3');
 		const _4_regex = new RegExp('4');
 		if (_2_regex.test(num)) {
-			return TypeGuards.LEGS_2;
+			return TypeGuards.DRAWERS_2;
 		} else if (_3_regex.test(num)) {
-			return TypeGuards.LEGS_3;
+			return TypeGuards.DRAWERS_3;
 		} else if (_4_regex.test(num)) {
-			return TypeGuards.LEGS_4;
+			return TypeGuards.DRAWERS_4;
 		} else {
-			return TypeGuards.LEGS;
+			return TypeGuards.DRAWERS;
+		}
+	}
+
+	public static determineRolloutDrawersNum(num: string): TypeGuards {
+		const _2_regex = new RegExp('2');
+		const _3_regex = new RegExp('3');
+		const _4_regex = new RegExp('4');
+		const _5_regex = new RegExp('5');
+		const _6_regex = new RegExp('6');
+		if (_2_regex.test(num)) {
+			return TypeGuards.ROLLOUT_DRAWERS_2;
+		} else if (_3_regex.test(num)) {
+			return TypeGuards.ROLLOUT_DRAWERS_3;
+		} else if (_4_regex.test(num)) {
+			return TypeGuards.ROLLOUT_DRAWERS_4;
+		} else if (_5_regex.test(num)) {
+			return TypeGuards.ROLLOUT_DRAWERS_5;
+		} else if (_6_regex.test(num)) {
+			return TypeGuards.ROLLOUT_DRAWERS_6;
+		} else {
+			return TypeGuards.ROLLOUT_DRAWERS;
 		}
 	}
 
