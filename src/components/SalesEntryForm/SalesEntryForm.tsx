@@ -13,7 +13,7 @@ import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_RO_DRAWERS, MAX_TOPS} fr
 import Select from 'react-select';
 import {
 	CUTLERY_OPTIONS, HARDWARE_OPTIONS,
-	KNIFE_BLOCK_OPTIONS,
+	KNIFE_BLOCK_OPTIONS, PAINT_OPTIONS,
 	PULLOUT_TRASH_OPTIONS,
 	SPICE_RACK_OPTIONS,
 	UTENSIL_OPTIONS, WINE_RACK_OPTIONS
@@ -90,6 +90,9 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const rodwrQuantityQID = this.props.context.questions.filter((q: any) => {
 				return q['short_name'] === 'rodwr_quantity';
 			});
+			const paintIsCustomQID = this.props.context.questions.filter((q: any) => {
+				return q['short_name'] === 'pnt_isc';
+			});
 
 			const cabQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === cabQuantityQID[0]['q_id'];
@@ -109,6 +112,9 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			const rodwrQuantity = this.props.context.productDetails.filter((pd: any) => {
 				return pd['q_fk'] === rodwrQuantityQID[0]['q_id'];
 			});
+			const paintIsCustom = this.props.context.productDetails.filter((pd: any) => {
+				return pd['q_fk'] === paintIsCustomQID[0]['q_id'];
+			});
 
 			this.showExtraRows('cab_quantity', cabQuantity[0]['response']);
 			this.showExtraRows('top_quantity', topQuantity[0]['response']);
@@ -116,6 +122,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			this.showExtraRows('legs_quantity', legsQuantity[0]['response']);
 			this.showExtraRows('dwr_quantity', dwrQuantity[0]['response']);
 			this.showExtraRows('rodwr_quantity', rodwrQuantity[0]['response']);
+			this.showExtraRows('pnt_isc', paintIsCustom[0]['response']);
 		}
 	}
 
@@ -150,6 +157,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 
 	private injectGroupingInput(question: any, classyMcClasserson: string) {
 		const hardware_regex = new RegExp('hrdwr_');
+		const paint_color_regex = new RegExp('pnt_clr');
 		let idx = -1;
 		this.state.productDetails.some((pd: ProductDetails, internal_i: number) => {
 			if (pd.q_fk === question.q_id) {
@@ -303,6 +311,25 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 						value={value}
 						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
 						options={HARDWARE_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (paint_color_regex.test(question['short_name'])) {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				PAINT_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = PAINT_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={PAINT_OPTIONS}
 					/>
 				</div>
 			);
@@ -556,6 +583,8 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			this.setExtraRowsStyle(value, 'top_', MAX_TOPS);
 		} else if (columnName === 'rodwr_quantity') {
 			this.setExtraRowsStyle(value, 'rodwr_', MAX_RO_DRAWERS);
+		} else if (columnName === 'pnt_isc') {
+			this.setCheckboxShowHideStyle(value, 'pnt_cus')
 		}
 	};
 
@@ -607,5 +636,34 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				}
 			});
 		}
+	};
+
+	private setCheckboxShowHideStyle = (val: any, unique_dim: string): void => {
+		if (String(val).length > 0 && val !== undefined) {
+			if (val) {
+				if (unique_dim.includes('pnt_')) {
+					this.setCustomPaintRowsByCheckbox('flex');
+				}
+			} else {
+				if (unique_dim.includes('pnt_')) {
+					this.setCustomPaintRowsByCheckbox('none');
+				}
+			}
+		} else {
+			if (unique_dim.includes('pnt_')) {
+				this.setCustomPaintRowsByCheckbox('none');
+			}
+		}
+	};
+
+	private setCustomPaintRowsByCheckbox(displayVal: string) {
+		const ele_ids: string[] = ['pnt_cus_1', 'pnt_cus_2'];
+		ele_ids.forEach((element) => {
+			const ele = document.getElementById(element);
+			console.log(ele);
+			if (ele !== null && ele !== undefined) {
+				ele.style.display = displayVal;
+			}
+		});
 	}
 }
