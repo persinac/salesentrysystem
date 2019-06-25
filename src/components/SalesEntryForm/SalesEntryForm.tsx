@@ -12,7 +12,7 @@ import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtilit
 import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_TOPS} from "../../constants/ProductDetails";
 import Select from 'react-select';
 import {
-	CUTLERY_OPTIONS,
+	CUTLERY_OPTIONS, HARDWARE_OPTIONS,
 	KNIFE_BLOCK_OPTIONS,
 	PULLOUT_TRASH_OPTIONS,
 	SPICE_RACK_OPTIONS,
@@ -142,6 +142,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	}
 
 	private injectGroupingInput(question: any, classyMcClasserson: string) {
+		const hardware_regex = new RegExp('hrdwr_');
 		let idx = -1;
 		this.state.productDetails.some((pd: ProductDetails, internal_i: number) => {
 			if (pd.q_fk === question.q_id) {
@@ -276,6 +277,25 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 						value={value}
 						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
 						options={CUTLERY_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (hardware_regex.test(question['short_name'])) {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				HARDWARE_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = HARDWARE_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={HARDWARE_OPTIONS}
 					/>
 				</div>
 			);
