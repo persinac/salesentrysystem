@@ -167,6 +167,9 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			return false;
 		});
 		if (question['datatype'] === 'boolean') {
+			if (this.state.productDetails[idx].response == '0') {
+				this.state.productDetails[idx].response = "";
+			}
 			return (
 				<div className={classyMcClasserson}>
 					<label htmlFor={question['short_name']}>{question['text']}</label>

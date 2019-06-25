@@ -317,6 +317,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 							}
 							return false;
 						});
+						pds[idx].pd_id = upd.pd_id;
 						pds[idx].updated_on = upd.updated_on;
 						pds[idx].response = upd.response;
 					});
