@@ -16,6 +16,7 @@
     "@types/react-select": "^2.0.19",
     "@types/styled-components": "^4.1.15",
     "bootstrap": "^4.3.1",
+    "env-cmd": "^9.0.3",
     "firebase": "^6.0.2",
     "react": "^16.8.6",
     "react-bootstrap": "latest",
@@ -30,8 +31,8 @@
     "typescript": "next"
   },
   "scripts": {
-    "start": "react-scripts start : .env.development",
-    "start-prod": "react-scripts start : .env.production",
+    "start": "react-scripts start",
+    "start-prod": "env-cmd -f ./.env.production react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
