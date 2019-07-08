@@ -9,6 +9,8 @@ import {newSalesEntryContext} from "../../Context/NewSalesEntryContext";
 
 interface IProps {
 	submitHandler: any;
+	priceConstructor: any;
+	cabinetConstructor: any;
 }
 
 interface IState {
@@ -64,6 +66,8 @@ export class SalesEntryFormComponent extends React.Component<IProps, IState> {
 					category_id={cat.category_id}
 					category_title={cat.category}
 					context={context}
+					priceConstructor={this.props.priceConstructor}
+					cabinetConstructor={this.props.cabinetConstructor}
 				/>;
 			});
 			return (eles);

@@ -1,3 +1,14 @@
+export const CABINET_OPTIONS = [
+	{ value: '', label: '' },
+	{ value: 'cab_length_4_kanban', label: '4\' Kanban'},
+	{ value: 'cab_length_4_kanban_c', label: '4\' Custom'},
+	{ value: 'cab_length_5_kanban', label: '5\' Kanban'},
+	{ value: 'cab_length_5_kanban_c', label: '5\' Custom'},
+	{ value: 'cab_length_6_kanban_c', label: '6\' Custom'},
+	{ value: 'cab_length_7_kanban_c', label: '7\' Custom'},
+	{ value: 'cab_length_option', label: 'Custom'}
+];
+
 export const PULLOUT_TRASH_OPTIONS = [
 	{ value: '', label: '' },
 	{ value: '4WCTM18INDM2', label: 'WOOD TOP MOUNT WASTE CONTAINER' },

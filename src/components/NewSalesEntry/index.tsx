@@ -7,7 +7,17 @@ import * as ROLES from '../../constants/roles';
 import * as routes from '../../constants/routes';
 import '../../styles/general.css';
 import '../../styles/error.css';
-import {Cabinet, Doors, Drawers, Legs, ProductDetails, SalesEntryState, Tops} from '../../State';
+import {
+	Cabinet,
+	Doors,
+	Drawers,
+	Legs, MeasurementDetails,
+	PriceMatrix,
+	PricingComponent,
+	ProductDetails,
+	SalesEntryState,
+	Tops
+} from '../../State';
 import {ProductHeaderComponent} from '../ProductHeaderInfo';
 import {CustomerValidation} from '../../Validation/CustomerValidation';
 import {ProductHeaderValidation} from '../../Validation/ProductHeaderValidation';
@@ -22,6 +32,7 @@ import {DoorsValidation} from "../../Validation/DoorsValidation";
 import {LegsErrorShortNamesMapping} from "../../Enums/InterfaceErrorMapping";
 import {LegsValidation} from "../../Validation/LegsValidation";
 import {RolloutDrawerValidation} from "../../Validation/RolloutDrawerValidation";
+import {SalesEntrySidebarComponent} from "../SalesEntrySidebar";
 
 const rp = require('request-promise');
 
@@ -80,7 +91,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		rolloutDrawerThreeErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_3, e_length: '', e_width: '', e_height: ''},
 		rolloutDrawerFourErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_height: ''},
 		rolloutDrawerFiveErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: ''},
-		rolloutDrawerSixErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_6, e_length: '', e_width: '', e_height: ''}
+		rolloutDrawerSixErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_6, e_length: '', e_width: '', e_height: ''},
+		cabinet: {type: TypeGuards.CABINET}
 	};
 
 	private post_options = {
@@ -98,6 +110,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		this.setCustomerStateWithEvent = this.setCustomerStateWithEvent.bind(this);
 		this.setProductStateWithEvent = this.setProductStateWithEvent.bind(this);
 		this.onProductDetailsSubmit = this.onProductDetailsSubmit.bind(this);
+		this.constructPrice = this.constructPrice.bind(this);
+		this.constructComponent = this.constructComponent.bind(this);
+		// Mapper.mapProductComponent = Mapper.mapProductComponent.bind(this);
 		this.state = {...NewSalesEntryComponent.INITIAL_STATE};
 	}
 
@@ -140,6 +155,16 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			);
 		}
 
+		const priceURL = process.env.REACT_APP_BASE_API_URL + 'pricing';
+		await this.getWRFServerData(priceURL).then((d) => {
+			const parsedD = JSON.parse(d);
+			this.setState({prices: parsedD});
+			if (parsedD) {
+				console.log(this.state.prices);
+				// build / map prices here for sidebar component
+			}
+		});
+
 		const questionUrl = process.env.REACT_APP_BASE_API_URL + 'question';
 		await this.getWRFServerData(questionUrl).then((d) => {
 			const parsedD = JSON.parse(d);
@@ -170,6 +195,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				}
 			}
 		);
+
+		// build price component data
+		this.setState({ componentPrice: new Map<string, PricingComponent>()});
 	}
 
 	public getWRFServerData = (builtURI: string): Promise<any> => {
@@ -181,7 +209,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				console.log('ERROR!!!!');
 				console.log(e);
 			});
-	}
+	};
 
 	public postWRFServerData(body: any, endpoint: string, put: boolean): Promise<any> {
 		this.post_options.body = body;
@@ -197,6 +225,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	}
 
 	public render() {
+		console.log('rendererererere');
 		const {containerHeight, navbarHeight} = this.state;
 		const rowStyle = {
 			height: `calc(100% - ${containerHeight})`
@@ -213,7 +242,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 						</div>
 						<div className={'row'} style={rowStyle}>
 							<div className={'col-md-4 order-md-2 mb-4'}>
-								<p className={'lead'}>Maybe use this sidebar as a component summary? Price/Margin?</p>
+								<newSalesEntryContext.Consumer>
+									{context => (<SalesEntrySidebarComponent context={context}/>)}
+								</newSalesEntryContext.Consumer>
 							</div>
 							<div className={'col-md-8 order-md-1'}>
 								{this.renderPage()}
@@ -253,6 +284,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	}
 
 	public onProductDetailsSubmit = (event: any, validate: boolean) => {
+		console.log(this.state.componentPrice);
 		const {productDetails, questions} = this.state;
 
 		const pdsToUpdate = productDetails.filter((pd: ProductDetails) => {
@@ -266,7 +298,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			pd.updated_by = this.props.email;
 		});
 
-		const fresh_cab: Cabinet = {type: TypeGuards.CABINET};
 		const fresh_top: Tops = {type: TypeGuards.TOPS};
 		const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
 		const fresh_door: Doors = {type: TypeGuards.DOORS};
@@ -280,7 +311,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const legs_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.LEGS);
 		const rodwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.ROLLOUT_DRAWERS);
 
-		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, fresh_cab);
+		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, this.state.cabinet);
 		const tm: ProductComponent = Mapper.mapProductComponent(top_details, fresh_top);
 		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
 		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
@@ -437,9 +468,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				</div>
 			);
 		} else if (page === 1) {
-			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />);
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
 		} else if (page === 2) {
-			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} />);
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
 		} else  {
 			return (
 				<div>
@@ -480,6 +511,75 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				[columnType]: val
 			}
 		}));
+	}
+
+	// sets state with new cabinet
+	private constructComponent(): void {
+		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.CABINETS);
+		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, this.state.cabinet);
+		console.log(cm);
+		this.setState({cabinet: cm});
+	}
+
+	// value corresponds to dropdown values.. which is the only reason we need it
+	private constructPrice(value: any, propName: string, productDetail: ProductDetails) {
+
+		console.log(propName);
+		console.log(productDetail);
+		let currPriceComponent: PricingComponent = {};
+		let priceKey: string = '';
+		let myNewValue: PriceMatrix;
+
+		switch (true) {
+			case propName.startsWith('cab_size'):
+				myNewValue = this.state.prices.filter((p: PriceMatrix) => p.short_name === value)[0];
+				priceKey = 'cabinet_size';
+				if(this.state.componentPrice.has(priceKey)) {
+					currPriceComponent = this.state.componentPrice.get(priceKey);
+				}
+
+				currPriceComponent.id = currPriceComponent.id || null;
+				currPriceComponent.pd_id = productDetail.pd_id;
+				currPriceComponent.actual_price = myNewValue.sell_price;
+				currPriceComponent.custom_price = myNewValue.sell_price;
+				break;
+			case propName.startsWith('cab_quantity'):
+			case propName.startsWith('cab_lngth'):
+			case propName.startsWith('cab_wdth'):
+			case propName.startsWith('cab_height'):
+				// multi cabs is an ad hoc calculation, there likely won't be an entry in the price matrix?
+				// maybe there should be... but for now, there isn't one since we will be saving the
+				// calculated price in the db itself
+				myNewValue = this.state.prices.filter((p: PriceMatrix) => p.short_name === 'cab_length_option')[0];
+				priceKey = 'cabinet_size';
+				if(this.state.componentPrice.has(priceKey)) {
+					currPriceComponent = this.state.componentPrice.get(priceKey);
+				}
+
+				if (Number(this.state.cabinet.quantity) > 1) {
+					currPriceComponent.id = currPriceComponent.id || null;
+					currPriceComponent.pd_id = currPriceComponent.pd_id || productDetail.pd_id;
+					let price: number = 0.00;
+
+					this.state.cabinet.measurement.forEach((m: MeasurementDetails) => {
+						if (m.length !== undefined && m.width !== undefined) {
+							const temp_w: number = Number(m.width);
+							const temp_l: number = Number(m.length);
+
+							price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+						}
+					});
+					currPriceComponent.actual_price = price;
+					currPriceComponent.custom_price = price;
+				}
+				break;
+		}
+
+		if (currPriceComponent.pd_id !== undefined && currPriceComponent.pd_id !== null) {
+			this.state.componentPrice.set(priceKey, currPriceComponent);
+			// force re-render
+			this.setState({componentPrice: this.state.componentPrice});
+		}
 	}
 }
 

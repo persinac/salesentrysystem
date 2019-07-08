@@ -1,3 +1,5 @@
+import DateTimeFormat = Intl.DateTimeFormat;
+
 export interface IAppState {
 	authUser: any;
 }
@@ -168,6 +170,14 @@ export interface MeasurementDetails {
 	height?: number;
 }
 
+export interface PricingComponent {
+	id?: number;
+	pd_id?: number;
+	price?: number;
+	actual_price?: number;
+	custom_price?: number;
+}
+
 /***
  * Begin specific ERROR component grouping
  ***/
@@ -268,6 +278,19 @@ export interface TotalSizeValidationError {
 	e_height?: string;
 }
 
+export interface PriceMatrix {
+	pm_id: number;
+	short_name: string;
+	sku: string;
+	price: number;
+	sell_price: number;
+	is_active: boolean;
+	created_on: Date;
+	created_by: string;
+	updated_on: Date;
+	updated_by: string;
+}
+
 export interface SalesEntryState {
 	email: string;
 	error: any;
@@ -283,6 +306,7 @@ export interface SalesEntryState {
 	productHeaderErrors?: ProductHeaderValidationError;
 	productDetails?: ProductDetails[];
 	questions?: Questions[];
+	prices?: PriceMatrix[];
 	categories?: any;
 	secondary_categories?: any;
 	productId?: number;
@@ -315,4 +339,6 @@ export interface SalesEntryState {
 	legThreeErrors?: LegsValidationError;
 	legFourErrors?: LegsValidationError;
 	legFiveErrors?: LegsValidationError;
+	componentPrice?: Map<string, PricingComponent>;
+	cabinet?: Cabinet;
 }

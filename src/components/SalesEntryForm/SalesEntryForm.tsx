@@ -7,11 +7,11 @@ import {ProductDetails, Questions, SalesEntryState} from '../../State';
 import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
 import {Mapper} from "../../Mapper/Mapper";
 import {Categories} from "../../Enums/Category";
-import {number} from "prop-types";
 import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtility";
 import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_RO_DRAWERS, MAX_TOPS} from "../../constants/ProductDetails";
 import Select from 'react-select';
 import {
+	CABINET_OPTIONS,
 	CUTLERY_OPTIONS, HARDWARE_OPTIONS,
 	KNIFE_BLOCK_OPTIONS, PAINT_OPTIONS,
 	PULLOUT_TRASH_OPTIONS,
@@ -23,6 +23,8 @@ interface InterfaceProps {
 	category_id?: number;
 	category_title?: string;
 	context: SalesEntryState;
+	priceConstructor: any;
+	cabinetConstructor: any;
 }
 
 interface IState {
@@ -30,12 +32,6 @@ interface IState {
 	productDetails?: ProductDetails[];
 	currentQuestionIdx?: number;
 }
-
-const options = [
-	{ value: '4WCTM18INDM2', label: 'WOOD TOP MOUNT WASTE CONTAINER' },
-	{ value: '4WCTM2150DM2', label: '**DOUBLE WOOD PULLOUT TOP MOUNT WASTE CN' },
-	{ value: '4WCTM24DM2162', label: 'DOUBLE WOOD PULLOUT TOP MOUNT WASTE CNTR' },
-];
 
 export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 	constructor(props: any) {
@@ -182,6 +178,25 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 						className='form-control'
 					/>
 					{this.attachError(Number(question['cat_fk']), question['short_name'])}
+				</div>
+			);
+		} else if (question['short_name'] === 'cab_size') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				CABINET_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = CABINET_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={CABINET_OPTIONS}
+					/>
 				</div>
 			);
 		} else if (question['short_name'] === 'ftr_pot') {
@@ -552,14 +567,33 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		}
 
 		this.showExtraRows(columnType, val);
+
 		this.setState({
 			productDetails: this.onUpdateItem(index, columnType, val)
 		});
+		this.props.cabinetConstructor();
+		this.props.priceConstructor(val, columnType, this.getItem(index, columnType, val));
 	}
+
+	private getItem = (i: number, propName: string, value: any) => {
+		let idx = -1;
+
+		this.state.productDetails.some((pd: ProductDetails, internal_i: number) => {
+			if (pd.q_fk == i) {
+				idx = internal_i;
+				return true;
+			}
+			return false;
+		});
+		let pdItem: ProductDetails = this.state.productDetails[idx];
+		pdItem.response = value;
+		return pdItem;
+	};
 
 	private onUpdateItem = (i: number, propName: string, value: any) => {
 		let myList = this.state.productDetails;
 		let idx = -1;
+
 		this.state.productDetails.some((pd: ProductDetails, internal_i: number) => {
 			if (pd.q_fk == i) {
 				idx = internal_i;
@@ -663,7 +697,6 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		const ele_ids: string[] = ['pnt_cus_1', 'pnt_cus_2'];
 		ele_ids.forEach((element) => {
 			const ele = document.getElementById(element);
-			console.log(ele);
 			if (ele !== null && ele !== undefined) {
 				ele.style.display = displayVal;
 			}
