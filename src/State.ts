@@ -341,4 +341,18 @@ export interface SalesEntryState {
 	legFiveErrors?: LegsValidationError;
 	componentPrice?: Map<string, PricingComponent>;
 	cabinet?: Cabinet;
+	door?: Doors;
+	tops?: Tops;
+	drawers?: Drawers;
+	rollout_drawers?: RolloutDrawers;
+	legs?: Legs;
+}
+
+export interface PartialSalesEntryState {
+	cabinet?: Cabinet;
+	door?: Doors;
+	tops?: Tops;
+	drawers?: Drawers;
+	rollout_drawers?: RolloutDrawers;
+	legs?: Legs;
 }

@@ -9,6 +9,20 @@ export const CABINET_OPTIONS = [
 	{ value: 'cab_length_option', label: 'Custom'}
 ];
 
+export const TOP_OPTIONS = [
+	{ value: '', label: '' },
+	{ value: 'top_standard_1', label: 'Standard 50x26'},
+	{ value: 'top_standard_2', label: 'Standard 50x36'},
+	{ value: 'top_standard_3', label: 'Standard 62x26'},
+	{ value: 'top_standard_4', label: 'Standard 62x36'},
+	{ value: 'top_standard_1_multi', label: 'Standard 50x26 Multiple'},
+	{ value: 'top_standard_2_multi', label: 'Standard 50x36 Multiple'},
+	{ value: 'top_standard_3_multi', label: 'Standard 62x26 Multiple'},
+	{ value: 'top_standard_4_multi', label: 'Standard 62x36 Multiple'},
+	{ value: 'top_option_custom', label: 'Custom'},
+	{ value: 'top_custom_multi', label: 'Custom Multiple'}
+];
+
 export const PULLOUT_TRASH_OPTIONS = [
 	{ value: '', label: '' },
 	{ value: '4WCTM18INDM2', label: 'WOOD TOP MOUNT WASTE CONTAINER' },

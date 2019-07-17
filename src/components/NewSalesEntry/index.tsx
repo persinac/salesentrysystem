@@ -33,6 +33,8 @@ import {LegsErrorShortNamesMapping} from "../../Enums/InterfaceErrorMapping";
 import {LegsValidation} from "../../Validation/LegsValidation";
 import {RolloutDrawerValidation} from "../../Validation/RolloutDrawerValidation";
 import {SalesEntrySidebarComponent} from "../SalesEntrySidebar";
+import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
+import {PriceBuilder} from "../../Utility/PriceBuilder";
 
 const rp = require('request-promise');
 
@@ -92,7 +94,12 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		rolloutDrawerFourErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_4, e_length: '', e_width: '', e_height: ''},
 		rolloutDrawerFiveErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_5, e_length: '', e_width: '', e_height: ''},
 		rolloutDrawerSixErrors: {type: TypeGuards.ROLLOUT_DRAWERS_VALIDATION_ERROR_6, e_length: '', e_width: '', e_height: ''},
-		cabinet: {type: TypeGuards.CABINET}
+		cabinet: {type: TypeGuards.CABINET},
+		door: {type: TypeGuards.DOORS},
+		drawers: {type: TypeGuards.DRAWERS},
+		rollout_drawers: {type: TypeGuards.ROLLOUT_DRAWERS},
+		tops: {type: TypeGuards.TOPS},
+		legs: {type: TypeGuards.LEGS}
 	};
 
 	private post_options = {
@@ -225,7 +232,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	}
 
 	public render() {
-		console.log('rendererererere');
 		const {containerHeight, navbarHeight} = this.state;
 		const rowStyle = {
 			height: `calc(100% - ${containerHeight})`
@@ -298,11 +304,11 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			pd.updated_by = this.props.email;
 		});
 
-		const fresh_top: Tops = {type: TypeGuards.TOPS};
-		const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
-		const fresh_door: Doors = {type: TypeGuards.DOORS};
-		const fresh_leg: Legs = {type: TypeGuards.LEGS};
-		const fresh_ro_drawers: Legs = {type: TypeGuards.ROLLOUT_DRAWERS};
+		// const fresh_top: Tops = {type: TypeGuards.TOPS};
+		// const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
+		// const fresh_door: Doors = {type: TypeGuards.DOORS};
+		// const fresh_leg: Legs = {type: TypeGuards.LEGS};
+		// const fresh_ro_drawers: Legs = {type: TypeGuards.ROLLOUT_DRAWERS};
 
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
 		const top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.TOP);
@@ -312,11 +318,11 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const rodwr_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.ROLLOUT_DRAWERS);
 
 		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, this.state.cabinet);
-		const tm: ProductComponent = Mapper.mapProductComponent(top_details, fresh_top);
-		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, fresh_drawer);
-		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, fresh_door);
-		const leg: ProductComponent = Mapper.mapProductComponent(legs_details, fresh_leg);
-		const rodwr: ProductComponent = Mapper.mapProductComponent(rodwr_details, fresh_ro_drawers);
+		const tm: ProductComponent = Mapper.mapProductComponent(top_details, this.state.tops);
+		const dwm: ProductComponent = Mapper.mapProductComponent(dwr_details, this.state.drawers);
+		const dr: ProductComponent = Mapper.mapProductComponent(dr_details, this.state.door);
+		const leg: ProductComponent = Mapper.mapProductComponent(legs_details, this.state.legs);
+		const rodwr: ProductComponent = Mapper.mapProductComponent(rodwr_details, this.state.rollout_drawers);
 
 		// validate components:
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
@@ -513,69 +519,38 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		}));
 	}
 
-	// sets state with new cabinet
+	// sets state with new product
 	private constructComponent(): void {
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.CABINETS);
+		const door_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.DOORS);
+		const drawer_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.DRAWERS);
+		const rollout_drawers_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.ROLLOUT_DRAWERS);
+		const tops_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.TOP);
+		const legs_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.LEGS);
 		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, this.state.cabinet);
-		console.log(cm);
-		this.setState({cabinet: cm});
+		const dm: ProductComponent = Mapper.mapProductComponent(door_details, this.state.door);
+		const dwr: ProductComponent = Mapper.mapProductComponent(drawer_details, this.state.drawers);
+		const ro_dwr: ProductComponent = Mapper.mapProductComponent(rollout_drawers_details, this.state.rollout_drawers);
+		const top: ProductComponent = Mapper.mapProductComponent(tops_details, this.state.tops);
+		const legs: ProductComponent = Mapper.mapProductComponent(legs_details, this.state.legs);
+
+		this.setState({cabinet: cm, door: dm, drawers: dwr, rollout_drawers: ro_dwr, tops: top, legs: legs});
 	}
 
-	// value corresponds to dropdown values.. which is the only reason we need it
+	// value corresponds to dropdown values.. which is the only reason we need value
 	private constructPrice(value: any, propName: string, productDetail: ProductDetails) {
 
 		console.log(propName);
 		console.log(productDetail);
-		let currPriceComponent: PricingComponent = {};
-		let priceKey: string = '';
-		let myNewValue: PriceMatrix;
+		let currPriceComponent: PricingComponent;
+		let priceKey: string = PriceBuilder.determinePriceKey(propName);
 
-		switch (true) {
-			case propName.startsWith('cab_size'):
-				myNewValue = this.state.prices.filter((p: PriceMatrix) => p.short_name === value)[0];
-				priceKey = 'cabinet_size';
-				if(this.state.componentPrice.has(priceKey)) {
-					currPriceComponent = this.state.componentPrice.get(priceKey);
-				}
+		currPriceComponent = PriceBuilder.buildPrice(
+			value, propName, priceKey, productDetail, this.state.prices, this.state.componentPrice, this.state
+		);
 
-				currPriceComponent.id = currPriceComponent.id || null;
-				currPriceComponent.pd_id = productDetail.pd_id;
-				currPriceComponent.actual_price = myNewValue.sell_price;
-				currPriceComponent.custom_price = myNewValue.sell_price;
-				break;
-			case propName.startsWith('cab_quantity'):
-			case propName.startsWith('cab_lngth'):
-			case propName.startsWith('cab_wdth'):
-			case propName.startsWith('cab_height'):
-				// multi cabs is an ad hoc calculation, there likely won't be an entry in the price matrix?
-				// maybe there should be... but for now, there isn't one since we will be saving the
-				// calculated price in the db itself
-				myNewValue = this.state.prices.filter((p: PriceMatrix) => p.short_name === 'cab_length_option')[0];
-				priceKey = 'cabinet_size';
-				if(this.state.componentPrice.has(priceKey)) {
-					currPriceComponent = this.state.componentPrice.get(priceKey);
-				}
 
-				if (Number(this.state.cabinet.quantity) > 1) {
-					currPriceComponent.id = currPriceComponent.id || null;
-					currPriceComponent.pd_id = currPriceComponent.pd_id || productDetail.pd_id;
-					let price: number = 0.00;
-
-					this.state.cabinet.measurement.forEach((m: MeasurementDetails) => {
-						if (m.length !== undefined && m.width !== undefined) {
-							const temp_w: number = Number(m.width);
-							const temp_l: number = Number(m.length);
-
-							price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
-						}
-					});
-					currPriceComponent.actual_price = price;
-					currPriceComponent.custom_price = price;
-				}
-				break;
-		}
-
-		if (currPriceComponent.pd_id !== undefined && currPriceComponent.pd_id !== null) {
+		if (currPriceComponent.actual_price !== undefined && currPriceComponent.custom_price !== null) {
 			this.state.componentPrice.set(priceKey, currPriceComponent);
 			// force re-render
 			this.setState({componentPrice: this.state.componentPrice});

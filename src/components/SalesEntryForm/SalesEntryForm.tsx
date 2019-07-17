@@ -15,7 +15,7 @@ import {
 	CUTLERY_OPTIONS, HARDWARE_OPTIONS,
 	KNIFE_BLOCK_OPTIONS, PAINT_OPTIONS,
 	PULLOUT_TRASH_OPTIONS,
-	SPICE_RACK_OPTIONS,
+	SPICE_RACK_OPTIONS, TOP_OPTIONS,
 	UTENSIL_OPTIONS, WINE_RACK_OPTIONS
 } from "../../constants/ProductOptions";
 
@@ -272,6 +272,25 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 						value={value}
 						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
 						options={UTENSIL_OPTIONS}
+					/>
+				</div>
+			);
+		} else if (question['short_name'] === 'top_size') {
+			let value = {label: '', value: ''};
+			if (String(this.state.productDetails[idx].response).length > 0) {
+				TOP_OPTIONS.forEach((kvp: any, i: number) => {
+					if (kvp.value === this.state.productDetails[idx].response) {
+						value = TOP_OPTIONS[i];
+					}
+				});
+			}
+			return (
+				<div className={classyMcClasserson}>
+					<label htmlFor={question['short_name']}>{question['text']}</label>
+					<Select
+						value={value}
+						onChange={(event: any) => this.setDynStateWithEvent(event, question['q_id'], question['short_name'])}
+						options={TOP_OPTIONS}
 					/>
 				</div>
 			);
