@@ -1,10 +1,20 @@
-import {MeasurementDetails, PartialSalesEntryState, PriceMatrix, PricingComponent, ProductDetails} from "../State";
+import {
+	MeasurementDetails,
+	PartialSalesEntryState,
+	PriceMatrix,
+	PricingComponent,
+	ProductDetails,
+	Questions
+} from "../State";
 import {ShortNamePrefix} from "../Enums/ShortNamePrefix";
 
 export class PriceBuilder {
 	public static determinePriceKey(propertyName: string) {
 		switch (true) {
 			case propertyName.startsWith('top_size'):
+			case propertyName.startsWith('top_quantity'):
+			case propertyName.startsWith('top_wdth'):
+			case propertyName.startsWith('top_lngth'):
 				return `${ShortNamePrefix.TOP}_size`;
 			case propertyName.startsWith('ftr_pot'):
 				return 'ftr_pot';
@@ -18,6 +28,25 @@ export class PriceBuilder {
 				return 'ftr_knf';
 			case propertyName.startsWith('ftr_cly'):
 				return 'ftr_cly';
+			case propertyName.startsWith('ftr_dtd'):
+				return 'ftr_dtd';
+			case propertyName.startsWith('ftr_oco'):
+				return 'ftr_oco';
+			case propertyName.startsWith('ftr_applft'):
+				return 'ftr_applft';
+			case propertyName.startsWith('ftr_os2l'):
+				return 'ftr_os2l';
+			case propertyName.startsWith('ftr_os3l'):
+				return 'ftr_os3l';
+			case propertyName.startsWith('ftr_tls'):
+				return 'ftr_tls';
+			case propertyName.startsWith('hrdwr_drwr'):
+				return 'hrdwr_drwr';
+			case propertyName.startsWith('hrdwr_dr'):
+				return 'hrdwr_dr';
+			case propertyName.startsWith('pnt_clr'):
+			case propertyName.startsWith('pnt_isc'): // custom paint - no record in price matrix table for custom, can add later
+				return 'pnt_clr';
 			case propertyName.startsWith('cab_size'):
 				return `${ShortNamePrefix.CABINET}_size`;
 			case propertyName.startsWith('cab_quantity'):
@@ -65,7 +94,6 @@ export class PriceBuilder {
 		let myNewValue: PriceMatrix;
 
 		switch (true) {
-			case propertyName.startsWith('top_size'):
 			case propertyName.startsWith('ftr_pot'):
 			case propertyName.startsWith('ftr_wr'):
 			case propertyName.startsWith('ftr_utn'):
@@ -74,6 +102,111 @@ export class PriceBuilder {
 			case propertyName.startsWith('ftr_cly'):
 			case propertyName.startsWith('cab_size'):
 				pc = this.buildGenericPrice(prices, value, componentPrice, priceKey, productDetail);
+				break;
+			case propertyName.startsWith('pnt_clr'):
+			case propertyName.startsWith('pnt_isc'): // custom paint - no record in price matrix table for custom, can add later
+				pc = this.buildGenericPrice(prices, 'pnt_clr', componentPrice, priceKey, productDetail);
+				break;
+			case propertyName.startsWith('ftr_dtd'):
+			case propertyName.startsWith('ftr_oco'):
+			case propertyName.startsWith('ftr_applft'):
+			case propertyName.startsWith('ftr_os2l'):
+			case propertyName.startsWith('ftr_os3l'):
+			case propertyName.startsWith('ftr_tls'):
+				pc = this.buildGenericPrice(prices, priceKey, componentPrice, priceKey, productDetail);
+				break;
+			case propertyName.startsWith(`hrdwr_drwr`):
+				myNewValue = prices.filter((p: PriceMatrix) => p.short_name === value)[0];
+				if(componentPrice.has(priceKey)) {
+					pc = componentPrice.get(priceKey);
+				}
+
+				if (Number(state.drawers.quantity) > 1) {
+					pc.id = pc.id || null;
+					pc.pd_id = pc.pd_id || productDetail.pd_id;
+					const price: number = myNewValue.special_drawer_sell_price * Number(state.drawers.quantity);
+
+					pc.actual_price = price;
+					pc.custom_price = price;
+				}
+				break;
+			case propertyName.startsWith(`hrdwr_dr`):
+				myNewValue = prices.filter((p: PriceMatrix) => p.short_name === value)[0];
+				if(componentPrice.has(priceKey)) {
+					pc = componentPrice.get(priceKey);
+				}
+
+				if (Number(state.door.quantity) > 1) {
+					pc.id = pc.id || null;
+					pc.pd_id = pc.pd_id || productDetail.pd_id;
+					const price: number = myNewValue.special_door_sell_price * Number(state.door.quantity);
+
+					pc.actual_price = price;
+					pc.custom_price = price;
+				}
+				break;
+			// case propertyName.startsWith('top_size'):
+			// 	myNewValue = prices.filter((p: PriceMatrix) => p.short_name === value)[0];
+			// 	if(componentPrice.has(priceKey)) {
+			// 		pc = componentPrice.get(priceKey);
+			// 	}
+			//
+			// 	if (Number(state.tops.quantity) > 1) {
+			// 		pc.id = pc.id || null;
+			// 		pc.pd_id = pc.pd_id || productDetail.pd_id;
+			// 		let price: number = 0.00;
+			//
+			// 		state.tops.measurement.forEach((m: MeasurementDetails) => {
+			// 			if (m.length !== undefined && m.width !== undefined) {
+			// 				const temp_w: number = Number(m.width);
+			// 				const temp_l: number = Number(m.length);
+			//
+			// 				price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+			// 			}
+			// 		});
+			// 		pc.actual_price = price;
+			// 		pc.custom_price = price;
+			// 	} else {
+			// 		pc = this.buildGenericPrice(prices, value, componentPrice, priceKey, productDetail);
+			// 	}
+			// 	break;
+			case propertyName.startsWith('top_size'):
+			case propertyName.startsWith('top_quantity'):
+			case propertyName.startsWith('top_lngth'):
+			case propertyName.startsWith('top_wdth'):
+				// find top_size question for FK
+				// find the FK from the product details in 'state'
+				// grab the value, that will determine if we multiply by l/w/h or use a straight value
+				let topQuestion: Questions = state.questions.filter((q: Questions) => q.short_name === 'top_size')[0];
+				let topSizeDetail = state.productDetails.filter((p: ProductDetails) => p.q_fk === topQuestion.q_id)[0];
+				myNewValue = prices.filter((p: PriceMatrix) => p.short_name === topSizeDetail.response)[0];
+				if(componentPrice.has(priceKey)) {
+					pc = componentPrice.get(priceKey);
+				}
+
+				if(topSizeDetail.response.includes('multi') || topSizeDetail.response.includes('custom')) {
+					if (Number(state.tops.quantity) > 0) {
+						pc.id = pc.id || null;
+						pc.pd_id = pc.pd_id || productDetail.pd_id;
+						let price: number = 0.00;
+
+						state.tops.measurement.forEach((m: MeasurementDetails, idx: number) => {
+							if((idx+1) <= Number(state.tops.quantity)) {
+								if (m.length !== undefined && m.width !== undefined) {
+									const temp_w: number = Number(m.width);
+									const temp_l: number = Number(m.length);
+
+									price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+								}
+							}
+						});
+						pc.actual_price = price;
+						pc.custom_price = price;
+					}
+				} else {
+					pc = this.buildGenericPrice(prices, value, componentPrice, priceKey, productDetail);
+				}
+
 				break;
 			case propertyName.startsWith('cab_quantity'):
 			case propertyName.startsWith('cab_lngth'):
@@ -262,8 +395,27 @@ export class PriceBuilder {
 
 		pc.id = pc.id || null;
 		pc.pd_id = productDetail.pd_id;
-		pc.actual_price = myNewValue.sell_price;
-		pc.custom_price = myNewValue.sell_price;
+		switch (typeof productDetail.response) {
+			case "boolean":
+				if(productDetail.response) {
+					pc.actual_price = myNewValue.sell_price;
+					pc.custom_price = myNewValue.sell_price;
+				} else {
+					pc.actual_price = 0;
+					pc.custom_price = 0;
+				}
+				break;
+			case "string":
+				if(productDetail.response !== null && productDetail.response !== '') {
+					pc.actual_price = myNewValue.sell_price;
+					pc.custom_price = myNewValue.sell_price;
+				} else {
+					pc.actual_price = 0;
+					pc.custom_price = 0;
+				}
+				break;
+		}
+
 
 		return pc;
 	}

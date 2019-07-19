@@ -10,9 +10,17 @@ export const SidebarKeyList = [
 	'ftr_pot',
 	'ftr_wr',
 	'ftr_utn',
-	'ftr_oco',
 	'ftr_spr',
 	'ftr_knf',
 	'ftr_cly',
+	'ftr_dtd',
+	'ftr_oco',
+	'ftr_applft',
+	'ftr_os2l',
+	'ftr_os3l',
+	'ftr_tls',
+	'pnt_clr',
+	'hrdwr_drwr',
+	'hrdwr_dr',
 	`subtotal`
 ];

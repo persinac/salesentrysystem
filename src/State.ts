@@ -284,6 +284,8 @@ export interface PriceMatrix {
 	sku: string;
 	price: number;
 	sell_price: number;
+	special_door_sell_price: number;
+	special_drawer_sell_price: number;
 	is_active: boolean;
 	created_on: Date;
 	created_by: string;
@@ -355,4 +357,6 @@ export interface PartialSalesEntryState {
 	drawers?: Drawers;
 	rollout_drawers?: RolloutDrawers;
 	legs?: Legs;
+	productDetails?: ProductDetails[];
+	questions?: Questions[];
 }
