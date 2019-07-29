@@ -388,7 +388,7 @@ export class PriceBuilder {
 		let pc: PricingComponent = {};
 		let myNewValue: PriceMatrix;
 		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === valueToMatch)[0];
-
+		console.log(componentPrice);
 		if(componentPrice.has(priceKey)) {
 			pc = componentPrice.get(priceKey);
 		}

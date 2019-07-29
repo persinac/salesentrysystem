@@ -24,7 +24,7 @@ export class TopValidation extends Validation {
 
 		this.num_of_tops = Number(top.quantity);
 		this.errors = [];
-		this.list_of_top_nums = Array.from(Array(this.num_of_tops).keys());
+		this.list_of_top_nums = this.num_of_tops ? Array.from(Array(this.num_of_tops).keys()) : [0];
 		this.createListOfTopErrors();
 	}
 
@@ -35,7 +35,7 @@ export class TopValidation extends Validation {
 			this.errors.push(
 				{
 					type: this.determineErrorNum(i),
-					e_length: '', e_quantity: '', e_width: ''
+					e_length: '', e_quantity: '', e_width: '', e_vendor: '', e_vendor_po: ''
 				}
 			)
 		});
@@ -49,7 +49,8 @@ export class TopValidation extends Validation {
 		const list_of_validation: boolean[] = [];
 
 		this.list_of_top_nums.forEach((i) => {
-			list_of_validation.push(this.errors[i].e_length.length === 0 &&
+			list_of_validation.push(
+				this.errors[i].e_length.length === 0 &&
 				this.errors[i].e_quantity.length === 0 &&
 				this.errors[i].e_width.length === 0)
 		});
@@ -67,7 +68,7 @@ export class TopValidation extends Validation {
 
 	private checkQuantity() {
 		const {quantity} = this.top_details;
-		if (String(quantity).length === 0) {
+		if (String(quantity).length === 0 || Number.isNaN(quantity) || quantity === undefined) {
 			this.errors[0].e_quantity = 'Top quantity cannot be blank';
 		}
 	}

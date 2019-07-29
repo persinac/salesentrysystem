@@ -14,7 +14,7 @@ import {
 	Legs, MeasurementDetails,
 	PriceMatrix,
 	PricingComponent,
-	ProductDetails,
+	ProductDetails, Questions,
 	SalesEntryState,
 	Tops
 } from '../../State';
@@ -111,6 +111,14 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		json: true // Automatically stringifies the body to JSON
 	};
 
+
+	private cab_details: ProductDetailsMapper;
+	private door_details: ProductDetailsMapper;
+	private drawer_details: ProductDetailsMapper;
+	private rollout_drawers_details: ProductDetailsMapper;
+	private tops_details: ProductDetailsMapper;
+	private legs_details: ProductDetailsMapper;
+
 	constructor(props: any) {
 		super(props);
 
@@ -131,7 +139,27 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	};
 
 	private async buildData() {
+
 		const isExistingEntry = (window.location.search !== null && window.location.search !== undefined && window.location.search.length > 0);
+
+		const priceURL = process.env.REACT_APP_BASE_API_URL + 'pricing';
+		await this.getWRFServerData(priceURL).then((d) => {
+			const parsedD = JSON.parse(d);
+			this.setState({prices: parsedD});
+			if (parsedD) {
+				console.log(this.state.prices);
+			}
+		});
+
+		const catUrl = process.env.REACT_APP_BASE_API_URL + 'category/';
+		await this.getWRFServerData(catUrl).then((d) => {
+				const parsedD = JSON.parse(d);
+				if (parsedD) {
+					this.setState({categories: parsedD});
+				}
+			}
+		);
+
 		let salesEntryId: number = null;
 		if (isExistingEntry) {
 			salesEntryId = Number.parseInt(window.location.search.slice(1));
@@ -162,16 +190,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			);
 		}
 
-		const priceURL = process.env.REACT_APP_BASE_API_URL + 'pricing';
-		await this.getWRFServerData(priceURL).then((d) => {
-			const parsedD = JSON.parse(d);
-			this.setState({prices: parsedD});
-			if (parsedD) {
-				console.log(this.state.prices);
-				// build / map prices here for sidebar component
-			}
-		});
-
 		const questionUrl = process.env.REACT_APP_BASE_API_URL + 'question';
 		await this.getWRFServerData(questionUrl).then((d) => {
 			const parsedD = JSON.parse(d);
@@ -194,18 +212,23 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			}
 		});
 
-		const catUrl = process.env.REACT_APP_BASE_API_URL + 'category/';
-		await this.getWRFServerData(catUrl).then((d) => {
-				const parsedD = JSON.parse(d);
-				if (parsedD) {
-					this.setState({categories: parsedD});
-				}
-			}
-		);
-
 		// build price component data
 		this.setState({ componentPrice: new Map<string, PricingComponent>()});
+
+		if (isExistingEntry) {
+			this.constructComponent();
+			this.state.productDetails.forEach((pd: ProductDetails) => {
+				if(pd.response !== "" && pd.response !== null && pd.response !== undefined) {
+					let question: Questions = this.state.questions.filter((q: Questions) => pd.q_fk === q.q_id)[0];
+					console.log(question.short_name);
+					console.log(pd);
+					this.constructPrice(pd.response,question.short_name,pd);
+				}
+			});
+		}
 	}
+
+	private buildPrice() {}
 
 	public getWRFServerData = (builtURI: string): Promise<any> => {
 		return rp(builtURI)
@@ -289,7 +312,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		}
 	}
 
-	public onProductDetailsSubmit = (event: any, validate: boolean) => {
+	public onProductDetailsSubmit = (event: any, submit: boolean, saveToDB: boolean) => {
 		console.log(this.state.componentPrice);
 		const {productDetails, questions} = this.state;
 
@@ -303,12 +326,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			}
 			pd.updated_by = this.props.email;
 		});
-
-		// const fresh_top: Tops = {type: TypeGuards.TOPS};
-		// const fresh_drawer: Drawers = {type: TypeGuards.DRAWERS};
-		// const fresh_door: Doors = {type: TypeGuards.DOORS};
-		// const fresh_leg: Legs = {type: TypeGuards.LEGS};
-		// const fresh_ro_drawers: Legs = {type: TypeGuards.ROLLOUT_DRAWERS};
 
 		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.CABINETS);
 		const top_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(productDetails, questions, Categories.TOP);
@@ -328,19 +345,20 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
 		const dwrv: DrawerValidation = new DrawerValidation(dwm);
-		const drv: DoorsValidation = new DoorsValidation(dr);
-		const legv: LegsValidation = new LegsValidation(leg);
-		const rodwrv: RolloutDrawerValidation = new RolloutDrawerValidation(rodwr);
+		// const drv: DoorsValidation = new DoorsValidation(dr);
+		// const legv: LegsValidation = new LegsValidation(leg);
+		// const rodwrv: RolloutDrawerValidation = new RolloutDrawerValidation(rodwr);
 
 		// have to run validation first, so that errors get set if needed
 		const cab_validate = cv.validate();
 		const top_validate = tv.validate();
 		const dwr_validate = dwrv.validate();
-		const drv_validate = drv.validate();
-		const legv_validate = legv.validate();
-		const rodwrv_validate = rodwrv.validate();
+		// const drv_validate = drv.validate();
+		// const legv_validate = legv.validate();
+		// const rodwrv_validate = rodwrv.validate();
 
-		if (cab_validate && top_validate && dwr_validate && drv_validate && legv_validate && rodwrv_validate) {
+		// if (cab_validate && top_validate && dwr_validate && drv_validate && legv_validate && rodwrv_validate) {
+		if (saveToDB || (submit && cab_validate && top_validate && dwr_validate)) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
 				.then((newPDs: any) => {
 					const updatedPDs: ProductDetails[] = newPDs.details;
@@ -377,25 +395,25 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			drawerTwoErrors: {...dwrv.getSpecificError(1)},
 			drawerThreeErrors: {...dwrv.getSpecificError(2)},
 			drawerFourErrors: {...dwrv.getSpecificError(3)},
-			doorErrors: {...drv.getSpecificError(0)},
-			doorTwoErrors: {...drv.getSpecificError(1)},
-			doorThreeErrors: {...drv.getSpecificError(2)},
-			doorFourErrors: {...drv.getSpecificError(3)},
-			doorFiveErrors: {...drv.getSpecificError(4)},
-			doorSixErrors: {...drv.getSpecificError(5)},
-			doorSevenErrors: {...drv.getSpecificError(6)},
-			doorEightErrors: {...drv.getSpecificError(7)},
-			legErrors: {...legv.getSpecificError(0)},
-			legTwoErrors: {...legv.getSpecificError(1)},
-			legThreeErrors: {...legv.getSpecificError(2)},
-			legFourErrors: {...legv.getSpecificError(3)},
-			legFiveErrors: {...legv.getSpecificError(4)},
-			rolloutDrawerErrors: {...rodwrv.getSpecificError(0)},
-			rolloutDrawerTwoErrors: {...rodwrv.getSpecificError(1)},
-			rolloutDrawerThreeErrors: {...rodwrv.getSpecificError(2)},
-			rolloutDrawerFourErrors: {...rodwrv.getSpecificError(3)},
-			rolloutDrawerFiveErrors: {...rodwrv.getSpecificError(4)},
-			rolloutDrawerSixErrors: {...rodwrv.getSpecificError(5)}
+			// doorErrors: {...drv.getSpecificError(0)},
+			// doorTwoErrors: {...drv.getSpecificError(1)},
+			// doorThreeErrors: {...drv.getSpecificError(2)},
+			// doorFourErrors: {...drv.getSpecificError(3)},
+			// doorFiveErrors: {...drv.getSpecificError(4)},
+			// doorSixErrors: {...drv.getSpecificError(5)},
+			// doorSevenErrors: {...drv.getSpecificError(6)},
+			// doorEightErrors: {...drv.getSpecificError(7)},
+			// legErrors: {...legv.getSpecificError(0)},
+			// legTwoErrors: {...legv.getSpecificError(1)},
+			// legThreeErrors: {...legv.getSpecificError(2)},
+			// legFourErrors: {...legv.getSpecificError(3)},
+			// legFiveErrors: {...legv.getSpecificError(4)},
+			// rolloutDrawerErrors: {...rodwrv.getSpecificError(0)},
+			// rolloutDrawerTwoErrors: {...rodwrv.getSpecificError(1)},
+			// rolloutDrawerThreeErrors: {...rodwrv.getSpecificError(2)},
+			// rolloutDrawerFourErrors: {...rodwrv.getSpecificError(3)},
+			// rolloutDrawerFiveErrors: {...rodwrv.getSpecificError(4)},
+			// rolloutDrawerSixErrors: {...rodwrv.getSpecificError(5)}
 		});
 
 		event.preventDefault();
@@ -519,20 +537,24 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		}));
 	}
 
+	private mapDetailsForConstruct() {
+		this.cab_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.CABINETS);
+		this.door_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.DOORS);
+		this.drawer_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.DRAWERS);
+		this.rollout_drawers_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.ROLLOUT_DRAWERS);
+		this.tops_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.TOP);
+		this.legs_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.LEGS);
+	}
+
 	// sets state with new product
 	private constructComponent(): void {
-		const cab_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.CABINETS);
-		const door_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.DOORS);
-		const drawer_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.DRAWERS);
-		const rollout_drawers_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.ROLLOUT_DRAWERS);
-		const tops_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.TOP);
-		const legs_details: ProductDetailsMapper = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.LEGS);
-		const cm: ProductComponent = Mapper.mapProductComponent(cab_details, this.state.cabinet);
-		const dm: ProductComponent = Mapper.mapProductComponent(door_details, this.state.door);
-		const dwr: ProductComponent = Mapper.mapProductComponent(drawer_details, this.state.drawers);
-		const ro_dwr: ProductComponent = Mapper.mapProductComponent(rollout_drawers_details, this.state.rollout_drawers);
-		const top: ProductComponent = Mapper.mapProductComponent(tops_details, this.state.tops);
-		const legs: ProductComponent = Mapper.mapProductComponent(legs_details, this.state.legs);
+		this.mapDetailsForConstruct();
+		const cm: ProductComponent = Mapper.mapProductComponent(this.cab_details, this.state.cabinet);
+		const dm: ProductComponent = Mapper.mapProductComponent(this.door_details, this.state.door);
+		const dwr: ProductComponent = Mapper.mapProductComponent(this.drawer_details, this.state.drawers);
+		const ro_dwr: ProductComponent = Mapper.mapProductComponent(this.rollout_drawers_details, this.state.rollout_drawers);
+		const top: ProductComponent = Mapper.mapProductComponent(this.tops_details, this.state.tops);
+		const legs: ProductComponent = Mapper.mapProductComponent(this.legs_details, this.state.legs);
 
 		this.setState({cabinet: cm, door: dm, drawers: dwr, rollout_drawers: ro_dwr, tops: top, legs: legs});
 	}
@@ -545,6 +567,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		let currPriceComponent: PricingComponent;
 		let priceKey: string = PriceBuilder.determinePriceKey(propName);
 
+		console.log(priceKey);
 		currPriceComponent = PriceBuilder.buildPrice(
 			value, propName, priceKey, productDetail, this.state.prices, this.state.componentPrice, this.state
 		);

@@ -22,7 +22,7 @@ export class CabinetValidation extends Validation {
 		this.num_of_cabs = Number(cabinet.quantity);
 		this.top_details = top;
 		this.errors = [];
-		this.list_of_cab_nums = Array.from(Array(this.num_of_cabs).keys());
+		this.list_of_cab_nums = this.num_of_cabs ? Array.from(Array(this.num_of_cabs).keys()) : [0];
 		this.createListOfErrors();
 	}
 
@@ -69,7 +69,7 @@ export class CabinetValidation extends Validation {
 	}
 
 	private checkQuantity() {
-		if (String(this.num_of_cabs).length === 0) {
+		if (String(this.num_of_cabs).length === 0 || Number.isNaN(this.num_of_cabs)) {
 			this.errors[0].e_quantity = 'Cabinet quantity cannot be blank';
 		} else if (this.num_of_cabs > 4) {
 			this.errors[0].e_quantity = 'Cannot have more than 4 cabinets';
@@ -88,10 +88,10 @@ export class CabinetValidation extends Validation {
 
 		this.list_of_cab_nums.forEach((i) => {
 			const curr_cab = this.cab_measurements[i];
-			if (String(curr_cab.length).length === 0) {
+			if (String(curr_cab.length).length === 0 || Number.isNaN(curr_cab.length) || curr_cab.length === undefined) {
 				this.errors[i].e_length = 'Cabinet length cannot be blank';
 			} else {
-				if (curr_cab.length !== null || curr_cab.length !== undefined) {
+				if (curr_cab.length !== null) {
 					length_arr.push(Number(curr_cab.length));
 				}
 			}
@@ -118,10 +118,10 @@ export class CabinetValidation extends Validation {
 
 		this.list_of_cab_nums.forEach((i) => {
 			const curr_cab = this.cab_measurements[i];
-			if (String(curr_cab.width).length === 0) {
+			if (String(curr_cab.width).length === 0 || Number.isNaN(curr_cab.width) || curr_cab.width === undefined) {
 				this.errors[i].e_width = 'Cabinet width cannot be blank';
 			} else {
-				if (curr_cab.width !== null || curr_cab.width !== undefined) {
+				if (curr_cab.width !== null) {
 					width_arr.push(Number(curr_cab.width));
 				}
 			}
@@ -143,7 +143,7 @@ export class CabinetValidation extends Validation {
 	private checkHeight() {
 		this.list_of_cab_nums.forEach((i) => {
 			const curr_cab = this.cab_measurements[i];
-			if (String(curr_cab.height).length === 0) {
+			if (String(curr_cab.height).length === 0 || Number.isNaN(curr_cab.height) || curr_cab.height === undefined) {
 				this.errors[i].e_height = 'Cabinet height cannot be blank';
 			}
 		});

@@ -77,7 +77,8 @@ export enum TopErrorShortNamesMapping {
 	top_vndr = 'e_vendor',
 	top_vndr_po = 'e_vendor_po',
 	top_lngth = 'e_length',
-	top_wdth = 'e_width'
+	top_wdth = 'e_width',
+	top_quantity = 'e_quantity'
 }
 
 // maps to interface: TotalSizeValidationError

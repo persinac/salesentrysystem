@@ -652,11 +652,15 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			// first if statement, hide all rows if quantity = 1 / 0
 			if (convertedVal < 2) {
 				listOfNums.forEach((num: number) => {
+					const ele_id = `${unique_dim_prefix}${num}`;
+					const ele = document.getElementById(ele_id);
 					if (num > 1) {
-						const ele_id = `${unique_dim_prefix}${num}`;
-						const ele = document.getElementById(ele_id);
 						if (ele !== null && ele !== undefined) {
 							ele.style.display = 'none';
+						}
+					} else {
+						if (ele !== null && ele !== undefined) {
+							ele.style.display = 'flex';
 						}
 					}
 				});
@@ -664,7 +668,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 				convertedVal = convertedVal > max_rows ? max_rows : convertedVal;
 				listOfNums = Array.from(Array(convertedVal + 1).keys());
 				maxListOfNums.forEach((num: number) => {
-					if (num > 1) {
+					if (num >= 1) {
 						if (listOfNums.includes(num)) {
 							const ele_id = `${unique_dim_prefix}${num}`;
 							const ele = document.getElementById(ele_id);
@@ -683,7 +687,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 			}
 		} else {
 			listOfNums.forEach((num: number) => {
-				if (num > 1) {
+				if (num >= 1) {
 					const ele_id = `${unique_dim_prefix}${num}`;
 					const ele = document.getElementById(ele_id);
 					if (ele !== null && ele !== undefined) {

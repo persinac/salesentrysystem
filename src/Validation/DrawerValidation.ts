@@ -77,6 +77,8 @@ export class DrawerValidation extends Validation {
 		const {quantity} = this.drawer_details;
 		if (String(quantity).length === 0 || quantity === undefined) {
 			this.errors[0].e_quantity = 'Drawer quantity cannot be blank';
+		} else if (Number(quantity) === 1) {
+			this.errors[0].e_quantity = 'Drawer quantity must be greater than 1';
 		} else {
 			this.list_of_qty = Array.from(Array(this.num_of_drawers).keys());
 		}

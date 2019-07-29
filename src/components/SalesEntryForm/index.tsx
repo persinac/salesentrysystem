@@ -45,10 +45,10 @@ export class SalesEntryFormComponent extends React.Component<IProps, IState> {
 						</Accordion>
 						<div className={'floater-rght'}>
 							<button type='button' className='btn btn-outline-primary margin-t-10'
-							        onClick={(e) => this.props.submitHandler(e, false)}>Save Order
+							        onClick={(e) => this.props.submitHandler(e, false, true)}>Save Order
 							</button>
 							<button type='button' className='btn btn-outline-success margin-t-10 margin-l-10'
-							        onClick={(e) => this.props.submitHandler(e, true)}>Submit Order
+							        onClick={(e) => this.props.submitHandler(e, true, true)}>Submit Order
 							</button>
 						</div>
 					</div>
