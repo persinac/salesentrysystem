@@ -145,31 +145,6 @@ export class PriceBuilder {
 					pc.custom_price = price;
 				}
 				break;
-			// case propertyName.startsWith('top_size'):
-			// 	myNewValue = prices.filter((p: PriceMatrix) => p.short_name === value)[0];
-			// 	if(componentPrice.has(priceKey)) {
-			// 		pc = componentPrice.get(priceKey);
-			// 	}
-			//
-			// 	if (Number(state.tops.quantity) > 1) {
-			// 		pc.id = pc.id || null;
-			// 		pc.pd_id = pc.pd_id || productDetail.pd_id;
-			// 		let price: number = 0.00;
-			//
-			// 		state.tops.measurement.forEach((m: MeasurementDetails) => {
-			// 			if (m.length !== undefined && m.width !== undefined) {
-			// 				const temp_w: number = Number(m.width);
-			// 				const temp_l: number = Number(m.length);
-			//
-			// 				price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
-			// 			}
-			// 		});
-			// 		pc.actual_price = price;
-			// 		pc.custom_price = price;
-			// 	} else {
-			// 		pc = this.buildGenericPrice(prices, value, componentPrice, priceKey, productDetail);
-			// 	}
-			// 	break;
 			case propertyName.startsWith('top_size'):
 			case propertyName.startsWith('top_quantity'):
 			case propertyName.startsWith('top_lngth'):
@@ -204,7 +179,7 @@ export class PriceBuilder {
 						pc.custom_price = price;
 					}
 				} else {
-					pc = this.buildGenericPrice(prices, value, componentPrice, priceKey, productDetail);
+					pc = this.buildGenericPrice(prices, topSizeDetail.response, componentPrice, priceKey, productDetail);
 				}
 
 				break;

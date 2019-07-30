@@ -111,7 +111,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		json: true // Automatically stringifies the body to JSON
 	};
 
-
 	private cab_details: ProductDetailsMapper;
 	private door_details: ProductDetailsMapper;
 	private drawer_details: ProductDetailsMapper;
@@ -345,20 +344,19 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const cv: CabinetValidation = new CabinetValidation(cm, tm);
 		const tv: TopValidation = new TopValidation(cm, tm);
 		const dwrv: DrawerValidation = new DrawerValidation(dwm);
-		// const drv: DoorsValidation = new DoorsValidation(dr);
-		// const legv: LegsValidation = new LegsValidation(leg);
-		// const rodwrv: RolloutDrawerValidation = new RolloutDrawerValidation(rodwr);
+		const drv: DoorsValidation = new DoorsValidation(dr);
+		const legv: LegsValidation = new LegsValidation(leg);
+		const rodwrv: RolloutDrawerValidation = new RolloutDrawerValidation(rodwr);
 
 		// have to run validation first, so that errors get set if needed
 		const cab_validate = cv.validate();
 		const top_validate = tv.validate();
 		const dwr_validate = dwrv.validate();
-		// const drv_validate = drv.validate();
-		// const legv_validate = legv.validate();
-		// const rodwrv_validate = rodwrv.validate();
+		const drv_validate = drv.validate();
+		const legv_validate = legv.validate();
+		const rodwrv_validate = rodwrv.validate();
 
-		// if (cab_validate && top_validate && dwr_validate && drv_validate && legv_validate && rodwrv_validate) {
-		if (saveToDB || (submit && cab_validate && top_validate && dwr_validate)) {
+		if (saveToDB || (submit && cab_validate && top_validate && dwr_validate && drv_validate && legv_validate && rodwrv_validate)) {
 			this.postWRFServerData(Array.from(pdsToUpdate), 'product/details', true)
 				.then((newPDs: any) => {
 					const updatedPDs: ProductDetails[] = newPDs.details;
@@ -384,6 +382,18 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				});
 		}
 
+		/***
+		 * Set card color based on validation
+		 */
+		// cab
+		this.shouldColorCardBackground(Categories.CABINETS, !cab_validate);
+
+		// top
+		this.shouldColorCardBackground(Categories.TOP, !top_validate);
+
+		// drawer - RO drawer - door - legs
+		this.shouldColorCardBackground(Categories.DOORS, (!dwr_validate || !rodwrv_validate || !drv_validate || !legv_validate));
+
 		this.setState({
 			cabinetErrors: {...cv.getSpecificError(0)},
 			cabinetTwoErrors: {...cv.getSpecificError(1)},
@@ -395,29 +405,29 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			drawerTwoErrors: {...dwrv.getSpecificError(1)},
 			drawerThreeErrors: {...dwrv.getSpecificError(2)},
 			drawerFourErrors: {...dwrv.getSpecificError(3)},
-			// doorErrors: {...drv.getSpecificError(0)},
-			// doorTwoErrors: {...drv.getSpecificError(1)},
-			// doorThreeErrors: {...drv.getSpecificError(2)},
-			// doorFourErrors: {...drv.getSpecificError(3)},
-			// doorFiveErrors: {...drv.getSpecificError(4)},
-			// doorSixErrors: {...drv.getSpecificError(5)},
-			// doorSevenErrors: {...drv.getSpecificError(6)},
-			// doorEightErrors: {...drv.getSpecificError(7)},
-			// legErrors: {...legv.getSpecificError(0)},
-			// legTwoErrors: {...legv.getSpecificError(1)},
-			// legThreeErrors: {...legv.getSpecificError(2)},
-			// legFourErrors: {...legv.getSpecificError(3)},
-			// legFiveErrors: {...legv.getSpecificError(4)},
-			// rolloutDrawerErrors: {...rodwrv.getSpecificError(0)},
-			// rolloutDrawerTwoErrors: {...rodwrv.getSpecificError(1)},
-			// rolloutDrawerThreeErrors: {...rodwrv.getSpecificError(2)},
-			// rolloutDrawerFourErrors: {...rodwrv.getSpecificError(3)},
-			// rolloutDrawerFiveErrors: {...rodwrv.getSpecificError(4)},
-			// rolloutDrawerSixErrors: {...rodwrv.getSpecificError(5)}
+			doorErrors: {...drv.getSpecificError(0)},
+			doorTwoErrors: {...drv.getSpecificError(1)},
+			doorThreeErrors: {...drv.getSpecificError(2)},
+			doorFourErrors: {...drv.getSpecificError(3)},
+			doorFiveErrors: {...drv.getSpecificError(4)},
+			doorSixErrors: {...drv.getSpecificError(5)},
+			doorSevenErrors: {...drv.getSpecificError(6)},
+			doorEightErrors: {...drv.getSpecificError(7)},
+			legErrors: {...legv.getSpecificError(0)},
+			legTwoErrors: {...legv.getSpecificError(1)},
+			legThreeErrors: {...legv.getSpecificError(2)},
+			legFourErrors: {...legv.getSpecificError(3)},
+			legFiveErrors: {...legv.getSpecificError(4)},
+			rolloutDrawerErrors: {...rodwrv.getSpecificError(0)},
+			rolloutDrawerTwoErrors: {...rodwrv.getSpecificError(1)},
+			rolloutDrawerThreeErrors: {...rodwrv.getSpecificError(2)},
+			rolloutDrawerFourErrors: {...rodwrv.getSpecificError(3)},
+			rolloutDrawerFiveErrors: {...rodwrv.getSpecificError(4)},
+			rolloutDrawerSixErrors: {...rodwrv.getSpecificError(5)}
 		});
 
 		event.preventDefault();
-	};
+	}
 
 	public onCustomerSubmit = (event: any) => {
 		const {productHeader, customer} = this.state;
@@ -453,7 +463,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 						productHeader: {...productStuff.newProduct},
 						customer: {...productStuff.newProduct.customer},
 						productDetails: pds}
-						);
+					);
 					console.log({...productStuff.newProduct.customer});
 				})
 				.catch((e) => {
@@ -537,6 +547,51 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		}));
 	}
 
+	private getParentCategory(category: number) {
+		const parentCat = this.state.categories.filter((c: any) => {
+			return c['category_id'] === category;
+		})[0];
+
+		return parentCat['belongs_to'] ? parentCat['belongs_to'] : parentCat['category_id'];
+	}
+
+	private shouldColorCardBackground(category: number, invalid: boolean) {
+		this.colorCardBackground(this.getParentCategory(category), invalid);
+	}
+
+	private colorCardBackground(parentCategory: number, invalid: boolean): void {
+		let eleId = '0';
+		let element;
+		const backgroundStyle: string = 'border: 2px solid red; background-color: #ffa7a7';
+		switch (parentCategory) {
+			case Categories.COLOR:
+				eleId = `${parentCategory}`;
+				element = document.getElementById(eleId).getElementsByClassName('card-header');
+				invalid ? element.item(0).setAttribute('style', backgroundStyle) : element.item(0).setAttribute('style', '');
+				break;
+			case Categories.FEATURES_LUXURIES:
+				eleId = `${parentCategory}`;
+				element = document.getElementById(eleId).getElementsByClassName('card-header');
+				invalid ? element.item(0).setAttribute('style', backgroundStyle) : element.item(0).setAttribute('style', '');
+				break;
+			case Categories.SIZE:
+				eleId = `${parentCategory}`;
+				element = document.getElementById(eleId).getElementsByClassName('card-header');
+				invalid ? element.item(0).setAttribute('style', backgroundStyle) : element.item(0).setAttribute('style', '');
+				break;
+			case Categories.STYLE:
+				eleId = `${parentCategory}`;
+				element = document.getElementById(eleId).getElementsByClassName('card-header');
+				invalid ? element.item(0).setAttribute('style', backgroundStyle) : element.item(0).setAttribute('style', '');
+				break;
+			case Categories.TOP:
+				eleId = `${parentCategory}`;
+				element = document.getElementById(eleId).getElementsByClassName('card-header');
+				invalid ? element.item(0).setAttribute('style', backgroundStyle) : element.item(0).setAttribute('style', '');
+				break;
+		}
+	}
+
 	private mapDetailsForConstruct() {
 		this.cab_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.CABINETS);
 		this.door_details = Mapper.unionQuestionsDetails(this.state.productDetails, this.state.questions, Categories.DOORS);
@@ -565,13 +620,12 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		console.log(propName);
 		console.log(productDetail);
 		let currPriceComponent: PricingComponent;
-		let priceKey: string = PriceBuilder.determinePriceKey(propName);
+		const priceKey: string = PriceBuilder.determinePriceKey(propName);
 
 		console.log(priceKey);
 		currPriceComponent = PriceBuilder.buildPrice(
 			value, propName, priceKey, productDetail, this.state.prices, this.state.componentPrice, this.state
 		);
-
 
 		if (currPriceComponent.actual_price !== undefined && currPriceComponent.custom_price !== null) {
 			this.state.componentPrice.set(priceKey, currPriceComponent);

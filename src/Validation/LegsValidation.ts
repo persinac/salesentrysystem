@@ -22,7 +22,7 @@ export class LegsValidation extends Validation {
 
 		this.num_of_legs = Number(leg.quantity);
 		this.errors = [];
-		this.list_of_qty = Array.from(Array(this.num_of_legs).keys());
+		this.list_of_qty = leg.quantity ? Array.from(Array(this.num_of_legs).keys()) : [];
 		this.createListOfErrors();
 	}
 

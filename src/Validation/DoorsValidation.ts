@@ -24,7 +24,7 @@ export class DoorsValidation extends Validation {
 		this.num_of_doors = Number(dr.quantity);
 		this.errors = [];
 		this.list_of_door_nums = Array.from(Array(this.num_of_doors).keys());
-		this.createListOfErrors()
+		this.createListOfErrors();
 	}
 
 	public validate(): boolean {
@@ -41,7 +41,7 @@ export class DoorsValidation extends Validation {
 				this.errors[i].e_paint_color.length === 0 &&
 				this.errors[i].e_quantity.length === 0 &&
 				this.errors[i].e_stain_color.length === 0 &&
-				this.errors[i].e_width.length === 0)
+				this.errors[i].e_width.length === 0);
 		});
 		return !list_of_validation.includes(false);
 	}
@@ -70,7 +70,7 @@ export class DoorsValidation extends Validation {
 
 	private checkQuantity() {
 		const {quantity} = this.door_details;
-		if (String(quantity).length === 0) {
+		if (String(quantity).length === 0 || quantity === undefined) {
 			this.errors[0].e_quantity = 'Door quantity cannot be blank';
 		} else if (Number(quantity) < 2) {
 			this.errors[0].e_quantity = 'Door quantity must be greater than 2';

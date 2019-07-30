@@ -25,6 +25,7 @@ export class DrawerValidation extends Validation {
 
 		this.num_of_drawers = Number(drawer.quantity);
 		this.errors = [];
+		this.list_of_qty = [];
 
 		this.createListOfErrors();
 	}
@@ -46,7 +47,7 @@ export class DrawerValidation extends Validation {
 	public validate(): boolean {
 		const list_of_validation: boolean[] = [];
 		this.checkQuantity();
-		if (!Number.isNaN(this.num_of_drawers)) {
+		if (!Number.isNaN(this.num_of_drawers) && this.list_of_qty.length > 1) {
 			this.checkLength();
 			this.checkWidth();
 			this.checkHeight();
@@ -55,7 +56,7 @@ export class DrawerValidation extends Validation {
 				list_of_validation.push(this.errors[i].e_length.length === 0 &&
 					this.errors[i].e_quantity.length === 0 &&
 					this.errors[i].e_height.length === 0 &&
-					this.errors[i].e_width.length === 0)
+					this.errors[i].e_width.length === 0);
 			});
 		} else {
 			// quantity invalid

@@ -546,7 +546,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 
 	private renderCard(questions: Questions[]) {
 		return (
-			<Card>
+			<Card id={this.props.category_id.toString()}>
 				<Accordion.Toggle as={Card.Header} eventKey={this.props.category_id.toString()}
 				                  onClick={(e) => this.handleAccordionToggleClick(e, `accord-${this.props.category_id.toString()}`)}>
 					{this.props.category_title}
