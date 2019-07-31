@@ -35,6 +35,7 @@ import {RolloutDrawerValidation} from "../../Validation/RolloutDrawerValidation"
 import {SalesEntrySidebarComponent} from "../SalesEntrySidebar";
 import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
 import {PriceBuilder} from "../../Utility/PriceBuilder";
+import {OrderSummaryComponent} from "../OrderSummary";
 
 const rp = require('request-promise');
 
@@ -133,7 +134,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	public componentDidMount = () => {
 		this.buildData();
 		const primaryNavBarHeight =  window.getComputedStyle(document.getElementById('primary-navbar'), null).getPropertyValue('height');
-		const hdrHeight =  window.getComputedStyle(document.getElementById('sales-entry-hdr'), null).getPropertyValue('height');
+		const hdrHeight = 0;
+			//window.getComputedStyle(document.getElementById('sales-entry-hdr'), null).getPropertyValue('height');
 		this.setState({containerHeight: `(${primaryNavBarHeight} + ${hdrHeight})`, navbarHeight: primaryNavBarHeight});
 	};
 
@@ -219,15 +221,11 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			this.state.productDetails.forEach((pd: ProductDetails) => {
 				if(pd.response !== "" && pd.response !== null && pd.response !== undefined) {
 					let question: Questions = this.state.questions.filter((q: Questions) => pd.q_fk === q.q_id)[0];
-					console.log(question.short_name);
-					console.log(pd);
 					this.constructPrice(pd.response,question.short_name,pd);
 				}
 			});
 		}
 	}
-
-	private buildPrice() {}
 
 	public getWRFServerData = (builtURI: string): Promise<any> => {
 		return rp(builtURI)
@@ -265,9 +263,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			<newSalesEntryContext.Provider value={this.state}>
 				<div className={'bg-light height-100'} style={containerStyle}>
 					<div className={'container'}>
-						<div className={'py-5 text-center'} id={'sales-entry-hdr'}>
-							<h2>Sales Entry</h2>
-						</div>
+						<div className={'py-5 text-center'} id={'sales-entry-hdr'}></div>
 						<div className={'row'} style={rowStyle}>
 							<div className={'col-md-4 order-md-2 mb-4'}>
 								<newSalesEntryContext.Consumer>
@@ -293,19 +289,53 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	private renderButtons() {
 		const {page} = this.state;
 		if (page === 0) {
-			return <button
-				type='button'
-				className='btn btn-outline-primary margin-t-10'
-				disabled={this.state.productHeader.ph_id === null || this.state.productHeader.ph_id === undefined}
-				onClick={(e) => {this.setState({page: 1}); }}>Next - Product Details</button>;
-		}
-		if (page === 1) {
 			return (
 				<div>
 					<button
 						type='button'
 						className='btn btn-outline-primary margin-t-10'
-						onClick={(e) => { this.setState({page: 0}); }}>Back - Primary Information</button>
+						disabled={this.state.productHeader.ph_id === null || this.state.productHeader.ph_id === undefined}
+						onClick={(e) => {this.setState({page: 1}); }}>Next - Product Details
+					</button>
+					{(this.state.productHeader.ph_id === null || this.state.productHeader.ph_id === undefined) ? null :
+						<button
+							type='button'
+							className='btn btn-outline-secondary margin-t-10 margin-l-10'
+							onClick={(e) => {
+								this.setState({page: 9});
+							}}>Order Summary
+						</button>
+					}
+				</div>
+			);
+		} else if (page === 1) {
+			return (
+				<div>
+					<button
+						type='button'
+						className='btn btn-outline-primary margin-t-10'
+						onClick={(e) => { this.setState({page: 0}); }}>Back - Primary Information
+					</button>
+					<button
+						type='button'
+						className='btn btn-outline-secondary margin-t-10 margin-l-10'
+						onClick={(e) => { this.setState({page: 9}); }}>Order Summary</button>
+				</div>
+			);
+		} else if (page === 9) {
+			return (
+				<div>
+					<button
+						type='button'
+						className='btn btn-outline-primary margin-t-10'
+						onClick={(e) => { this.setState({page: 0}); }}>Return to Primary Information
+					</button>
+					<button
+						type='button'
+						className='btn btn-outline-primary margin-t-10 margin-l-10'
+						disabled={false}
+						onClick={(e) => {this.setState({page: 1}); }}>Return to Product Details
+					</button>
 				</div>
 			);
 		}
@@ -505,6 +535,8 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
 		} else if (page === 2) {
 			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
+		} else if (page === 9) {
+			return (<OrderSummaryComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
 		} else  {
 			return (
 				<div>
@@ -616,9 +648,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 
 	// value corresponds to dropdown values.. which is the only reason we need value
 	private constructPrice(value: any, propName: string, productDetail: ProductDetails) {
-
-		console.log(propName);
-		console.log(productDetail);
 		let currPriceComponent: PricingComponent;
 		const priceKey: string = PriceBuilder.determinePriceKey(propName);
 

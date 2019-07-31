@@ -8,6 +8,12 @@ import {Card} from "react-bootstrap";
 import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
 import {SidebarKeyList} from "../../constants/SidebarMapping";
 
+/***
+ * Sidebar CSS:
+ * position: sticky
+ * top: 100px
+ */
+
 interface IProps {
 	submitHandler?: any;
 	context?: SalesEntryState;
