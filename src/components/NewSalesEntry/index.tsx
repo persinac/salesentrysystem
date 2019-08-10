@@ -259,18 +259,25 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		const containerStyle = {
 			height: `calc(100% - ${navbarHeight})`
 		};
+		const {page} = this.state;
+		let pageClassname = 'col-md-8 order-md-1';
+		if(page === 9) {
+			pageClassname = 'col-md-12 order-md-1';
+		}
 		return (
 			<newSalesEntryContext.Provider value={this.state}>
 				<div className={'bg-light height-100'} style={containerStyle}>
 					<div className={'container'}>
 						<div className={'py-5 text-center'} id={'sales-entry-hdr'}></div>
 						<div className={'row'} style={rowStyle}>
-							<div className={'col-md-4 order-md-2 mb-4'}>
-								<newSalesEntryContext.Consumer>
-									{context => (<SalesEntrySidebarComponent context={context}/>)}
-								</newSalesEntryContext.Consumer>
-							</div>
-							<div className={'col-md-8 order-md-1'}>
+							{ page !== 9 ?
+								<div className={'col-md-4 order-md-2 mb-4'}>
+									<newSalesEntryContext.Consumer>
+										{context => (<SalesEntrySidebarComponent context={context}/>)}
+									</newSalesEntryContext.Consumer>
+								</div> : null
+							}
+							<div className={pageClassname}>
 								{this.renderPage()}
 								<hr />
 							</div>
@@ -336,6 +343,53 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 						disabled={false}
 						onClick={(e) => {this.setState({page: 1}); }}>Return to Product Details
 					</button>
+				</div>
+			);
+		}
+	}
+
+	private renderPage() {
+		const {page,
+			customer,
+			customerErrors,
+			productHeader,
+			productHeaderErrors} = this.state;
+		if (page === 0) {
+			return (
+				<div>
+					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
+					<ProductHeaderComponent productHeader={productHeader} productHeaderErrors={productHeaderErrors} phHandler={this.setProductStateWithEvent}/>
+					<div className={'row'}>
+						<div className={'width-100'}>
+							<div className={'floater-rght'}>
+								<button
+									type='button'
+									className='btn btn-outline-primary margin-t-10'
+									onClick={(e) => this.onCustomerSubmit(e)}
+								>Save</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			);
+		} else if (page === 1) {
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
+		} else if (page === 2) {
+			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
+		} else if (page === 9) {
+			return (<OrderSummaryComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
+		} else  {
+			return (
+				<div>
+					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
+					<ProductHeaderComponent productHeader={productHeader} productHeaderErrors={productHeaderErrors} phHandler={this.setProductStateWithEvent}/>
+					<div className={'row'}>
+						<div className={'width-100'}>
+							<div className={'floater-rght'}>
+								<button type='button' className='btn btn-outline-primary margin-t-10'>Save</button>
+							</div>
+						</div>
+					</div>
 				</div>
 			);
 		}
@@ -505,53 +559,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		this.setState({customerErrors: {...cv.getErrors()}, productHeaderErrors: {...phv.getErrors()}});
 
 		event.preventDefault();
-	}
-
-	private renderPage() {
-		const {page,
-			customer,
-			customerErrors,
-			productHeader,
-			productHeaderErrors} = this.state;
-		if (page === 0) {
-			return (
-				<div>
-					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
-					<ProductHeaderComponent productHeader={productHeader} productHeaderErrors={productHeaderErrors} phHandler={this.setProductStateWithEvent}/>
-					<div className={'row'}>
-						<div className={'width-100'}>
-							<div className={'floater-rght'}>
-								<button
-									type='button'
-									className='btn btn-outline-primary margin-t-10'
-									onClick={(e) => this.onCustomerSubmit(e)}
-								>Save</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			);
-		} else if (page === 1) {
-			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
-		} else if (page === 2) {
-			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
-		} else if (page === 9) {
-			return (<OrderSummaryComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
-		} else  {
-			return (
-				<div>
-					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
-					<ProductHeaderComponent productHeader={productHeader} productHeaderErrors={productHeaderErrors} phHandler={this.setProductStateWithEvent}/>
-					<div className={'row'}>
-						<div className={'width-100'}>
-							<div className={'floater-rght'}>
-								<button type='button' className='btn btn-outline-primary margin-t-10'>Save</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			);
-		}
 	}
 
 	private static propKey(propertyName: string, value: any): object {

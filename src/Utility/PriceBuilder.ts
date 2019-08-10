@@ -199,12 +199,14 @@ export class PriceBuilder {
 					pc.pd_id = pc.pd_id || productDetail.pd_id;
 					let price: number = 0.00;
 
-					state.cabinet.measurement.forEach((m: MeasurementDetails) => {
-						if (m.length !== undefined && m.width !== undefined) {
-							const temp_w: number = Number(m.width);
-							const temp_l: number = Number(m.length);
+					state.cabinet.measurement.forEach((m: MeasurementDetails, i: number) => {
+						if((i+1) <= Number(state.cabinet.quantity)) {
+							if (m.length !== undefined && m.width !== undefined) {
+								const temp_w: number = Number(m.width);
+								const temp_l: number = Number(m.length);
 
-							price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+								price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+							}
 						}
 					});
 					pc.actual_price = price;
@@ -308,7 +310,6 @@ export class PriceBuilder {
 					pc = componentPrice.get(priceKey);
 				}
 
-				console.log(state.legs);
 				if (Number(state.legs.quantity) > 0) {
 					pc.id = pc.id || null;
 					pc.pd_id = pc.pd_id || productDetail.pd_id;
@@ -359,6 +360,145 @@ export class PriceBuilder {
 		return pc;
 	}
 
+
+	public static buildCabinetLineItemPrice(
+		response: string,
+		measurement: MeasurementDetails,
+		priceComponent: PricingComponent,
+		prices: PriceMatrix[],
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		// calculate
+		if(response === 'cab_length_option') {
+			myNewValue = prices.filter((p: PriceMatrix) => p.short_name === 'cab_length_option')[0];
+			if (measurement.length !== undefined && measurement.width !== undefined) {
+				const temp_w: number = Number(measurement.width);
+				const temp_l: number = Number(measurement.length);
+
+				price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+			}
+		} else {
+			price = priceComponent.actual_price
+		}
+
+		return price;
+	}
+
+	public static buildDoorLineItemPrice(
+		response: string,
+		measurement: MeasurementDetails,
+		priceComponent: PricingComponent,
+		prices: PriceMatrix[],
+		index: number
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === `${ShortNamePrefix.DOOR}_option`)[0];
+
+		if (index > 3) {
+			price = 50;
+		} else {
+			if (measurement.length !== undefined && measurement.width !== undefined && measurement.height !== undefined) {
+				const temp_w: number = Number(measurement.width);
+				const temp_l: number = Number(measurement.length);
+				const temp_h: number = Number(measurement.height);
+				price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price) + (temp_h * myNewValue.sell_price));
+			}
+		}
+		return price;
+	}
+
+	public static buildDrawerLineItemPrice(
+		response: string,
+		measurement: MeasurementDetails,
+		priceComponent: PricingComponent,
+		prices: PriceMatrix[]
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === `${ShortNamePrefix.DRAWER}_option`)[0];
+
+		if (measurement.length !== undefined && measurement.width !== undefined && measurement.height !== undefined) {
+			const temp_w: number = Number(measurement.width);
+			const temp_l: number = Number(measurement.length);
+			const temp_h: number = Number(measurement.height);
+			price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price) + (temp_h * myNewValue.sell_price));
+		}
+		return price;
+	}
+
+	public static buildRolloutDrawerLineItemPrice(
+		response: string,
+		measurement: MeasurementDetails,
+		priceComponent: PricingComponent,
+		prices: PriceMatrix[]
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === `${ShortNamePrefix.ROLLOUT_DRAWERS}_option`)[0];
+
+		if (measurement.length !== undefined && measurement.width !== undefined && measurement.height !== undefined) {
+			const temp_w: number = Number(measurement.width);
+			const temp_l: number = Number(measurement.length);
+			const temp_h: number = Number(measurement.height);
+			price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price) + (temp_h * myNewValue.sell_price));
+		}
+		return price;
+	}
+
+	public static buildLegsLineItemPrice(
+		response: string,
+		measurement: MeasurementDetails,
+		priceComponent: PricingComponent,
+		prices: PriceMatrix[]
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === `${ShortNamePrefix.LEGS}_option`)[0];
+
+		if (measurement.length !== undefined && measurement.width !== undefined) {
+			const temp_w: number = Number(measurement.width);
+			const temp_l: number = Number(measurement.length);
+			price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+		}
+		return price;
+	}
+
+	public static buildTopLineItemPrice(
+		response: string,
+		measurement: MeasurementDetails,
+		priceComponent: PricingComponent,
+		prices: PriceMatrix[],
+		index: number
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === `${ShortNamePrefix.TOP}_option`)[0];
+
+		console.log(response);
+		console.log(myNewValue);
+		if(response.includes('multi') || response.includes('custom')) {
+			myNewValue = prices.filter((p: PriceMatrix) => p.short_name === response)[0];
+			console.log(myNewValue);
+			if (measurement.length !== undefined && measurement.width !== undefined) {
+				const temp_w: number = Number(measurement.width);
+				const temp_l: number = Number(measurement.length);
+
+				price = ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+			}
+		} else {
+			price = priceComponent.actual_price
+		}
+		return price;
+	}
+
 	public static buildGenericPrice(prices: PriceMatrix[], valueToMatch: string, componentPrice: Map<string, PricingComponent>, priceKey: string, productDetail: ProductDetails): PricingComponent {
 		let pc: PricingComponent = {};
 		let myNewValue: PriceMatrix;
@@ -393,15 +533,5 @@ export class PriceBuilder {
 
 
 		return pc;
-	}
-
-	public static measurementWidthSum(measurements: MeasurementDetails[]): number {
-		let sum: number = 0;
-		measurements.forEach((v: MeasurementDetails) => {
-			if (v.width !== null && v.width !== undefined) {
-				sum = Number(sum) + Number(v.width);
-			}
-		});
-		return sum;
 	}
 }

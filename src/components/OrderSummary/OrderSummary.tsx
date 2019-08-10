@@ -1,23 +1,15 @@
-import {faLongArrowAltDown, faLongArrowAltUp} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React from "react";
-import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
-import {MeasurementDetails, ProductDetails, Questions, SalesEntryState} from '../../State';
-import {ErrorWrapper} from "../ErrorWrapper/ErrorWrapper";
-import {Mapper} from "../../Mapper/Mapper";
-import {Categories} from "../../Enums/Category";
-import {QuestionsUtility, SubHeaderQuantity} from "../../Utility/QuestionsUtility";
-import {MAX_CABS, MAX_DOORS, MAX_DRAWERS, MAX_LEGS, MAX_RO_DRAWERS, MAX_TOPS} from "../../constants/ProductDetails";
-import Select from 'react-select';
 import {
-	CABINET_OPTIONS,
-	CUTLERY_OPTIONS, HARDWARE_OPTIONS,
-	KNIFE_BLOCK_OPTIONS, PAINT_OPTIONS,
-	PULLOUT_TRASH_OPTIONS,
-	SPICE_RACK_OPTIONS, TOP_OPTIONS,
-	UTENSIL_OPTIONS, WINE_RACK_OPTIONS
+	MeasurementDetails,
+	PricingComponent,
+	ProductDetails,
+	SalesEntryState
+} from '../../State';
+import {
+	CABINET_OPTIONS
 } from "../../constants/ProductOptions";
+import {PriceBuilder} from "../../Utility/PriceBuilder";
+import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
 
 interface InterfaceProps {
 	category_id?: number;
@@ -47,15 +39,45 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 	shouldComponentUpdate(nextProps: InterfaceProps, nextState: IState) { return false; }
 
 	public render() {
+		const itemWidth = {
+			width: '10%'
+		};
+		const descWidth = {
+			width: '50%'
+		};
+		const unitsWidth = {
+			width: '10%'
+		};
+		const ppuWidth = {
+			width: '15%'
+		};
+		const ltWidth = {
+			width: '15%'
+		};
 		if (this.props.context) {
+			console.log(this.props.context.prices);
 			return (
 				<div>
-					{this.renderCabs()}
-					{this.renderDoors()}
-					{this.renderDrawers()}
-					{this.renderRolloutDrawers()}
-					{this.renderLegs()}
-					{this.renderTops()}
+					<table className={'table table-striped table-sm'}>
+						<thead>
+						<tr>
+							<th style={itemWidth}>Item</th>
+							<th style={descWidth}>Description</th>
+							<th style={unitsWidth}>Units</th>
+							<th style={ppuWidth}>Price per Unit</th>
+							<th style={ltWidth}>Line Total</th>
+						</tr>
+						</thead>
+						<tbody>
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.CABINET}_size`) ? this.renderCabs() : null}
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.DOOR}_size`) ? this.renderDoors() : null}
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.DRAWER}_size`) ? this.renderDrawers() : null}
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.ROLLOUT_DRAWERS}_size`) ? this.renderRolloutDrawers() : null}
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.LEGS}_size`) ? this.renderLegs() : null}
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.LEGS}_size`) ? this.renderTops() : null}
+						</tbody>
+					</table>
+
 				</div>
 			)
 		} else {
@@ -65,146 +87,185 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 
 	private renderCabs() {
 		const {cabinet} = this.props.context;
-		return (
-			<Card>
-				<Card.Body className={'nopadding'}>
-					<div className={'row'}>
-						<div className={'col-lg-12'}><p className={'lead'}>Cabinets</p></div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Quantity: {cabinet.quantity}</span>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<p>Size:</p>
-							<ul>
-								{this.buildMeasurementListItem(Number(cabinet.quantity), cabinet.measurement)}
-							</ul>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Material Type: {cabinet.material_type}</span>
-						</div>
-					</div>
-				</Card.Body>
-			</Card>
+		let value: string = this.getResponseFromProductDetails(
+			this.props.context.componentPrice.get('cab_size'),
+			this.props.context.productDetails
 		);
+		const description: string = CABINET_OPTIONS.filter((co) => co.value === value)[0].label;
+		const measurement = cabinet.measurement;
+		const list_of_nums: number[] = Number(cabinet.quantity) ? Array.from(Array(Number(cabinet.quantity)).keys()): [];
+		if (list_of_nums.length > 0) {
+			let trs = list_of_nums.map((i: number) => {
+				let price = PriceBuilder.buildCabinetLineItemPrice(
+					value,
+					measurement[i],
+					this.props.context.componentPrice.get('cab_size'),
+					this.props.context.prices
+				);
+				return (
+					<tr>
+					<td>#{(i+1)}</td>
+					<td>Cabinet - {description} - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
+					<td>1</td>
+					<td>${price}</td>
+					<td>${price}</td>
+				</tr>
+				);
+			});
+			return trs;
+		}
 	}
 
 	private renderDoors() {
 		const {door} = this.props.context;
-		return (
-			<Card>
-				<Card.Body className={'nopadding'}>
-					<div className={'row'}>
-						<div className={'col-lg-12'}><p className={'lead'}>Doors</p></div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Quantity: {door.quantity}</span>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<p>Size:</p>
-							<ul>
-								{this.buildMeasurementListItem(Number(door.quantity), door.measurement)}
-							</ul>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Material Type: {door.material_type}</span>
-						</div>
-					</div>
-				</Card.Body>
-			</Card>
+		let value: string = this.getResponseFromProductDetails(
+			this.props.context.componentPrice.get(`${ShortNamePrefix.DOOR}_size`),
+			this.props.context.productDetails
 		);
+		const measurement = door.measurement;
+		const list_of_nums: number[] = Number(door.quantity) ? Array.from(Array(Number(door.quantity)).keys()): [];
+		if (list_of_nums.length > 0) {
+			let trs = list_of_nums.map((i: number) => {
+				let price = PriceBuilder.buildDoorLineItemPrice(
+					value,
+					measurement[i],
+					this.props.context.componentPrice.get(`${ShortNamePrefix.DOOR}_size`),
+					this.props.context.prices,
+					i
+				);
+				return (
+					<tr>
+						<td>#{(i+1)}</td>
+						<td>Door - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
+						<td>1</td>
+						<td>${price}</td>
+						<td>${price}</td>
+					</tr>
+				);
+			});
+			return trs;
+		}
 	}
 
 	private renderDrawers() {
 		const {drawers} = this.props.context;
-		return (
-			<Card>
-				<Card.Body className={'nopadding'}>
-					<div className={'row'}>
-						<div className={'col-lg-12'}><p className={'lead'}>Drawers</p></div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Quantity: {drawers.quantity}</span>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<p>Size:</p>
-							<ul>
-								{this.buildMeasurementListItem(Number(drawers.quantity), drawers.measurement)}
-							</ul>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Material Type: {drawers.material_type}</span>
-						</div>
-					</div>
-				</Card.Body>
-			</Card>
+		let value: string = this.getResponseFromProductDetails(
+			this.props.context.componentPrice.get(`${ShortNamePrefix.DRAWER}_size`),
+			this.props.context.productDetails
 		);
+		const measurement = drawers.measurement;
+		const list_of_nums: number[] = Number(drawers.quantity) ? Array.from(Array(Number(drawers.quantity)).keys()): [];
+		if (list_of_nums.length > 0) {
+			let trs = list_of_nums.map((i: number) => {
+				let price = PriceBuilder.buildDrawerLineItemPrice(
+					value,
+					measurement[i],
+					this.props.context.componentPrice.get(`${ShortNamePrefix.DRAWER}_size`),
+					this.props.context.prices
+				);
+				return (
+					<tr>
+						<td>#{(i+1)}</td>
+						<td>Drawer - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
+						<td>1</td>
+						<td>${price}</td>
+						<td>${price}</td>
+					</tr>
+				);
+			});
+			return trs;
+		}
 	}
 
 	private renderRolloutDrawers() {
 		const {rollout_drawers} = this.props.context;
-		return (
-			<Card>
-				<Card.Body className={'nopadding'}>
-					<div className={'row'}>
-						<div className={'col-lg-12'}><p className={'lead'}>Rollout Drawers</p></div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Quantity: {rollout_drawers.quantity}</span>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<p>Size:</p>
-							<ul>
-								{this.buildMeasurementListItem(Number(rollout_drawers.quantity), rollout_drawers.measurement)}
-							</ul>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Material Type: {rollout_drawers.material_type}</span>
-						</div>
-					</div>
-				</Card.Body>
-			</Card>
+		let value: string = this.getResponseFromProductDetails(
+			this.props.context.componentPrice.get(`${ShortNamePrefix.ROLLOUT_DRAWERS}_size`),
+			this.props.context.productDetails
 		);
+		const measurement = rollout_drawers.measurement;
+		const list_of_nums: number[] = Number(rollout_drawers.quantity) ? Array.from(Array(Number(rollout_drawers.quantity)).keys()): [];
+		if (list_of_nums.length > 0) {
+			let trs = list_of_nums.map((i: number) => {
+				let price = PriceBuilder.buildRolloutDrawerLineItemPrice(
+					value,
+					measurement[i],
+					this.props.context.componentPrice.get(`${ShortNamePrefix.ROLLOUT_DRAWERS}_size`),
+					this.props.context.prices
+				);
+				return (
+					<tr>
+						<td>#{(i+1)}</td>
+						<td>Rollout Drawer - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
+						<td>1</td>
+						<td>${price}</td>
+						<td>${price}</td>
+					</tr>
+				);
+			});
+			return trs;
+		}
 	}
 
 	private renderLegs() {
 		const {legs} = this.props.context;
-		return (
-			<Card>
-				<Card.Body className={'nopadding'}>
-					<div className={'row'}>
-						<div className={'col-lg-12'}><p className={'lead'}>Legs</p></div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Quantity: {legs.quantity}</span>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<p>Size:</p>
-							<ul>
-								{this.buildMeasurementListItem(Number(legs.quantity), legs.measurement)}
-							</ul>
-						</div>
-					</div>
-				</Card.Body>
-			</Card>
+		let value: string = this.getResponseFromProductDetails(
+			this.props.context.componentPrice.get(`${ShortNamePrefix.LEGS}_size`),
+			this.props.context.productDetails
 		);
+		const measurement = legs.measurement;
+		const list_of_nums: number[] = Number(legs.quantity) ? Array.from(Array(Number(legs.quantity)).keys()): [];
+		if (list_of_nums.length > 0) {
+			let trs = list_of_nums.map((i: number) => {
+				let price = PriceBuilder.buildLegsLineItemPrice(
+					value,
+					measurement[i],
+					this.props.context.componentPrice.get(`${ShortNamePrefix.LEGS}_size`),
+					this.props.context.prices
+				);
+				return (
+					<tr>
+						<td>#{(i+1)}</td>
+						<td>Legs - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
+						<td>1</td>
+						<td>${price}</td>
+						<td>${price}</td>
+					</tr>
+				);
+			});
+			return trs;
+		}
 	}
 
 	private renderTops() {
 		const {tops} = this.props.context;
-		return (
-			<Card>
-				<Card.Body className={'nopadding'}>
-					<div className={'row'}>
-						<div className={'col-lg-12'}><p className={'lead'}>Tops</p></div>
-						<div className={'col-md-4 mb-3'}>
-							<span>Quantity: {tops.quantity}</span>
-						</div>
-						<div className={'col-md-4 mb-3'}>
-							<p>Size:</p>
-							<ul>
-								{this.buildMeasurementListItem(Number(tops.quantity), tops.measurement)}
-							</ul>
-						</div>
-					</div>
-				</Card.Body>
-			</Card>
+		let value: string = this.getResponseFromProductDetails(
+			this.props.context.componentPrice.get(`${ShortNamePrefix.TOP}_size`),
+			this.props.context.productDetails
 		);
+		const measurement = tops.measurement;
+		const list_of_nums: number[] = Number(tops.quantity) ? Array.from(Array(Number(tops.quantity)).keys()): [];
+		if (list_of_nums.length > 0) {
+			let trs = list_of_nums.map((i: number) => {
+				let price = PriceBuilder.buildTopLineItemPrice(
+					value,
+					measurement[i],
+					this.props.context.componentPrice.get(`${ShortNamePrefix.TOP}_size`),
+					this.props.context.prices,
+					i
+				);
+				return (
+					<tr>
+						<td>#{(i+1)}</td>
+						<td>Top - {measurement[i].length} x {measurement[i].width}</td>
+						<td>1</td>
+						<td>${price}</td>
+						<td>${price}</td>
+					</tr>
+				);
+			});
+			return trs;
+		}
 	}
 
 	private buildMeasurementListItem(qty: number, measurement: MeasurementDetails[]) {
@@ -223,5 +284,10 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		} else {
 			return <div></div>;
 		}
+	}
+
+	private getResponseFromProductDetails(cp: PricingComponent, productDetails: ProductDetails[]): string {
+		const detail = productDetails.filter((pd: ProductDetails) => pd.pd_id === cp.pd_id);
+		return detail[0].response;
 	}
 }

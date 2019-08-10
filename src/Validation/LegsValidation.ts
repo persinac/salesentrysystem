@@ -41,7 +41,7 @@ export class LegsValidation extends Validation {
 	}
 
 	public validate(): boolean {
-		this.checkQuantity();
+		// this.checkQuantity();
 		this.checkLength();
 		this.checkWidth();
 		this.checkHeight();
