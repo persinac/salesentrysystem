@@ -143,3 +143,14 @@ export const PAINT_OPTIONS = [
 	{ value: 'Tuscan Red', label: 'Tuscan Red'},
 	{ value: 'Westminster Green', label: 'Westminster Green'},
 ];
+
+export const SUB_MEASUREMENTS = [
+	{ value: '', label: ''},
+	{ value: '.125', label: '1/8'},
+	{ value: '.25', label: '1/4'},
+	{ value: '.375', label: '3/8'},
+	{ value: '.5', label: '1/2'},
+	{ value: '.625', label: '5/8'},
+	{ value: '.75', label: '3/4'},
+	{ value: '.875', label: '7/8'}
+];

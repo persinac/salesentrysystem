@@ -20,7 +20,7 @@ interface IProps {
 }
 
 interface IState {
-	mapStuff: string[];
+	mapStuff: any;
 }
 
 export class SalesEntrySidebarComponent extends React.Component<IProps, IState> {
@@ -39,10 +39,7 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 	}
 
 	public componentDidMount() {
-		console.log('componentDidMount');
-		this.setState({mapStuff: SidebarKeyList}
-		);
-		console.log(this.state);
+		this.setState({mapStuff: SidebarKeyList});
 	}
 
 	public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
@@ -53,9 +50,9 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 		let priceComponent: PricingComponent = {};
 		let subtotal: number = 0.00;
 		if (this.props.context.componentPrice) {
-			SidebarKeyList.forEach((k: string) => {
-				if(this.props.context.componentPrice.has(k)) {
-					priceComponent = this.props.context.componentPrice.get(k);
+			SidebarKeyList.forEach((k) => {
+				if(this.props.context.componentPrice.has(k.value)) {
+					priceComponent = this.props.context.componentPrice.get(k.value);
 					subtotal += priceComponent.actual_price;
 				}
 			});
@@ -74,11 +71,11 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 		let subtotal: number = 0.00;
 		let something;
 		if (this.props.context.componentPrice) {
-			something = SidebarKeyList.map((k: string) => {
-				if(this.props.context.componentPrice.has(k)) {
-					priceComponent = this.props.context.componentPrice.get(k);
+			something = SidebarKeyList.map((k) => {
+				if(this.props.context.componentPrice.has(k.value)) {
+					priceComponent = this.props.context.componentPrice.get(k.value);
 					subtotal += priceComponent.actual_price;
-					return this.renderPriceComponents(k, priceComponent.actual_price)
+					return this.renderPriceComponents(k.label, priceComponent.actual_price)
 				}
 			});
 			something.push(this.renderPriceComponents('Subtotal', subtotal));

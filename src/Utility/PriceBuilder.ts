@@ -189,28 +189,37 @@ export class PriceBuilder {
 				// multi cabs is an ad hoc calculation, there likely won't be an entry in the price matrix?
 				// maybe there should be... but for now, there isn't one since we will be saving the
 				// calculated price in the db itself
+				//
+				// only run through this calc when the selected dropdown is 'custom'
 				myNewValue = prices.filter((p: PriceMatrix) => p.short_name === 'cab_length_option')[0];
 				if(componentPrice.has(priceKey)) {
 					pc = componentPrice.get(priceKey);
 				}
 
-				if (Number(state.cabinet.quantity) > 1) {
-					pc.id = pc.id || null;
-					pc.pd_id = pc.pd_id || productDetail.pd_id;
-					let price: number = 0.00;
+				let filteredQuestions = state.questions.filter((q: Questions) => q.short_name === 'cab_size')[0];
+				let questionsWithResponses = state.productDetails.filter((pd: ProductDetails) => {
+					return (pd.response !== undefined && pd.q_fk === filteredQuestions.q_id );
+				})[0];
 
-					state.cabinet.measurement.forEach((m: MeasurementDetails, i: number) => {
-						if((i+1) <= Number(state.cabinet.quantity)) {
-							if (m.length !== undefined && m.width !== undefined) {
-								const temp_w: number = Number(m.width);
-								const temp_l: number = Number(m.length);
+				if (questionsWithResponses.response === 'cab_length_option') {
+					if (Number(state.cabinet.quantity) >= 1) {
+						pc.id = pc.id || null;
+						pc.pd_id = pc.pd_id || productDetail.pd_id;
+						let price: number = 0.00;
 
-								price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+						state.cabinet.measurement.forEach((m: MeasurementDetails, i: number) => {
+							if ((i + 1) <= Number(state.cabinet.quantity)) {
+								if (m.length !== undefined && m.width !== undefined) {
+									const temp_w: number = Number(m.width);
+									const temp_l: number = Number(m.length);
+
+									price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+								}
 							}
-						}
-					});
-					pc.actual_price = price;
-					pc.custom_price = price;
+						});
+						pc.actual_price = price;
+						pc.custom_price = price;
+					}
 				}
 				break;
 			case propertyName.startsWith(`${ShortNamePrefix.DOOR}_quantity`):
@@ -482,11 +491,8 @@ export class PriceBuilder {
 		let price: number = 0.00;
 		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === `${ShortNamePrefix.TOP}_option`)[0];
 
-		console.log(response);
-		console.log(myNewValue);
 		if(response.includes('multi') || response.includes('custom')) {
 			myNewValue = prices.filter((p: PriceMatrix) => p.short_name === response)[0];
-			console.log(myNewValue);
 			if (measurement.length !== undefined && measurement.width !== undefined) {
 				const temp_w: number = Number(measurement.width);
 				const temp_l: number = Number(measurement.length);
@@ -499,11 +505,76 @@ export class PriceBuilder {
 		return price;
 	}
 
+	public static buildFeatureLuxuryLineItemPrice(
+		response: string,
+		prices: PriceMatrix[]
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === response)[0];
+
+		if(myNewValue) {
+			price = myNewValue.sell_price;
+		}
+		return price;
+	}
+
+	public static buildHardwareDrawerLineItemPrice(
+		response: string,
+	  prices: PriceMatrix[],
+		quantity: number
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === response)[0];
+
+		if(myNewValue) {
+			if (Number(quantity) > 1) {
+				price = myNewValue.special_drawer_sell_price * Number(quantity);
+			}
+		}
+		return price;
+	}
+
+	public static buildHardwareDoorLineItemPrice(
+		response: string,
+		prices: PriceMatrix[],
+		quantity: number
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === response)[0];
+
+		if(myNewValue) {
+			if (Number(quantity) > 1) {
+				price = myNewValue.special_door_sell_price * Number(quantity);
+			}
+		}
+		return price;
+	}
+
+	public static buildCabPaintColorLineItemPrice(
+		response: string,
+		prices: PriceMatrix[]
+	): number {
+		let myNewValue: PriceMatrix;
+
+		let price: number = 0.00;
+		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === 'pnt_clr')[0];
+
+		if(myNewValue) {
+			price = myNewValue.sell_price;
+		}
+		return price;
+	}
+
 	public static buildGenericPrice(prices: PriceMatrix[], valueToMatch: string, componentPrice: Map<string, PricingComponent>, priceKey: string, productDetail: ProductDetails): PricingComponent {
 		let pc: PricingComponent = {};
 		let myNewValue: PriceMatrix;
 		myNewValue = prices.filter((p: PriceMatrix) => p.short_name === valueToMatch)[0];
-		console.log(componentPrice);
 		if(componentPrice.has(priceKey)) {
 			pc = componentPrice.get(priceKey);
 		}

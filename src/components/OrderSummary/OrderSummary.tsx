@@ -2,7 +2,7 @@ import React from "react";
 import {
 	MeasurementDetails,
 	PricingComponent,
-	ProductDetails,
+	ProductDetails, Questions,
 	SalesEntryState
 } from '../../State';
 import {
@@ -10,6 +10,7 @@ import {
 } from "../../constants/ProductOptions";
 import {PriceBuilder} from "../../Utility/PriceBuilder";
 import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
+import {FEATURE_LUXURIES_SHORT_NAMES} from "../../constants/FeaturesLuxuriesShortNames";
 
 interface InterfaceProps {
 	category_id?: number;
@@ -55,7 +56,6 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 			width: '15%'
 		};
 		if (this.props.context) {
-			console.log(this.props.context.prices);
 			return (
 				<div>
 					<table className={'table table-striped table-sm'}>
@@ -70,11 +70,15 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						</thead>
 						<tbody>
 							{this.props.context.componentPrice.has(`${ShortNamePrefix.CABINET}_size`) ? this.renderCabs() : null}
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.CABINET}_size`) ? this.renderCabinetColor() : null}
 							{this.props.context.componentPrice.has(`${ShortNamePrefix.DOOR}_size`) ? this.renderDoors() : null}
 							{this.props.context.componentPrice.has(`${ShortNamePrefix.DRAWER}_size`) ? this.renderDrawers() : null}
 							{this.props.context.componentPrice.has(`${ShortNamePrefix.ROLLOUT_DRAWERS}_size`) ? this.renderRolloutDrawers() : null}
 							{this.props.context.componentPrice.has(`${ShortNamePrefix.LEGS}_size`) ? this.renderLegs() : null}
-							{this.props.context.componentPrice.has(`${ShortNamePrefix.LEGS}_size`) ? this.renderTops() : null}
+							{this.props.context.componentPrice.has(`${ShortNamePrefix.TOP}_size`) ? this.renderTops() : null}
+							{this.renderFeaturesLuxuries()}
+							{this.renderHardwareDrawers()}
+							{this.renderHardwareDoors()}
 						</tbody>
 					</table>
 
@@ -107,8 +111,8 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 					<td>#{(i+1)}</td>
 					<td>Cabinet - {description} - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
 					<td>1</td>
-					<td>${price}</td>
-					<td>${price}</td>
+					<td>${price.toFixed(2)}</td>
+					<td>${price.toFixed(2)}</td>
 				</tr>
 				);
 			});
@@ -138,8 +142,8 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>#{(i+1)}</td>
 						<td>Door - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
 						<td>1</td>
-						<td>${price}</td>
-						<td>${price}</td>
+						<td>${price.toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
 					</tr>
 				);
 			});
@@ -168,8 +172,8 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>#{(i+1)}</td>
 						<td>Drawer - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
 						<td>1</td>
-						<td>${price}</td>
-						<td>${price}</td>
+						<td>${price.toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
 					</tr>
 				);
 			});
@@ -198,8 +202,8 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>#{(i+1)}</td>
 						<td>Rollout Drawer - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
 						<td>1</td>
-						<td>${price}</td>
-						<td>${price}</td>
+						<td>${price.toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
 					</tr>
 				);
 			});
@@ -228,8 +232,8 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>#{(i+1)}</td>
 						<td>Legs - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
 						<td>1</td>
-						<td>${price}</td>
-						<td>${price}</td>
+						<td>${price.toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
 					</tr>
 				);
 			});
@@ -259,12 +263,134 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>#{(i+1)}</td>
 						<td>Top - {measurement[i].length} x {measurement[i].width}</td>
 						<td>1</td>
-						<td>${price}</td>
-						<td>${price}</td>
+						<td>${price.toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
 					</tr>
 				);
 			});
 			return trs;
+		}
+	}
+
+	private renderFeaturesLuxuries() {
+		const {productDetails, questions} = this.props.context;
+
+		let filteredQuestions = FEATURE_LUXURIES_SHORT_NAMES.map((flsn) => {
+			return questions.filter((q: Questions) => q.short_name === flsn.value)[0];
+		});
+		let questionsWithResponses = filteredQuestions.map((fq: Questions) => {
+			return productDetails.filter((pd: ProductDetails) => {
+				return (pd.response !== undefined && pd.q_fk === fq.q_id );
+			})[0];
+		}).filter((e) => { return e !== undefined });
+
+		if(questionsWithResponses.length > 0) {
+			let trs = questionsWithResponses.map((pd: ProductDetails, i: number) => {
+				const question = filteredQuestions.filter((q: Questions) => pd.q_fk === q.q_id)[0];
+				let price = PriceBuilder.buildFeatureLuxuryLineItemPrice(
+					pd.response,
+					this.props.context.prices
+				);
+				if(price > 0) {
+					return (
+						<tr>
+							<td>#{(i + 1)}</td>
+							<td>{question.text}</td>
+							<td>1</td>
+							<td>${price.toFixed(2)}</td>
+							<td>${price.toFixed(2)}</td>
+						</tr>
+					);
+				}
+			});
+			return trs;
+		}
+	}
+
+	private renderHardwareDrawers() {
+		const {productDetails, questions} = this.props.context;
+		const {quantity} = this.props.context.drawers;
+
+		let filteredQuestions = questions.filter((q: Questions) => q.short_name === 'hrdwr_drwr')[0];
+		let questionsWithResponses = productDetails.filter((pd: ProductDetails) => {
+			return (pd.response !== undefined && pd.q_fk === filteredQuestions.q_id );
+		})[0];
+
+		if(questionsWithResponses && quantity) {
+			let price = PriceBuilder.buildHardwareDrawerLineItemPrice(
+				questionsWithResponses.response,
+				this.props.context.prices,
+				quantity
+			);
+			if(price > 0) {
+				return (
+					<tr>
+						<td>#1</td>
+						<td>{filteredQuestions.text}</td>
+						<td>{quantity}</td>
+						<td>${(price / quantity).toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
+					</tr>
+				);
+			}
+		}
+	}
+
+	private renderHardwareDoors() {
+		const {productDetails, questions} = this.props.context;
+		const {quantity} = this.props.context.door;
+
+		let filteredQuestions = questions.filter((q: Questions) => q.short_name === 'hrdwr_dr')[0];
+		let questionsWithResponses = productDetails.filter((pd: ProductDetails) => {
+			return (pd.response !== undefined && pd.q_fk === filteredQuestions.q_id );
+		})[0];
+
+		if(questionsWithResponses && quantity) {
+			let price = PriceBuilder.buildHardwareDoorLineItemPrice(
+				questionsWithResponses.response,
+				this.props.context.prices,
+				quantity
+			);
+			if(price > 0) {
+				return (
+					<tr>
+						<td>#1</td>
+						<td>{filteredQuestions.text}</td>
+						<td>{quantity}</td>
+						<td>${(price / quantity).toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
+					</tr>
+				);
+			}
+		}
+	}
+
+	private renderCabinetColor() {
+		const {productDetails, questions} = this.props.context;
+
+		let filteredQuestions = questions.filter((q: Questions) => q.short_name === 'pnt_clr')[0];
+		let questionsWithResponses = productDetails.filter((pd: ProductDetails) => {
+			return (pd.response !== undefined && pd.q_fk === filteredQuestions.q_id );
+		})[0];
+
+		console.log(filteredQuestions);
+		console.log(questionsWithResponses);
+		if(questionsWithResponses) {
+			let price = PriceBuilder.buildCabPaintColorLineItemPrice(
+				questionsWithResponses.response,
+				this.props.context.prices
+			);
+			if(price > 0) {
+				return (
+					<tr>
+						<td>#1</td>
+						<td>Cabinet Paint Color - {questionsWithResponses.response}</td>
+						<td>1</td>
+						<td>${price.toFixed(2)}</td>
+						<td>${price.toFixed(2)}</td>
+					</tr>
+				);
+			}
 		}
 	}
 
