@@ -342,6 +342,7 @@ export interface SalesEntryState {
 	legFourErrors?: LegsValidationError;
 	legFiveErrors?: LegsValidationError;
 	componentPrice?: Map<string, PricingComponent>;
+	priceComponents?: PricingComponent[];
 	cabinet?: Cabinet;
 	door?: Doors;
 	tops?: Tops;

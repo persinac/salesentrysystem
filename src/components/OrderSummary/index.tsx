@@ -11,6 +11,7 @@ interface IProps {
 	submitHandler: any;
 	priceConstructor: any;
 	cabinetConstructor: any;
+	customPrice?: boolean;
 }
 
 interface IState {
@@ -50,7 +51,7 @@ export class OrderSummaryComponent extends React.Component<IProps, IState> {
 
 	private renderCards(context: SalesEntryState) {
 		if (context.categories && context.productDetails) {
-			return <OrderSummary context={context}/>;
+			return <OrderSummary context={context} customPrice={this.props.customPrice}/>;
 		} else {
 			return null;
 		}

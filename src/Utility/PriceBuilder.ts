@@ -236,11 +236,8 @@ export class PriceBuilder {
 					pc.pd_id = pc.pd_id || productDetail.pd_id;
 					let price: number = 0.00;
 
-					console.log(state.door.measurement);
 					state.door.measurement.forEach((m: MeasurementDetails, idx: number) => {
 						if (m.length !== undefined && m.width !== undefined && m.height !== undefined) {
-							console.log(idx);
-							console.log(myNewValue.sell_price);
 							const temp_w: number = Number(m.width);
 							const temp_l: number = Number(m.length);
 							const temp_h: number = Number(m.height);
@@ -364,7 +361,6 @@ export class PriceBuilder {
 				}
 				break;
 		}
-		console.log(pc);
 
 		return pc;
 	}

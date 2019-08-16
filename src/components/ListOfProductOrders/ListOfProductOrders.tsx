@@ -29,7 +29,6 @@ export class ListOfProductOrders extends React.Component<InterfaceProps, IState>
 
 	private renderCard() {
 		const {productHeader} = this.props;
-		console.log(productHeader);
 		return (
 			<div className={'table-responsive'}>
 				<table className={'table table-striped table-sm'}>

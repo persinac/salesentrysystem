@@ -43,7 +43,6 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 	}
 
 	public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
-		console.log(this.props.context.componentPrice);
 	}
 
 	public render() {
@@ -53,7 +52,12 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 			SidebarKeyList.forEach((k) => {
 				if(this.props.context.componentPrice.has(k.value)) {
 					priceComponent = this.props.context.componentPrice.get(k.value);
-					subtotal += priceComponent.actual_price;
+					if(priceComponent.custom_price > priceComponent.actual_price) {
+						subtotal += priceComponent.custom_price;
+					} else {
+						subtotal += priceComponent.actual_price;
+					}
+
 				}
 			});
 		}
@@ -74,8 +78,15 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 			something = SidebarKeyList.map((k) => {
 				if(this.props.context.componentPrice.has(k.value)) {
 					priceComponent = this.props.context.componentPrice.get(k.value);
-					subtotal += priceComponent.actual_price;
-					return this.renderPriceComponents(k.label, priceComponent.actual_price)
+					let priceToUse: number = 0.00
+					if(priceComponent.custom_price > priceComponent.actual_price) {
+						priceToUse = priceComponent.custom_price;
+						subtotal += priceComponent.custom_price;
+					} else {
+						priceToUse = priceComponent.actual_price;
+						subtotal += priceComponent.actual_price;
+					}
+					return this.renderPriceComponents(k.label, priceToUse)
 				}
 			});
 			something.push(this.renderPriceComponents('Subtotal', subtotal));

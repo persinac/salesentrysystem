@@ -18,6 +18,7 @@ interface InterfaceProps {
 	context: SalesEntryState;
 	priceConstructor?: any;
 	cabinetConstructor?: any;
+	customPrice?: boolean;
 }
 
 interface IState {
@@ -44,7 +45,7 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 			width: '10%'
 		};
 		const descWidth = {
-			width: '50%'
+			width: '40%'
 		};
 		const unitsWidth = {
 			width: '10%'
@@ -52,8 +53,11 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		const ppuWidth = {
 			width: '15%'
 		};
-		const ltWidth = {
+		const cpWidth = {
 			width: '15%'
+		};
+		const ltWidth = {
+			width: '10%'
 		};
 		if (this.props.context) {
 			return (
@@ -66,6 +70,7 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 							<th style={unitsWidth}>Units</th>
 							<th style={ppuWidth}>Price per Unit</th>
 							<th style={ltWidth}>Line Total</th>
+							<th style={cpWidth}>Custom Price</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -113,6 +118,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 					<td>1</td>
 					<td>${price.toFixed(2)}</td>
 					<td>${price.toFixed(2)}</td>
+						{this.props.customPrice ?
+							<td>
+								<input
+									id={String(i + 1)}
+									value={""}
+									type='text'
+									placeholder="Stuff"
+									className='form-control'
+								/>
+							</td> : null
+						}
 				</tr>
 				);
 			});
@@ -144,6 +160,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>1</td>
 						<td>${price.toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			});
@@ -174,6 +198,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>1</td>
 						<td>${price.toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			});
@@ -204,6 +236,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>1</td>
 						<td>${price.toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			});
@@ -234,6 +274,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>1</td>
 						<td>${price.toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			});
@@ -265,6 +313,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>1</td>
 						<td>${price.toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			});
@@ -273,11 +329,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 	}
 
 	private renderFeaturesLuxuries() {
-		const {productDetails, questions} = this.props.context;
+		const {productDetails, questions, componentPrice} = this.props.context;
+
+		console.log(componentPrice);
 
 		let filteredQuestions = FEATURE_LUXURIES_SHORT_NAMES.map((flsn) => {
-			return questions.filter((q: Questions) => q.short_name === flsn.value)[0];
+			if (componentPrice.has(flsn.value)) {
+				console.log(componentPrice.get(flsn.value));
+			}
+			return questions.filter((q: Questions) => {return q.short_name === flsn.value})[0];
 		});
+
 		let questionsWithResponses = filteredQuestions.map((fq: Questions) => {
 			return productDetails.filter((pd: ProductDetails) => {
 				return (pd.response !== undefined && pd.q_fk === fq.q_id );
@@ -299,6 +361,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 							<td>1</td>
 							<td>${price.toFixed(2)}</td>
 							<td>${price.toFixed(2)}</td>
+							<td>
+								<input
+									value={""}
+									type='text'
+									placeholder="Stuff"
+									className='form-control'
+								/>
+							</td>
 						</tr>
 					);
 				}
@@ -330,6 +400,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>{quantity}</td>
 						<td>${(price / quantity).toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			}
@@ -337,7 +415,7 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 	}
 
 	private renderHardwareDoors() {
-		const {productDetails, questions} = this.props.context;
+		const {productDetails, questions, componentPrice} = this.props.context;
 		const {quantity} = this.props.context.door;
 
 		let filteredQuestions = questions.filter((q: Questions) => q.short_name === 'hrdwr_dr')[0];
@@ -359,6 +437,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>{quantity}</td>
 						<td>${(price / quantity).toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			}
@@ -373,8 +459,6 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 			return (pd.response !== undefined && pd.q_fk === filteredQuestions.q_id );
 		})[0];
 
-		console.log(filteredQuestions);
-		console.log(questionsWithResponses);
 		if(questionsWithResponses) {
 			let price = PriceBuilder.buildCabPaintColorLineItemPrice(
 				questionsWithResponses.response,
@@ -388,6 +472,14 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 						<td>1</td>
 						<td>${price.toFixed(2)}</td>
 						<td>${price.toFixed(2)}</td>
+						<td>
+							<input
+								value={""}
+								type='text'
+								placeholder="Stuff"
+								className='form-control'
+							/>
+						</td>
 					</tr>
 				);
 			}
@@ -397,7 +489,6 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 	private buildMeasurementListItem(qty: number, measurement: MeasurementDetails[]) {
 		const list_of_door_nums: number[] = qty ? Array.from(Array(qty).keys()): [];
 		if (list_of_door_nums.length > 0) {
-			console.log(list_of_door_nums);
 			return list_of_door_nums.map((i: number) => {
 				return (
 					<li>

@@ -103,7 +103,6 @@ export class TopValidation extends Validation {
 	}
 
 	/***
-	 * Once we have the total size component constructed, we'll need to validate against that, too
 	 * This will need to be updated once multiple UNIQUE cab measurements are entered
 	 * Need to grab the max width from all cab width(s)
 	 */

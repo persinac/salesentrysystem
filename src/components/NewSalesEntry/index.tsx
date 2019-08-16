@@ -36,6 +36,13 @@ import {SalesEntrySidebarComponent} from "../SalesEntrySidebar";
 import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
 import {PriceBuilder} from "../../Utility/PriceBuilder";
 import {OrderSummaryComponent} from "../OrderSummary";
+import {
+	PAGE_CUSTOM_PRICE,
+	PAGE_ORDER_SUMMARY,
+	PAGE_PRIMARY_INFO,
+	PAGE_PRODUCT_INFO,
+	PAGE_PRODUCT_SUMMARY
+} from "../../constants/Pages";
 
 const rp = require('request-promise');
 
@@ -109,6 +116,13 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		body: {
 			some: 'payload'
 		},
+		json: true // Automatically stringifies the body to JSON
+	};
+
+	private get_options = {
+		method: 'GET',
+		uri: '',
+		qs: {},
 		json: true // Automatically stringifies the body to JSON
 	};
 
@@ -189,6 +203,15 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					}
 				}
 			);
+
+			const myOtherURL = process.env.REACT_APP_BASE_API_URL + 'prices/products';
+			let pd_ids = this.state.productDetails.map((pd: ProductDetails) => { return pd.pd_id});
+			console.log(pd_ids.join(','));
+			await this.getWRFServerDataBody(myOtherURL, {"pd_ids": pd_ids.join(',')}).then((d: PricingComponent[]) => {
+				if(d) {
+					this.setState({priceComponents: d})
+				}
+			});
 		}
 
 		const questionUrl = process.env.REACT_APP_BASE_API_URL + 'question';
@@ -238,6 +261,20 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			});
 	};
 
+	public getWRFServerDataBody = (builtURI: string, body: any): Promise<any> => {
+		this.get_options.qs = body;
+		this.get_options.uri = builtURI;
+		console.log(this.get_options);
+		return rp(this.get_options)
+			.then((d: any) => {
+				return d;
+			})
+			.catch((e: any) => {
+				console.log('ERROR!!!!');
+				console.log(e);
+			});
+	};
+
 	public postWRFServerData(body: any, endpoint: string, put: boolean): Promise<any> {
 		this.post_options.body = body;
 		this.post_options.uri = process.env.REACT_APP_BASE_API_URL + endpoint;
@@ -261,7 +298,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		};
 		const {page} = this.state;
 		let pageClassname = 'col-md-8 order-md-1';
-		if(page === 9) {
+		if(page === PAGE_CUSTOM_PRICE || page === PAGE_ORDER_SUMMARY) {
 			pageClassname = 'col-md-12 order-md-1';
 		}
 		return (
@@ -270,7 +307,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					<div className={'container'}>
 						<div className={'py-5 text-center'} id={'sales-entry-hdr'}></div>
 						<div className={'row'} style={rowStyle}>
-							{ page !== 9 ?
+							{ (page !== PAGE_ORDER_SUMMARY && page !== PAGE_CUSTOM_PRICE) ?
 								<div className={'col-md-4 order-md-2 mb-4'}>
 									<newSalesEntryContext.Consumer>
 										{context => (<SalesEntrySidebarComponent context={context}/>)}
@@ -295,53 +332,69 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 
 	private renderButtons() {
 		const {page} = this.state;
-		if (page === 0) {
+		if (page === PAGE_PRIMARY_INFO) {
 			return (
 				<div>
 					<button
 						type='button'
 						className='btn btn-outline-primary margin-t-10'
 						disabled={this.state.productHeader.ph_id === null || this.state.productHeader.ph_id === undefined}
-						onClick={(e) => {this.setState({page: 1}); }}>Next - Product Details
+						onClick={(e) => {this.setState({page: PAGE_PRODUCT_INFO}); }}>Next - Product Details
 					</button>
 					{(this.state.productHeader.ph_id === null || this.state.productHeader.ph_id === undefined) ? null :
 						<button
 							type='button'
 							className='btn btn-outline-secondary margin-t-10 margin-l-10'
 							onClick={(e) => {
-								this.setState({page: 9});
+								this.setState({page: PAGE_ORDER_SUMMARY});
 							}}>Order Summary
+						</button>
+					}
+					{(this.state.productHeader.ph_id === null || this.state.productHeader.ph_id === undefined) ? null :
+						<button
+							type='button'
+							className='btn btn-outline-secondary margin-t-10 margin-l-10'
+							onClick={(e) => {
+								this.setState({page: PAGE_CUSTOM_PRICE});
+							}}>Input Custom Prices
 						</button>
 					}
 				</div>
 			);
-		} else if (page === 1) {
+		} else if (page === PAGE_PRODUCT_INFO) {
 			return (
 				<div>
 					<button
 						type='button'
 						className='btn btn-outline-primary margin-t-10'
-						onClick={(e) => { this.setState({page: 0}); }}>Back - Primary Information
+						onClick={(e) => { this.setState({page: PAGE_PRIMARY_INFO}); }}>Back - Primary Information
 					</button>
 					<button
 						type='button'
 						className='btn btn-outline-secondary margin-t-10 margin-l-10'
-						onClick={(e) => { this.setState({page: 9}); }}>Order Summary</button>
+						onClick={(e) => { this.setState({page: PAGE_ORDER_SUMMARY}); }}>Order Summary</button>
+					<button
+						type='button'
+						className='btn btn-outline-secondary margin-t-10 margin-l-10'
+						onClick={(e) => {
+							this.setState({page: PAGE_CUSTOM_PRICE});
+						}}>Input Custom Prices
+					</button>
 				</div>
 			);
-		} else if (page === 9) {
+		} else if (page === PAGE_ORDER_SUMMARY || page === PAGE_CUSTOM_PRICE) {
 			return (
 				<div>
 					<button
 						type='button'
 						className='btn btn-outline-primary margin-t-10'
-						onClick={(e) => { this.setState({page: 0}); }}>Return to Primary Information
+						onClick={(e) => { this.setState({page: PAGE_PRIMARY_INFO}); }}>Return to Primary Information
 					</button>
 					<button
 						type='button'
 						className='btn btn-outline-primary margin-t-10 margin-l-10'
 						disabled={false}
-						onClick={(e) => {this.setState({page: 1}); }}>Return to Product Details
+						onClick={(e) => {this.setState({page: PAGE_PRODUCT_INFO}); }}>Return to Product Details
 					</button>
 				</div>
 			);
@@ -354,7 +407,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			customerErrors,
 			productHeader,
 			productHeaderErrors} = this.state;
-		if (page === 0) {
+		if (page === PAGE_PRIMARY_INFO) {
 			return (
 				<div>
 					<CustomerEntryComponent customer={customer} customerErrors={customerErrors} customerHandler={this.setCustomerStateWithEvent}/>
@@ -372,12 +425,24 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					</div>
 				</div>
 			);
-		} else if (page === 1) {
+		} else if (page === PAGE_PRODUCT_INFO) {
 			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
-		} else if (page === 2) {
+		} else if (page === PAGE_PRODUCT_SUMMARY) {
 			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
-		} else if (page === 9) {
-			return (<OrderSummaryComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
+		} else if (page === PAGE_CUSTOM_PRICE) {
+			return (<OrderSummaryComponent
+				submitHandler={this.onProductDetailsSubmit}
+				priceConstructor={this.constructPrice}
+				cabinetConstructor={this.constructComponent}
+				customPrice={true}
+			/>);
+		} else if (page === PAGE_ORDER_SUMMARY) {
+			return (<OrderSummaryComponent
+				submitHandler={this.onProductDetailsSubmit}
+				priceConstructor={this.constructPrice}
+				cabinetConstructor={this.constructComponent}
+				customPrice={false}
+			/>);
 		} else  {
 			return (
 				<div>
@@ -459,6 +524,20 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 						pds[idx].response = upd.response;
 					});
 					this.setState({productDetails: pds});
+				})
+				.catch((e) => {
+					console.log(e);
+					console.log('DONE - Error');
+				});
+			// update price component
+			let tempPCs: PricingComponent[] = [];
+			this.state.componentPrice.forEach((pc: PricingComponent, key: string) => {
+				tempPCs.push(pc);
+			});
+			this.postWRFServerData(Array.from(tempPCs), 'prices/products', false)
+				.then((newPCs: any) => {
+					const updatedPCs: PricingComponent[] = newPCs.price_components;
+					this.setState({priceComponents: updatedPCs});
 				})
 				.catch((e) => {
 					console.log(e);
@@ -573,7 +652,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				[columnType]: val
 			}
 		}));
-		console.log(this.state.customer);
 	}
 
 	private setProductStateWithEvent(event: any, columnType: string): void {
@@ -658,10 +736,15 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		let currPriceComponent: PricingComponent;
 		const priceKey: string = PriceBuilder.determinePriceKey(propName);
 
-		console.log(priceKey);
 		currPriceComponent = PriceBuilder.buildPrice(
 			value, propName, priceKey, productDetail, this.state.prices, this.state.componentPrice, this.state
 		);
+
+		let existingComponent = this.state.priceComponents.filter((pc: PricingComponent) => pc.pd_id === productDetail.pd_id);
+
+		if(existingComponent.length > 0) {
+			currPriceComponent = existingComponent[0];
+		}
 
 		if (currPriceComponent.actual_price !== undefined && currPriceComponent.custom_price !== null) {
 			this.state.componentPrice.set(priceKey, currPriceComponent);
