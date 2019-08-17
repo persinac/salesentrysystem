@@ -4,7 +4,6 @@ import {
 	Roles, SalesEntryState,
 } from '../../State';
 import {newSalesEntryContext} from "../../Context/NewSalesEntryContext";
-import {SalesEntryForm} from "../SalesEntryForm/SalesEntryForm";
 import {OrderSummary} from "./OrderSummary";
 
 interface IProps {
@@ -43,15 +42,28 @@ export class OrderSummaryComponent extends React.Component<IProps, IState> {
 					<div className={'width-100'}>
 						{this.renderCards(context)}
 					</div>
+					{ this.props.customPrice ?
+						<button
+							type='button'
+							className='btn btn-outline-secondary margin-t-10 margin-l-10 floater-rght'
+							disabled={false}
+							onClick={(e) => {this.props.submitHandler()}}>Save Custom Price
+						</button> : null
+					}
 				</div>)
 				}
+
 			</newSalesEntryContext.Consumer>
 		);
 	}
 
 	private renderCards(context: SalesEntryState) {
 		if (context.categories && context.productDetails) {
-			return <OrderSummary context={context} customPrice={this.props.customPrice}/>;
+			return (
+				<div>
+				<OrderSummary context={context} customPrice={this.props.customPrice}/>
+				</div>
+			);
 		} else {
 			return null;
 		}

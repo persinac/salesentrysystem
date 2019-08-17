@@ -22,9 +22,7 @@ interface InterfaceProps {
 }
 
 interface IState {
-	doesContainShow?: boolean;
-	productDetails?: ProductDetails[];
-	currentQuestionIdx?: number;
+	componentPrice?: Map<string, PricingComponent>;
 }
 
 export class OrderSummary extends React.Component<InterfaceProps, IState> {
@@ -32,20 +30,18 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		super(props);
 
 		this.state = {
-			doesContainShow: false,
-			currentQuestionIdx: 0,
-			productDetails: this.props.context.productDetails
+			componentPrice: this.props.context.componentPrice
 		};
 	}
 
-	shouldComponentUpdate(nextProps: InterfaceProps, nextState: IState) { return false; }
+	shouldComponentUpdate(nextProps: InterfaceProps, nextState: IState) { return true; }
 
 	public render() {
 		const itemWidth = {
 			width: '10%'
 		};
 		const descWidth = {
-			width: '40%'
+			width: this.props.customPrice ? '40%' : '50%'
 		};
 		const unitsWidth = {
 			width: '10%'
@@ -57,7 +53,7 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 			width: '15%'
 		};
 		const ltWidth = {
-			width: '10%'
+			width: this.props.customPrice ? '10%' : '15%'
 		};
 		if (this.props.context) {
 			return (
@@ -70,7 +66,9 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 							<th style={unitsWidth}>Units</th>
 							<th style={ppuWidth}>Price per Unit</th>
 							<th style={ltWidth}>Line Total</th>
-							<th style={cpWidth}>Custom Price</th>
+							{this.props.customPrice ?
+								<th style={cpWidth}>Custom Price</th> : null
+							}
 						</tr>
 						</thead>
 						<tbody>
@@ -97,7 +95,7 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 	private renderCabs() {
 		const {cabinet} = this.props.context;
 		let value: string = this.getResponseFromProductDetails(
-			this.props.context.componentPrice.get('cab_size'),
+			this.state.componentPrice.get(`${ShortNamePrefix.CABINET}_size`),
 			this.props.context.productDetails
 		);
 		const description: string = CABINET_OPTIONS.filter((co) => co.value === value)[0].label;
@@ -105,32 +103,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		const list_of_nums: number[] = Number(cabinet.quantity) ? Array.from(Array(Number(cabinet.quantity)).keys()): [];
 		if (list_of_nums.length > 0) {
 			let trs = list_of_nums.map((i: number) => {
-				let price = PriceBuilder.buildCabinetLineItemPrice(
-					value,
-					measurement[i],
-					this.props.context.componentPrice.get('cab_size'),
-					this.props.context.prices
-				);
-				return (
-					<tr>
-					<td>#{(i+1)}</td>
-					<td>Cabinet - {description} - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
-					<td>1</td>
-					<td>${price.toFixed(2)}</td>
-					<td>${price.toFixed(2)}</td>
-						{this.props.customPrice ?
-							<td>
-								<input
-									id={String(i + 1)}
-									value={""}
-									type='text'
-									placeholder="Stuff"
-									className='form-control'
-								/>
-							</td> : null
-						}
-				</tr>
-				);
+				let price = this.state.componentPrice.get(`${ShortNamePrefix.CABINET}_size`).custom_price;
+				if (this.props.customPrice) {
+					price = PriceBuilder.buildCabinetLineItemPrice(
+						value,
+						measurement[i],
+						this.state.componentPrice.get(`${ShortNamePrefix.CABINET}_size`),
+						this.props.context.prices
+					);
+				}
+				const descrip = `Cabinet - ${description} - ${measurement[i].length} x ${measurement[i].width} x ${measurement[i].height}`;
+				return this.renderRow(i, descrip, 1, price, price, `${ShortNamePrefix.CABINET}_size`, (i+1)>1);
 			});
 			return trs;
 		}
@@ -139,37 +122,25 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 	private renderDoors() {
 		const {door} = this.props.context;
 		let value: string = this.getResponseFromProductDetails(
-			this.props.context.componentPrice.get(`${ShortNamePrefix.DOOR}_size`),
+			this.state.componentPrice.get(`${ShortNamePrefix.DOOR}_size`),
 			this.props.context.productDetails
 		);
 		const measurement = door.measurement;
 		const list_of_nums: number[] = Number(door.quantity) ? Array.from(Array(Number(door.quantity)).keys()): [];
 		if (list_of_nums.length > 0) {
 			let trs = list_of_nums.map((i: number) => {
-				let price = PriceBuilder.buildDoorLineItemPrice(
-					value,
-					measurement[i],
-					this.props.context.componentPrice.get(`${ShortNamePrefix.DOOR}_size`),
-					this.props.context.prices,
-					i
-				);
-				return (
-					<tr>
-						<td>#{(i+1)}</td>
-						<td>Door - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
-						<td>1</td>
-						<td>${price.toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
-				);
+				let price = this.state.componentPrice.get(`${ShortNamePrefix.DOOR}_size`).custom_price;
+				if (this.props.customPrice) {
+					price = PriceBuilder.buildDoorLineItemPrice(
+						value,
+						measurement[i],
+						this.state.componentPrice.get(`${ShortNamePrefix.DOOR}_size`),
+						this.props.context.prices,
+						i
+					);
+				}
+				const descrip = `Door - ${measurement[i].length} x ${measurement[i].width} x ${measurement[i].height}`;
+				return this.renderRow(i, descrip, 1, price, price, `${ShortNamePrefix.DOOR}_size`, (i+1)>1);
 			});
 			return trs;
 		}
@@ -185,29 +156,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		const list_of_nums: number[] = Number(drawers.quantity) ? Array.from(Array(Number(drawers.quantity)).keys()): [];
 		if (list_of_nums.length > 0) {
 			let trs = list_of_nums.map((i: number) => {
-				let price = PriceBuilder.buildDrawerLineItemPrice(
-					value,
-					measurement[i],
-					this.props.context.componentPrice.get(`${ShortNamePrefix.DRAWER}_size`),
-					this.props.context.prices
-				);
-				return (
-					<tr>
-						<td>#{(i+1)}</td>
-						<td>Drawer - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
-						<td>1</td>
-						<td>${price.toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
-				);
+				let price = this.state.componentPrice.get(`${ShortNamePrefix.DRAWER}_size`).custom_price;
+				if (this.props.customPrice) {
+					price = PriceBuilder.buildDrawerLineItemPrice(
+						value,
+						measurement[i],
+						this.state.componentPrice.get(`${ShortNamePrefix.DRAWER}_size`),
+						this.props.context.prices
+					);
+				}
+				const descrip = `Drawer - ${measurement[i].length} x ${measurement[i].width} x ${measurement[i].height}`;
+				return this.renderRow(i, descrip, 1, price, price, `${ShortNamePrefix.DRAWER}_size`, (i+1)>1);
 			});
 			return trs;
 		}
@@ -223,29 +182,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		const list_of_nums: number[] = Number(rollout_drawers.quantity) ? Array.from(Array(Number(rollout_drawers.quantity)).keys()): [];
 		if (list_of_nums.length > 0) {
 			let trs = list_of_nums.map((i: number) => {
-				let price = PriceBuilder.buildRolloutDrawerLineItemPrice(
-					value,
-					measurement[i],
-					this.props.context.componentPrice.get(`${ShortNamePrefix.ROLLOUT_DRAWERS}_size`),
-					this.props.context.prices
-				);
-				return (
-					<tr>
-						<td>#{(i+1)}</td>
-						<td>Rollout Drawer - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
-						<td>1</td>
-						<td>${price.toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
-				);
+				let price = this.state.componentPrice.get(`${ShortNamePrefix.ROLLOUT_DRAWERS}_size`).custom_price;
+				if (this.props.customPrice) {
+					price = PriceBuilder.buildRolloutDrawerLineItemPrice(
+						value,
+						measurement[i],
+						this.state.componentPrice.get(`${ShortNamePrefix.ROLLOUT_DRAWERS}_size`),
+						this.props.context.prices
+					);
+				}
+				const descrip = `Rollout Drawer - ${measurement[i].length} x ${measurement[i].width} x ${measurement[i].height}`;
+				return this.renderRow(i, descrip, 1, price, price, `${ShortNamePrefix.ROLLOUT_DRAWERS}_size`, (i+1)>1);
 			});
 			return trs;
 		}
@@ -261,29 +208,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		const list_of_nums: number[] = Number(legs.quantity) ? Array.from(Array(Number(legs.quantity)).keys()): [];
 		if (list_of_nums.length > 0) {
 			let trs = list_of_nums.map((i: number) => {
-				let price = PriceBuilder.buildLegsLineItemPrice(
-					value,
-					measurement[i],
-					this.props.context.componentPrice.get(`${ShortNamePrefix.LEGS}_size`),
-					this.props.context.prices
-				);
-				return (
-					<tr>
-						<td>#{(i+1)}</td>
-						<td>Legs - {measurement[i].length} x {measurement[i].width} x {measurement[i].height}</td>
-						<td>1</td>
-						<td>${price.toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
-				);
+				let price = this.state.componentPrice.get(`${ShortNamePrefix.LEGS}_size`).custom_price;
+				if (this.props.customPrice) {
+					price = PriceBuilder.buildLegsLineItemPrice(
+						value,
+						measurement[i],
+						this.state.componentPrice.get(`${ShortNamePrefix.LEGS}_size`),
+						this.props.context.prices
+					);
+				}
+				const descrip = `Legs - ${measurement[i].length} x ${measurement[i].width} x ${measurement[i].height}`;
+				return this.renderRow(i, descrip, 1, price, price, `${ShortNamePrefix.LEGS}_size`, (i+1)>1);
 			});
 			return trs;
 		}
@@ -299,30 +234,18 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		const list_of_nums: number[] = Number(tops.quantity) ? Array.from(Array(Number(tops.quantity)).keys()): [];
 		if (list_of_nums.length > 0) {
 			let trs = list_of_nums.map((i: number) => {
-				let price = PriceBuilder.buildTopLineItemPrice(
-					value,
-					measurement[i],
-					this.props.context.componentPrice.get(`${ShortNamePrefix.TOP}_size`),
-					this.props.context.prices,
-					i
-				);
-				return (
-					<tr>
-						<td>#{(i+1)}</td>
-						<td>Top - {measurement[i].length} x {measurement[i].width}</td>
-						<td>1</td>
-						<td>${price.toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
-				);
+				let price = this.state.componentPrice.get(`${ShortNamePrefix.TOP}_size`).custom_price;
+				if (this.props.customPrice) {
+					price = PriceBuilder.buildTopLineItemPrice(
+						value,
+						measurement[i],
+						this.state.componentPrice.get(`${ShortNamePrefix.TOP}_size`),
+						this.props.context.prices,
+						i
+					);
+				}
+				const descrip = `Top - ${measurement[i].length} x ${measurement[i].width} x ${measurement[i].height}`;
+				return this.renderRow(i, descrip, 1, price, price, `${ShortNamePrefix.TOP}_size`, (i+1)>1);
 			});
 			return trs;
 		}
@@ -331,12 +254,7 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 	private renderFeaturesLuxuries() {
 		const {productDetails, questions, componentPrice} = this.props.context;
 
-		console.log(componentPrice);
-
 		let filteredQuestions = FEATURE_LUXURIES_SHORT_NAMES.map((flsn) => {
-			if (componentPrice.has(flsn.value)) {
-				console.log(componentPrice.get(flsn.value));
-			}
 			return questions.filter((q: Questions) => {return q.short_name === flsn.value})[0];
 		});
 
@@ -349,28 +267,36 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		if(questionsWithResponses.length > 0) {
 			let trs = questionsWithResponses.map((pd: ProductDetails, i: number) => {
 				const question = filteredQuestions.filter((q: Questions) => pd.q_fk === q.q_id)[0];
-				let price = PriceBuilder.buildFeatureLuxuryLineItemPrice(
-					pd.response,
-					this.props.context.prices
-				);
-				if(price > 0) {
-					return (
-						<tr>
-							<td>#{(i + 1)}</td>
-							<td>{question.text}</td>
-							<td>1</td>
-							<td>${price.toFixed(2)}</td>
-							<td>${price.toFixed(2)}</td>
-							<td>
-								<input
-									value={""}
-									type='text'
-									placeholder="Stuff"
-									className='form-control'
-								/>
-							</td>
-						</tr>
-					);
+
+				if (this.state.componentPrice.has(`${question.short_name}`)) {
+					let price = this.state.componentPrice.get(`${question.short_name}`).custom_price;
+					if (!price) {
+						price = PriceBuilder.buildFeatureLuxuryLineItemPrice(
+							pd.response,
+							this.props.context.prices
+						);
+					}
+					if (price > 0) {
+						const descrip = `${question.text}`;
+						return this.renderRow(i, descrip, 1, price, price, `${question.short_name}`, false);
+						return (
+							<tr>
+								<td>#{(i + 1)}</td>
+								<td>{question.text}</td>
+								<td>1</td>
+								<td>${price.toFixed(2)}</td>
+								<td>${price.toFixed(2)}</td>
+								<td>
+									<input
+										value={""}
+										type='text'
+										placeholder="Stuff"
+										className='form-control'
+									/>
+								</td>
+							</tr>
+						);
+					}
 				}
 			});
 			return trs;
@@ -387,29 +313,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		})[0];
 
 		if(questionsWithResponses && quantity) {
-			let price = PriceBuilder.buildHardwareDrawerLineItemPrice(
-				questionsWithResponses.response,
-				this.props.context.prices,
-				quantity
-			);
-			if(price > 0) {
-				return (
-					<tr>
-						<td>#1</td>
-						<td>{filteredQuestions.text}</td>
-						<td>{quantity}</td>
-						<td>${(price / quantity).toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
+			let price = this.state.componentPrice.get(`hrdwr_drwr`).custom_price;
+			if (this.props.customPrice && !price) {
+				price = PriceBuilder.buildHardwareDrawerLineItemPrice(
+					questionsWithResponses.response,
+					this.props.context.prices,
+					quantity
 				);
+			}
+			const descrip = filteredQuestions.text;
+			if(price > 0) {
+				return this.renderRow(0, descrip, quantity, price, price, 'hrdwr_drwr', false);
 			}
 		}
 	}
@@ -424,29 +338,17 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		})[0];
 
 		if(questionsWithResponses && quantity) {
-			let price = PriceBuilder.buildHardwareDoorLineItemPrice(
-				questionsWithResponses.response,
-				this.props.context.prices,
-				quantity
-			);
-			if(price > 0) {
-				return (
-					<tr>
-						<td>#1</td>
-						<td>{filteredQuestions.text}</td>
-						<td>{quantity}</td>
-						<td>${(price / quantity).toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
+			let price = this.state.componentPrice.get(`hrdwr_dr`).custom_price;
+			if (this.props.customPrice && !price) {
+				price = PriceBuilder.buildHardwareDoorLineItemPrice(
+					questionsWithResponses.response,
+					this.props.context.prices,
+					quantity
 				);
+			}
+			const descrip = filteredQuestions.text;
+			if(price > 0) {
+				return this.renderRow(0, descrip, quantity, price, price, 'hrdwr_dr', false);
 			}
 		}
 	}
@@ -460,51 +362,73 @@ export class OrderSummary extends React.Component<InterfaceProps, IState> {
 		})[0];
 
 		if(questionsWithResponses) {
-			let price = PriceBuilder.buildCabPaintColorLineItemPrice(
-				questionsWithResponses.response,
-				this.props.context.prices
-			);
-			if(price > 0) {
-				return (
-					<tr>
-						<td>#1</td>
-						<td>Cabinet Paint Color - {questionsWithResponses.response}</td>
-						<td>1</td>
-						<td>${price.toFixed(2)}</td>
-						<td>${price.toFixed(2)}</td>
-						<td>
-							<input
-								value={""}
-								type='text'
-								placeholder="Stuff"
-								className='form-control'
-							/>
-						</td>
-					</tr>
+			let price = this.state.componentPrice.get(`pnt_clr`).custom_price;
+			if (this.props.customPrice && !price) {
+				price = PriceBuilder.buildCabPaintColorLineItemPrice(
+					questionsWithResponses.response,
+					this.props.context.prices
 				);
+			}
+			const descrip = `Cabinet Paint Color - ${questionsWithResponses.response}`;
+			if(price > 0) {
+				return this.renderRow(0, descrip, 1, price, price, 'pnt_clr', false);
 			}
 		}
 	}
 
-	private buildMeasurementListItem(qty: number, measurement: MeasurementDetails[]) {
-		const list_of_door_nums: number[] = qty ? Array.from(Array(qty).keys()): [];
-		if (list_of_door_nums.length > 0) {
-			return list_of_door_nums.map((i: number) => {
-				return (
-					<li>
-						<span>
-							{measurement[i].length} x {measurement[i].width} x {measurement[i].height}
-						</span>
-					</li>
-				);
-			})
-		} else {
-			return <div></div>;
-		}
+	private renderRow(i: number, text: string, units: number, individualItemPrice: number, linePrice: number, shortName: string, disableInput: boolean) {
+		return (
+			<tr>
+				<td>#{(i + 1)}</td>
+				<td>{text}</td>
+				<td>{units}</td>
+				<td>${Number(individualItemPrice).toFixed(2)}</td>
+				<td>${Number(linePrice).toFixed(2)}</td>
+				{this.props.customPrice ?
+					<td>
+						<input
+							id={String(i + 1)}
+							value={disableInput ? '' : this.state.componentPrice.get(shortName).custom_price}
+							type='text'
+							onChange={(event: any) => {
+								this.setDynStateWithEvent(event,i,shortName);
+							}}
+							placeholder={(i + 1) === 1 ? 'custom price' : ''}
+							className='form-control'
+							disabled={disableInput}
+						/>
+					</td> : null
+				}
+			</tr>
+		);
 	}
-
 	private getResponseFromProductDetails(cp: PricingComponent, productDetails: ProductDetails[]): string {
 		const detail = productDetails.filter((pd: ProductDetails) => pd.pd_id === cp.pd_id);
 		return detail[0].response;
+	}
+
+	private setDynStateWithEvent(event: any, index: number, columnType: string): void {
+		let val: any;
+		if (event.label !== undefined) {
+			val = event.value;
+		} else if((event.target as any) === undefined) {
+			val = event;
+		} else {
+			val = (event.target as any).type === 'checkbox' ? event.target.checked : (event.target as any).value;
+		}
+
+		this.setState({
+			componentPrice: this.onUpdateItem(index, columnType, val)
+		});
+	}
+
+	private onUpdateItem = (i: number, propName: string, value: any) => {
+		let myList = this.state.componentPrice;
+
+		let cp = myList.get(propName);
+		cp.custom_price = value;
+
+		myList.set(propName, cp);
+		return myList;
 	}
 }

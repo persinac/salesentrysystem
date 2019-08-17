@@ -8,15 +8,9 @@ import * as routes from '../../constants/routes';
 import '../../styles/general.css';
 import '../../styles/error.css';
 import {
-	Cabinet,
-	Doors,
-	Drawers,
-	Legs, MeasurementDetails,
-	PriceMatrix,
 	PricingComponent,
 	ProductDetails, Questions,
-	SalesEntryState,
-	Tops
+	SalesEntryState
 } from '../../State';
 import {ProductHeaderComponent} from '../ProductHeaderInfo';
 import {CustomerValidation} from '../../Validation/CustomerValidation';
@@ -29,11 +23,9 @@ import {newSalesEntryContext} from '../../Context/NewSalesEntryContext';
 import {SalesEntryFormComponent} from "../SalesEntryForm";
 import {DrawerValidation} from "../../Validation/DrawerValidation";
 import {DoorsValidation} from "../../Validation/DoorsValidation";
-import {LegsErrorShortNamesMapping} from "../../Enums/InterfaceErrorMapping";
 import {LegsValidation} from "../../Validation/LegsValidation";
 import {RolloutDrawerValidation} from "../../Validation/RolloutDrawerValidation";
 import {SalesEntrySidebarComponent} from "../SalesEntrySidebar";
-import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
 import {PriceBuilder} from "../../Utility/PriceBuilder";
 import {OrderSummaryComponent} from "../OrderSummary";
 import {
@@ -141,7 +133,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		this.onProductDetailsSubmit = this.onProductDetailsSubmit.bind(this);
 		this.constructPrice = this.constructPrice.bind(this);
 		this.constructComponent = this.constructComponent.bind(this);
-		// Mapper.mapProductComponent = Mapper.mapProductComponent.bind(this);
+		this.saveComponentPricing = this.saveComponentPricing.bind(this);
 		this.state = {...NewSalesEntryComponent.INITIAL_STATE};
 	}
 
@@ -161,9 +153,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		await this.getWRFServerData(priceURL).then((d) => {
 			const parsedD = JSON.parse(d);
 			this.setState({prices: parsedD});
-			if (parsedD) {
-				console.log(this.state.prices);
-			}
+			// if (parsedD) {
+			// 	console.log(this.state.prices);
+			// }
 		});
 
 		const catUrl = process.env.REACT_APP_BASE_API_URL + 'category/';
@@ -206,7 +198,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 
 			const myOtherURL = process.env.REACT_APP_BASE_API_URL + 'prices/products';
 			let pd_ids = this.state.productDetails.map((pd: ProductDetails) => { return pd.pd_id});
-			console.log(pd_ids.join(','));
 			await this.getWRFServerDataBody(myOtherURL, {"pd_ids": pd_ids.join(',')}).then((d: PricingComponent[]) => {
 				if(d) {
 					this.setState({priceComponents: d})
@@ -264,7 +255,6 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	public getWRFServerDataBody = (builtURI: string, body: any): Promise<any> => {
 		this.get_options.qs = body;
 		this.get_options.uri = builtURI;
-		console.log(this.get_options);
 		return rp(this.get_options)
 			.then((d: any) => {
 				return d;
@@ -431,14 +421,14 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			return (<SalesEntryFormComponent submitHandler={this.onProductDetailsSubmit} priceConstructor={this.constructPrice} cabinetConstructor={this.constructComponent}/>);
 		} else if (page === PAGE_CUSTOM_PRICE) {
 			return (<OrderSummaryComponent
-				submitHandler={this.onProductDetailsSubmit}
+				submitHandler={this.onPriceComponentSubmit}
 				priceConstructor={this.constructPrice}
 				cabinetConstructor={this.constructComponent}
 				customPrice={true}
 			/>);
 		} else if (page === PAGE_ORDER_SUMMARY) {
 			return (<OrderSummaryComponent
-				submitHandler={this.onProductDetailsSubmit}
+				submitHandler={this.onPriceComponentSubmit}
 				priceConstructor={this.constructPrice}
 				cabinetConstructor={this.constructComponent}
 				customPrice={false}
@@ -530,19 +520,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					console.log('DONE - Error');
 				});
 			// update price component
-			let tempPCs: PricingComponent[] = [];
-			this.state.componentPrice.forEach((pc: PricingComponent, key: string) => {
-				tempPCs.push(pc);
-			});
-			this.postWRFServerData(Array.from(tempPCs), 'prices/products', false)
-				.then((newPCs: any) => {
-					const updatedPCs: PricingComponent[] = newPCs.price_components;
-					this.setState({priceComponents: updatedPCs});
-				})
-				.catch((e) => {
-					console.log(e);
-					console.log('DONE - Error');
-				});
+			this.onPriceComponentSubmit(event);
 		}
 
 		/***
@@ -590,7 +568,24 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		});
 
 		event.preventDefault();
-	}
+	};
+
+	public onPriceComponentSubmit = (event: any) => {
+		// update price component
+		let tempPCs: PricingComponent[] = [];
+		this.state.componentPrice.forEach((pc: PricingComponent, key: string) => {
+			tempPCs.push(pc);
+		});
+		this.postWRFServerData(Array.from(tempPCs), 'prices/products', false)
+			.then((newPCs: any) => {
+				const updatedPCs: PricingComponent[] = newPCs.price_components;
+				this.setState({priceComponents: updatedPCs});
+			})
+			.catch((e) => {
+				console.log(e);
+				console.log('DONE - Error');
+			});
+	};
 
 	public onCustomerSubmit = (event: any) => {
 		const {productHeader, customer} = this.state;
@@ -730,6 +725,15 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 
 		this.setState({cabinet: cm, door: dm, drawers: dwr, rollout_drawers: ro_dwr, tops: top, legs: legs});
 	}
+
+	private saveComponentPricing(event: any, newPrice: number, shortName: string) {
+		console.log(newPrice);
+		console.log(shortName);
+
+		this.state.componentPrice.get(shortName).custom_price = newPrice;
+		console.log(this.state.componentPrice.get(shortName));
+		this.setState({componentPrice: this.state.componentPrice});
+	};
 
 	// value corresponds to dropdown values.. which is the only reason we need value
 	private constructPrice(value: any, propName: string, productDetail: ProductDetails) {

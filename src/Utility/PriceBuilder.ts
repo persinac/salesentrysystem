@@ -376,16 +376,20 @@ export class PriceBuilder {
 
 		let price: number = 0.00;
 		// calculate
-		if(response === 'cab_length_option') {
-			myNewValue = prices.filter((p: PriceMatrix) => p.short_name === 'cab_length_option')[0];
-			if (measurement.length !== undefined && measurement.width !== undefined) {
-				const temp_w: number = Number(measurement.width);
-				const temp_l: number = Number(measurement.length);
-
-				price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
-			}
+		if (priceComponent.custom_price) {
+			price = priceComponent.custom_price;
 		} else {
-			price = priceComponent.actual_price
+			if (response === 'cab_length_option') {
+				myNewValue = prices.filter((p: PriceMatrix) => p.short_name === 'cab_length_option')[0];
+				if (measurement.length !== undefined && measurement.width !== undefined) {
+					const temp_w: number = Number(measurement.width);
+					const temp_l: number = Number(measurement.length);
+
+					price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+				}
+			} else {
+				price = priceComponent.actual_price
+			}
 		}
 
 		return price;

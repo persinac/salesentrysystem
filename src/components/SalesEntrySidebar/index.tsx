@@ -1,11 +1,9 @@
 import React from 'react';
 import '../../styles/general.css';
 import {
-	PricingComponent,
-	Roles, SalesEntryState,
+	PricingComponent, SalesEntryState,
 } from '../../State';
 import {Card} from "react-bootstrap";
-import {ShortNamePrefix} from "../../Enums/ShortNamePrefix";
 import {SidebarKeyList} from "../../constants/SidebarMapping";
 
 /***
@@ -52,7 +50,7 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 			SidebarKeyList.forEach((k) => {
 				if(this.props.context.componentPrice.has(k.value)) {
 					priceComponent = this.props.context.componentPrice.get(k.value);
-					if(priceComponent.custom_price > priceComponent.actual_price) {
+					if(Number(priceComponent.custom_price) > priceComponent.actual_price) {
 						subtotal += priceComponent.custom_price;
 					} else {
 						subtotal += priceComponent.actual_price;
@@ -78,10 +76,10 @@ export class SalesEntrySidebarComponent extends React.Component<IProps, IState> 
 			something = SidebarKeyList.map((k) => {
 				if(this.props.context.componentPrice.has(k.value)) {
 					priceComponent = this.props.context.componentPrice.get(k.value);
-					let priceToUse: number = 0.00
-					if(priceComponent.custom_price > priceComponent.actual_price) {
-						priceToUse = priceComponent.custom_price;
-						subtotal += priceComponent.custom_price;
+					let priceToUse: number = 0.00;
+					if(Number(priceComponent.custom_price) > priceComponent.actual_price) {
+						priceToUse = Number(priceComponent.custom_price);
+						subtotal += Number(priceComponent.custom_price);
 					} else {
 						priceToUse = priceComponent.actual_price;
 						subtotal += priceComponent.actual_price;
