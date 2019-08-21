@@ -74,6 +74,7 @@ export class SalesEntryForm extends React.Component<InterfaceProps, IState> {
 		}
 		// TODO: Clean this mess up. Not ideal.
 		if (currCategory[0].category_id === 4 || currCategory[0].category_id === 2) {
+			console.log(this.props.context.questions);
 			const cabQuantityQID = this.props.context.questions.filter((q: any) => {
 				return q['short_name'] === 'cab_quantity';
 			});

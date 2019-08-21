@@ -159,27 +159,29 @@ export class PriceBuilder {
 					pc = componentPrice.get(priceKey);
 				}
 
-				if(topSizeDetail.response.includes('multi') || topSizeDetail.response.includes('custom')) {
-					if (Number(state.tops.quantity) > 0) {
-						pc.id = pc.id || null;
-						pc.pd_id = pc.pd_id || productDetail.pd_id;
-						let price: number = 0.00;
+				if(topSizeDetail.response !== undefined) {
+					if (topSizeDetail.response.includes('multi') || topSizeDetail.response.includes('custom')) {
+						if (Number(state.tops.quantity) > 0) {
+							pc.id = pc.id || null;
+							pc.pd_id = pc.pd_id || productDetail.pd_id;
+							let price: number = 0.00;
 
-						state.tops.measurement.forEach((m: MeasurementDetails, idx: number) => {
-							if((idx+1) <= Number(state.tops.quantity)) {
-								if (m.length !== undefined && m.width !== undefined) {
-									const temp_w: number = Number(m.width);
-									const temp_l: number = Number(m.length);
+							state.tops.measurement.forEach((m: MeasurementDetails, idx: number) => {
+								if ((idx + 1) <= Number(state.tops.quantity)) {
+									if (m.length !== undefined && m.width !== undefined) {
+										const temp_w: number = Number(m.width);
+										const temp_l: number = Number(m.length);
 
-									price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+										price += ((temp_l * myNewValue.sell_price) + (temp_w * myNewValue.sell_price));
+									}
 								}
-							}
-						});
-						pc.actual_price = price;
-						pc.custom_price = price;
+							});
+							pc.actual_price = price;
+							pc.custom_price = price;
+						}
+					} else {
+						pc = this.buildGenericPrice(prices, topSizeDetail.response, componentPrice, priceKey, productDetail);
 					}
-				} else {
-					pc = this.buildGenericPrice(prices, topSizeDetail.response, componentPrice, priceKey, productDetail);
 				}
 
 				break;

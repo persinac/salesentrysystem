@@ -166,11 +166,11 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				}
 			}
 		);
-
+		console.log('1');
 		let salesEntryId: number = null;
 		if (isExistingEntry) {
 			salesEntryId = Number.parseInt(window.location.search.slice(1));
-
+			console.log('2');
 			const myURL = process.env.REACT_APP_BASE_API_URL + 'product/relationship/all/' + salesEntryId;
 			await this.getWRFServerData(myURL).then((d) => {
 					const parsedD = JSON.parse(d);
@@ -195,20 +195,26 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 					}
 				}
 			);
-
+			console.log('3');
 			const myOtherURL = process.env.REACT_APP_BASE_API_URL + 'prices/products';
 			let pd_ids = this.state.productDetails.map((pd: ProductDetails) => { return pd.pd_id});
-			await this.getWRFServerDataBody(myOtherURL, {"pd_ids": pd_ids.join(',')}).then((d: PricingComponent[]) => {
-				if(d) {
-					this.setState({priceComponents: d})
-				}
-			});
+			console.log(pd_ids);
+			if(pd_ids.length > 0) {
+				await this.getWRFServerDataBody(myOtherURL, {"pd_ids": pd_ids.join(',')}).then((d: PricingComponent[]) => {
+					if (d) {
+						this.setState({priceComponents: d})
+					}
+				});
+			}
+			console.log('4');
 		}
 
+		console.log('Pre Question');
 		const questionUrl = process.env.REACT_APP_BASE_API_URL + 'question';
 		await this.getWRFServerData(questionUrl).then((d) => {
 			const parsedD = JSON.parse(d);
 			this.setState({questions: parsedD});
+			console.log(this.state.questions);
 			if (parsedD) {
 				const pds: ProductDetails[] = [];
 				parsedD.forEach((e: any) => {
@@ -769,11 +775,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 	}
 
 	private saveComponentPricing(event: any, newPrice: number, shortName: string) {
-		console.log(newPrice);
-		console.log(shortName);
-
 		this.state.componentPrice.get(shortName).custom_price = newPrice;
-		console.log(this.state.componentPrice.get(shortName));
 		this.setState({componentPrice: this.state.componentPrice});
 	};
 
@@ -786,9 +788,12 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 			value, propName, priceKey, productDetail, this.state.prices, this.state.componentPrice, this.state
 		);
 
-		let existingComponent = this.state.priceComponents.filter((pc: PricingComponent) => pc.pd_id === productDetail.pd_id);
+		let existingComponent;
+		if(this.state.priceComponents) {
+			existingComponent = this.state.priceComponents.filter((pc: PricingComponent) => pc.pd_id === productDetail.pd_id);
+		}
 
-		if(existingComponent.length > 0) {
+		if(existingComponent !== undefined && existingComponent.length > 0) {
 			currPriceComponent = existingComponent[0];
 		}
 

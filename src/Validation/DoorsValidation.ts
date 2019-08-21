@@ -23,7 +23,7 @@ export class DoorsValidation extends Validation {
 		this.door_measurements = dr.measurement;
 		this.num_of_doors = Number(dr.quantity);
 		this.errors = [];
-		this.list_of_door_nums = Array.from(Array(this.num_of_doors).keys());
+		this.list_of_door_nums = []; //this.num_of_doors ? [] : Array.from(Array(this.num_of_doors).keys());
 		this.createListOfErrors();
 	}
 
@@ -76,6 +76,8 @@ export class DoorsValidation extends Validation {
 			this.errors[0].e_quantity = 'Door quantity must be greater than 2';
 		} else if (Number(quantity) > 8) {
 			this.errors[0].e_quantity = 'Door quantity must be less than 8';
+		} else {
+			this.list_of_door_nums = Array.from(Array(quantity).keys());
 		}
 	}
 
@@ -95,15 +97,6 @@ export class DoorsValidation extends Validation {
 				}
 			}
 		});
-
-		// const arrSum: number = length_arr.reduce((a,b) => a + b, 0);
-		// if (arrSum > (top_length - 2)) {
-		// 	this.list_of_door_nums.forEach((i) => {
-		// 		if (this.errors[i].e_length.length === 0) {
-		// 			this.errors[i].e_length = 'Total cabinet length must be less than top length by 2in';
-		// 		}
-		// 	});
-		// }
 	}
 
 	/***
