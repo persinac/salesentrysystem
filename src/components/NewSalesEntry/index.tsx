@@ -269,6 +269,7 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		this.post_options.body = body;
 		this.post_options.uri = process.env.REACT_APP_BASE_API_URL + endpoint;
 		this.post_options.method = put ? 'PUT' : 'POST';
+		console.log(this.post_options);
 		return rp(this.post_options)
 			.then((parsedBody: any) => {
 				return parsedBody;
@@ -521,6 +522,9 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 				});
 			// update price component
 			this.onPriceComponentSubmit(event);
+
+			//also update product header updated on / by / status
+			this.onProductHeaderSubmit(event, true, submit);
 		}
 
 		/***
@@ -633,7 +637,45 @@ class NewSalesEntryComponent extends React.Component<IProps, SalesEntryState> {
 		this.setState({customerErrors: {...cv.getErrors()}, productHeaderErrors: {...phv.getErrors()}});
 
 		event.preventDefault();
-	}
+	};
+
+
+	public onProductHeaderSubmit = (event: any, shouldPut: boolean, didSubmit: boolean) => {
+		const {productHeader} = this.state;
+		const isNewProduct = !productHeader.ph_id;
+
+		productHeader.updated_by = this.props.email;
+		productHeader.updated_on = new Date();
+		productHeader.status = didSubmit ?  'Submitted' : 'Updated';
+
+		const phv: ProductHeaderValidation = new ProductHeaderValidation(productHeader);
+		const phv_validate = phv.validate();
+
+		console.log('Product header ID: ' + productHeader.ph_id);
+		if (phv_validate && productHeader.ph_id) {
+			this.postWRFServerData({...productHeader}, 'product/'+productHeader.ph_id, shouldPut)
+				.then((productStuff: any) => {
+					const ph_id = productStuff.newProduct.ph_id;
+					const pds: ProductDetails[] = this.state.productDetails;
+					if (isNewProduct) {
+						pds.map((e: ProductDetails) => {
+							e.ph_fk = ph_id;
+						});
+					}
+					this.setState({
+						productHeader: {...productHeader}}
+					);
+				})
+				.catch((e) => {
+					console.log(e);
+					console.log('DONE - Error');
+				});
+		}
+
+		this.setState({productHeaderErrors: {...phv.getErrors()}});
+
+		event.preventDefault();
+	};
 
 	private static propKey(propertyName: string, value: any): object {
 		return {[propertyName]: value};
