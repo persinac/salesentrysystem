@@ -1,10 +1,7 @@
-import {faLongArrowAltDown, faLongArrowAltUp} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React from "react";
 import {ProductHeader} from "../../State";
 import * as ROUTES from "../../constants/routes";
 import {Link} from "react-router-dom";
-
 
 interface InterfaceProps {
 	productHeader?: ProductHeader[];

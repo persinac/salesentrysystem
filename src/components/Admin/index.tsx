@@ -1,12 +1,9 @@
 import React from 'react';
 import {db} from '../../Firebase';
 import {withAuthorization} from '../../Firebase/withAuthorization';
-import {Admin} from './Admin';
 import * as ROLES from '../../constants/roles';
 import * as routes from '../../constants/routes';
 import AdminSideNav from "../Navigation/AdminSideNav";
-import {listOfProductOrdersPage} from "../ListOfProductOrders";
-import {Component} from "react";
 import {ListOfProductOrders} from "../ListOfProductOrders/ListOfProductOrders";
 import {ProductHeader} from "../../State";
 
@@ -31,7 +28,7 @@ class AdminComponent extends React.Component<{}, IState> {
 	}
 
 	public componentDidMount() {
-		db.getUsers().then(snapshot =>
+		db.getUsers().then((snapshot: any) =>
 			this.setState(() => ({users: snapshot.val()}))
 		);
 

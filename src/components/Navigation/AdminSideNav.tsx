@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import * as ROUTES from '../../constants/routes';
 import Nav from "react-bootstrap/Nav";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faDungeon} from '@fortawesome/free-solid-svg-icons';
+import {faDungeon} from "@fortawesome/free-solid-svg-icons";
 import {faSuperpowers} from "@fortawesome/free-brands-svg-icons";
 
 export default class AdminSideNav extends React.Component {
